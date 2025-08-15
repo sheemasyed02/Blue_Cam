@@ -3,6 +3,7 @@ import Webcam from 'react-webcam';
 import { motion } from 'framer-motion';
 import { cn } from '../utils';
 import { Navigation } from '../components';
+import { downloadImage } from '../utils/imageUtils';
 
 interface CameraPageProps {
   className?: string;
@@ -39,6 +40,13 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   const retakePhoto = useCallback(() => {
     setCapturedImage(null);
   }, []);
+
+  const savePhoto = useCallback(() => {
+    if (capturedImage) {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      downloadImage(capturedImage, `blue-vintage-camera-${timestamp}.jpg`);
+    }
+  }, [capturedImage]);
 
   return (
     <div className={cn(
@@ -82,6 +90,22 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       className="w-full h-auto"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                    
+                    {/* Quick Save Button Overlay */}
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={savePhoto}
+                      className="absolute top-4 right-4 p-3 bg-gold/90 text-cream rounded-full 
+                               hover:bg-gold transition-all backdrop-blur-sm shadow-lg
+                               hover:shadow-xl"
+                      aria-label="Save photo"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </motion.button>
                   </div>
                 ) : (
                   // Live Webcam Preview
@@ -131,17 +155,30 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                 {/* Action Buttons */}
                 <div className="space-y-3">
                   {capturedImage ? (
-                    // Retake Button
-                    <motion.button
-                      whileHover={{ scale: 1.02, backgroundColor: '#e4c3a1' }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={retakePhoto}
-                      className="w-full py-4 px-6 bg-gold text-cream rounded-xl font-body font-medium
-                               transition-all duration-200 shadow-lg hover:shadow-xl
-                               text-lg md:text-xl"
-                    >
-                      📷 Retake Photo
-                    </motion.button>
+                    <>
+                      {/* Save Photo Button */}
+                      <motion.button
+                        whileHover={{ scale: 1.02, backgroundColor: '#e4c3a1' }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={savePhoto}
+                        className="w-full py-4 px-6 bg-gold text-cream rounded-xl font-body font-medium
+                                 transition-all duration-200 shadow-lg hover:shadow-xl
+                                 text-lg md:text-xl"
+                      >
+                        � Save Photo
+                      </motion.button>
+                      
+                      {/* Retake Button */}
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={retakePhoto}
+                        className="w-full py-3 px-6 bg-charcoal text-cream rounded-xl font-body font-medium
+                                 transition-all duration-200 hover:bg-charcoal/80 shadow-md"
+                      >
+                        �📷 Retake Photo
+                      </motion.button>
+                    </>
                   ) : (
                     // Capture Button
                     <motion.button
@@ -196,10 +233,20 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       <span>Try different angles for creative shots</span>
                     </li>
                     {capturedImage && (
-                      <li className="flex items-start gap-2">
-                        <span className="text-gold mt-0.5">•</span>
-                        <span>Apply vintage filters to enhance your photo</span>
-                      </li>
+                      <>
+                        <li className="flex items-start gap-2">
+                          <span className="text-gold mt-0.5">•</span>
+                          <span>Click 'Save Photo' to download to your device</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-gold mt-0.5">•</span>
+                          <span>Use the gold save button for quick download</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-gold mt-0.5">•</span>
+                          <span>Apply vintage filters to enhance your photo</span>
+                        </li>
+                      </>
                     )}
                   </ul>
                 </div>
