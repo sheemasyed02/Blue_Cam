@@ -113,13 +113,38 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
   ];
 
   const presets = [
-    { name: 'Vintage', filter: 'sepia(80%) brightness(110%) contrast(120%)' },
-    { name: 'Blue Tone', filter: 'hue-rotate(200deg) saturate(120%)' },
+    { name: 'Vintage', filter: 'sepia(80%) brightness(110%) contrast(110%)' },
+    { name: 'Blue Tone', filter: 'hue-rotate(150deg) saturate(100%)' },
     { name: 'Warm', filter: 'sepia(30%) saturate(120%) brightness(110%)' },
-    { name: 'Cool', filter: 'hue-rotate(180deg) saturate(110%)' },
+    { name: 'Cool', filter: 'hue-rotate(150deg) saturate(110%)' },
     { name: 'Black & White', filter: 'grayscale(100%) contrast(110%)' },
     { name: 'High Contrast', filter: 'contrast(150%) saturate(130%)' }
   ];
+
+  const handleChangeImage = useCallback(() => {
+    // Trigger the file input directly
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const imageUrl = event.target?.result as string;
+          // Replace the old image with the new one
+          setSelectedImage(imageUrl);
+          setProcessedImage(imageUrl);
+          // Reset adjustments
+          setBrightness(100);
+          setContrast(100);
+          setSaturation(100);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    fileInput.click();
+  }, []);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -184,6 +209,20 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
         return (
           <div className="space-y-3">
             <h3 className="font-title font-semibold text-charcoal text-lg mb-4">Filter Presets</h3>
+            
+            {/* Change Image Button */}
+            {selectedImage && (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleChangeImage}
+                className="w-full py-3 bg-peach/30 border-2 border-gold text-charcoal rounded-lg 
+                         font-body font-medium hover:bg-peach/50 transition-all shadow-sm"
+              >
+                🔄 Change Image
+              </motion.button>
+            )}
+            
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {presets.map((preset) => (
                 <motion.button
@@ -329,6 +368,17 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
               >
                 📥 Download Edited Photo
               </motion.button>
+
+              {/* Change Image Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleChangeImage}
+                className="w-full py-3 bg-charcoal text-cream rounded-lg font-body font-medium
+                         hover:bg-charcoal/80 transition-all shadow-md hover:shadow-lg"
+              >
+                🔄 Select Different Image
+              </motion.button>
             </div>
           </div>
         );
@@ -417,6 +467,18 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
                       className="w-full h-full object-cover"
                     />
                   )}
+                  
+                  {/* Change Image Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleChangeImage}
+                    className="absolute top-4 right-4 px-3 py-2 bg-charcoal/80 text-cream 
+                             rounded-lg hover:bg-charcoal transition-all backdrop-blur-sm
+                             font-body text-sm shadow-lg hover:shadow-xl"
+                  >
+                    🔄 Change Image
+                  </motion.button>
                 </div>
               ) : (
                 <div 
