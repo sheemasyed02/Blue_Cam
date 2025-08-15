@@ -29,6 +29,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   
   // Active editing control state
   const [activeControl, setActiveControl] = useState<string | null>(null);
+  
+  // Settings panel state
+  const [showSettings, setShowSettings] = useState(false);
 
   // Update time every second
   useEffect(() => {
@@ -172,7 +175,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
             className="mb-8"
-            style={{ height: '80vh' }}
+            style={{ height: '78vh' }}
           >
             {/* Camera Container */}
             <div className="relative w-full h-full max-w-6xl mx-auto">
@@ -384,6 +387,243 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                                     d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                             </svg>
                           </motion.button>
+
+                          {/* Settings Button */}
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setShowSettings(!showSettings)}
+                            className={`absolute bottom-6 right-6 p-3 backdrop-blur-sm border rounded-xl transition-all ${
+                              showSettings 
+                                ? 'bg-gold/90 text-cream border-gold/50 shadow-lg' 
+                                : 'bg-vintage-800/80 text-cream border-vintage-600/50'
+                            }`}
+                          >
+                            <motion.svg 
+                              className="w-5 h-5" 
+                              fill="none" 
+                              stroke="currentColor" 
+                              viewBox="0 0 24 24"
+                              animate={{ rotate: showSettings ? 180 : 0 }}
+                              transition={{ duration: 0.3 }}
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </motion.svg>
+                          </motion.button>
+
+                          {/* Settings Panel */}
+                          <AnimatePresence>
+                            {showSettings && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                                transition={{ duration: 0.3, ease: "easeOut" }}
+                                className="absolute bottom-20 right-6 bg-gradient-to-br from-vintage-100/95 to-vintage-200/95 backdrop-blur-lg rounded-2xl p-4 border border-vintage-300/50 shadow-2xl z-20"
+                                style={{ width: '280px' }}
+                              >
+                                <h3 className="text-charcoal font-title text-lg mb-4 flex items-center justify-between">
+                                  <span>Camera Settings</span>
+                                  <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => setShowSettings(false)}
+                                    className="p-1 text-vintage-600 hover:text-charcoal"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </motion.button>
+                                </h3>
+                                
+                                {/* Settings Grid */}
+                                <div className="grid grid-cols-4 gap-2 mb-4">
+                                  {/* Brightness */}
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setActiveControl(activeControl === 'brightness' ? null : 'brightness')}
+                                    className={`p-3 rounded-xl transition-all flex flex-col items-center space-y-1 ${
+                                      activeControl === 'brightness' 
+                                        ? 'bg-gold text-cream shadow-md' 
+                                        : brightness !== 100 
+                                          ? 'bg-copper/80 text-cream'
+                                          : 'bg-vintage-300 text-charcoal hover:bg-vintage-400'
+                                    }`}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                    <span className="text-xs">Bright</span>
+                                  </motion.button>
+
+                                  {/* Contrast */}
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setActiveControl(activeControl === 'contrast' ? null : 'contrast')}
+                                    className={`p-3 rounded-xl transition-all flex flex-col items-center space-y-1 ${
+                                      activeControl === 'contrast' 
+                                        ? 'bg-gold text-cream shadow-md' 
+                                        : contrast !== 100 
+                                          ? 'bg-copper/80 text-cream'
+                                          : 'bg-vintage-300 text-charcoal hover:bg-vintage-400'
+                                    }`}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span className="text-xs">Contrast</span>
+                                  </motion.button>
+
+                                  {/* Saturation */}
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setActiveControl(activeControl === 'saturation' ? null : 'saturation')}
+                                    className={`p-3 rounded-xl transition-all flex flex-col items-center space-y-1 ${
+                                      activeControl === 'saturation' 
+                                        ? 'bg-gold text-cream shadow-md' 
+                                        : saturation !== 100 
+                                          ? 'bg-copper/80 text-cream'
+                                          : 'bg-vintage-300 text-charcoal hover:bg-vintage-400'
+                                    }`}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 3H5v10h2V3zM17 21a4 4 0 004-4V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4zM17 3h2v10h-2V3z" />
+                                    </svg>
+                                    <span className="text-xs">Saturation</span>
+                                  </motion.button>
+
+                                  {/* Temperature */}
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setActiveControl(activeControl === 'temperature' ? null : 'temperature')}
+                                    className={`p-3 rounded-xl transition-all flex flex-col items-center space-y-1 ${
+                                      activeControl === 'temperature' 
+                                        ? 'bg-gold text-cream shadow-md' 
+                                        : temperature !== 0 
+                                          ? 'bg-copper/80 text-cream'
+                                          : 'bg-vintage-300 text-charcoal hover:bg-vintage-400'
+                                    }`}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                    <span className="text-xs">Temp</span>
+                                  </motion.button>
+
+                                  {/* Grain */}
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setActiveControl(activeControl === 'grain' ? null : 'grain')}
+                                    className={`p-3 rounded-xl transition-all flex flex-col items-center space-y-1 ${
+                                      activeControl === 'grain' 
+                                        ? 'bg-gold text-cream shadow-md' 
+                                        : grain !== 0 
+                                          ? 'bg-copper/80 text-cream'
+                                          : 'bg-vintage-300 text-charcoal hover:bg-vintage-400'
+                                    }`}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                            d="M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2V3a2 2 0 00-2-2H5zM5 7h14v10a11 11 0 01-11-11V7z" />
+                                    </svg>
+                                    <span className="text-xs">Grain</span>
+                                  </motion.button>
+
+                                  {/* Fade */}
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setActiveControl(activeControl === 'fade' ? null : 'fade')}
+                                    className={`p-3 rounded-xl transition-all flex flex-col items-center space-y-1 ${
+                                      activeControl === 'fade' 
+                                        ? 'bg-gold text-cream shadow-md' 
+                                        : fade !== 0 
+                                          ? 'bg-copper/80 text-cream'
+                                          : 'bg-vintage-300 text-charcoal hover:bg-vintage-400'
+                                    }`}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                    <span className="text-xs">Fade</span>
+                                  </motion.button>
+
+                                  {/* Vignette */}
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setActiveControl(activeControl === 'vignette' ? null : 'vignette')}
+                                    className={`p-3 rounded-xl transition-all flex flex-col items-center space-y-1 ${
+                                      activeControl === 'vignette' 
+                                        ? 'bg-gold text-cream shadow-md' 
+                                        : vignette !== 0 
+                                          ? 'bg-copper/80 text-cream'
+                                          : 'bg-vintage-300 text-charcoal hover:bg-vintage-400'
+                                    }`}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                            d="M9 12l2 2 4-4" />
+                                    </svg>
+                                    <span className="text-xs">Vignette</span>
+                                  </motion.button>
+
+                                  {/* Reset Button */}
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => {
+                                      setBrightness(100);
+                                      setContrast(100);
+                                      setSaturation(100);
+                                      setGrain(0);
+                                      setTemperature(0);
+                                      setFade(0);
+                                      setVignette(0);
+                                      setActiveControl(null);
+                                    }}
+                                    className="p-3 rounded-xl bg-vintage-400 text-charcoal hover:bg-vintage-500 transition-all flex flex-col items-center space-y-1"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    <span className="text-xs">Reset</span>
+                                  </motion.button>
+                                </div>
+
+                                {/* Current Values Display */}
+                                <div className="text-xs text-vintage-600 space-y-1">
+                                  <div className="flex justify-between">
+                                    <span>Brightness:</span><span>{brightness}%</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Contrast:</span><span>{contrast}%</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Saturation:</span><span>{saturation}%</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>Temperature:</span><span>{temperature > 0 ? '+' : ''}{temperature}</span>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                         
                         {/* Capture Flash */}
@@ -406,11 +646,393 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             </div>
           </motion.div>
 
-          {/* Camera Controls Panel Below Camera */}
-         
-     
-            
-          {/* Capture Button Section */}
+          {/* Enhanced Slider Control (appears when control is selected) */}
+          <AnimatePresence>
+            {activeControl && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+                className="fixed bottom-32 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-vintage-100/95 to-vintage-200/95 backdrop-blur-lg rounded-2xl p-6 border border-vintage-300/50 shadow-2xl z-30 min-w-80"
+              >
+                {/* Brightness Control */}
+                {activeControl === 'brightness' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span>Brightness</span>
+                      </h3>
+                      <span className="text-2xl font-mono text-charcoal font-bold">{brightness}%</span>
+                    </div>
+                    
+                    <div className="relative">
+                      <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-gold/80 to-gold rounded-full shadow-sm"
+                          style={{ width: `${((brightness - 50) / (200 - 50)) * 100}%` }}
+                          animate={{ width: `${((brightness - 50) / (200 - 50)) * 100}%` }}
+                          transition={{ duration: 0.2 }}
+                        />
+                      </div>
+                      
+                      <input
+                        type="range"
+                        min="50"
+                        max="200"
+                        step="1"
+                        value={brightness}
+                        onChange={(e) => setBrightness(Number(e.target.value))}
+                        className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
+                      />
+                      
+                      <motion.div
+                        className="absolute top-1/2 w-6 h-6 bg-gold border-3 border-cream rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
+                        style={{ left: `${((brightness - 50) / (200 - 50)) * 100}%` }}
+                        animate={{ left: `${((brightness - 50) / (200 - 50)) * 100}%` }}
+                        transition={{ duration: 0.2 }}
+                        whileHover={{ scale: 1.2 }}
+                      >
+                        <div className="absolute inset-1 bg-cream rounded-full"></div>
+                      </motion.div>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm text-vintage-600">
+                      <span>Dark</span>
+                      <span>Normal</span>
+                      <span>Bright</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Contrast Control */}
+                {activeControl === 'contrast' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span>Contrast</span>
+                      </h3>
+                      <span className="text-2xl font-mono text-charcoal font-bold">{contrast}%</span>
+                    </div>
+                    
+                    <div className="relative">
+                      <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-copper/80 to-copper rounded-full shadow-sm"
+                          style={{ width: `${((contrast - 50) / (200 - 50)) * 100}%` }}
+                          animate={{ width: `${((contrast - 50) / (200 - 50)) * 100}%` }}
+                          transition={{ duration: 0.2 }}
+                        />
+                      </div>
+                      
+                      <input
+                        type="range"
+                        min="50"
+                        max="200"
+                        step="1"
+                        value={contrast}
+                        onChange={(e) => setContrast(Number(e.target.value))}
+                        className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
+                      />
+                      
+                      <motion.div
+                        className="absolute top-1/2 w-6 h-6 bg-copper border-3 border-cream rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
+                        style={{ left: `${((contrast - 50) / (200 - 50)) * 100}%` }}
+                        animate={{ left: `${((contrast - 50) / (200 - 50)) * 100}%` }}
+                        transition={{ duration: 0.2 }}
+                        whileHover={{ scale: 1.2 }}
+                      >
+                        <div className="absolute inset-1 bg-cream rounded-full"></div>
+                      </motion.div>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm text-vintage-600">
+                      <span>Flat</span>
+                      <span>Normal</span>
+                      <span>High</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Saturation Control */}
+                {activeControl === 'saturation' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 3H5v10h2V3zM17 21a4 4 0 004-4V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4zM17 3h2v10h-2V3z" />
+                        </svg>
+                        <span>Saturation</span>
+                      </h3>
+                      <span className="text-2xl font-mono text-charcoal font-bold">{saturation}%</span>
+                    </div>
+                    
+                    <div className="relative">
+                      <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-sepia/80 to-sepia rounded-full shadow-sm"
+                          style={{ width: `${(saturation / 200) * 100}%` }}
+                          animate={{ width: `${(saturation / 200) * 100}%` }}
+                          transition={{ duration: 0.2 }}
+                        />
+                      </div>
+                      
+                      <input
+                        type="range"
+                        min="0"
+                        max="200"
+                        step="1"
+                        value={saturation}
+                        onChange={(e) => setSaturation(Number(e.target.value))}
+                        className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
+                      />
+                      
+                      <motion.div
+                        className="absolute top-1/2 w-6 h-6 bg-sepia border-3 border-cream rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
+                        style={{ left: `${(saturation / 200) * 100}%` }}
+                        animate={{ left: `${(saturation / 200) * 100}%` }}
+                        transition={{ duration: 0.2 }}
+                        whileHover={{ scale: 1.2 }}
+                      >
+                        <div className="absolute inset-1 bg-cream rounded-full"></div>
+                      </motion.div>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm text-vintage-600">
+                      <span>B&W</span>
+                      <span>Normal</span>
+                      <span>Vivid</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Temperature Control */}
+                {activeControl === 'temperature' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        <span>Temperature</span>
+                      </h3>
+                      <span className="text-2xl font-mono text-charcoal font-bold">
+                        {temperature > 0 ? '+' : ''}{temperature}
+                      </span>
+                    </div>
+                    
+                    <div className="relative">
+                      <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-blue-400/80 via-vintage-400 to-orange-400/80 rounded-full shadow-sm"
+                          style={{ width: `${((temperature + 100) / 200) * 100}%` }}
+                          animate={{ width: `${((temperature + 100) / 200) * 100}%` }}
+                          transition={{ duration: 0.2 }}
+                        />
+                      </div>
+                      
+                      <input
+                        type="range"
+                        min="-100"
+                        max="100"
+                        step="1"
+                        value={temperature}
+                        onChange={(e) => setTemperature(Number(e.target.value))}
+                        className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
+                      />
+                      
+                      <motion.div
+                        className="absolute top-1/2 w-6 h-6 bg-bronze border-3 border-cream rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
+                        style={{ left: `${((temperature + 100) / 200) * 100}%` }}
+                        animate={{ left: `${((temperature + 100) / 200) * 100}%` }}
+                        transition={{ duration: 0.2 }}
+                        whileHover={{ scale: 1.2 }}
+                      >
+                        <div className="absolute inset-1 bg-cream rounded-full"></div>
+                      </motion.div>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm text-vintage-600">
+                      <span>Cool</span>
+                      <span>Neutral</span>
+                      <span>Warm</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Grain Control */}
+                {activeControl === 'grain' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2V3a2 2 0 00-2-2H5zM5 7h14v10a11 11 0 01-11-11V7z" />
+                        </svg>
+                        <span>Film Grain</span>
+                      </h3>
+                      <span className="text-2xl font-mono text-charcoal font-bold">{grain}%</span>
+                    </div>
+                    
+                    <div className="relative">
+                      <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-vintage-600/80 to-vintage-800 rounded-full shadow-sm"
+                          style={{ width: `${grain}%` }}
+                          animate={{ width: `${grain}%` }}
+                          transition={{ duration: 0.2 }}
+                        />
+                      </div>
+                      
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={grain}
+                        onChange={(e) => setGrain(Number(e.target.value))}
+                        className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
+                      />
+                      
+                      <motion.div
+                        className="absolute top-1/2 w-6 h-6 bg-vintage-700 border-3 border-cream rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
+                        style={{ left: `${grain}%` }}
+                        animate={{ left: `${grain}%` }}
+                        transition={{ duration: 0.2 }}
+                        whileHover={{ scale: 1.2 }}
+                      >
+                        <div className="absolute inset-1 bg-cream rounded-full"></div>
+                      </motion.div>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm text-vintage-600">
+                      <span>Clean</span>
+                      <span>Subtle</span>
+                      <span>Heavy</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Fade Control */}
+                {activeControl === 'fade' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span>Fade</span>
+                      </h3>
+                      <span className="text-2xl font-mono text-charcoal font-bold">{fade}%</span>
+                    </div>
+                    
+                    <div className="relative">
+                      <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-cream/80 to-cream rounded-full shadow-sm"
+                          style={{ width: `${fade}%` }}
+                          animate={{ width: `${fade}%` }}
+                          transition={{ duration: 0.2 }}
+                        />
+                      </div>
+                      
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={fade}
+                        onChange={(e) => setFade(Number(e.target.value))}
+                        className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
+                      />
+                      
+                      <motion.div
+                        className="absolute top-1/2 w-6 h-6 bg-cream border-3 border-charcoal rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
+                        style={{ left: `${fade}%` }}
+                        animate={{ left: `${fade}%` }}
+                        transition={{ duration: 0.2 }}
+                        whileHover={{ scale: 1.2 }}
+                      >
+                        <div className="absolute inset-1 bg-charcoal rounded-full"></div>
+                      </motion.div>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm text-vintage-600">
+                      <span>Sharp</span>
+                      <span>Dreamy</span>
+                      <span>Faded</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Vignette Control */}
+                {activeControl === 'vignette' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M9 12l2 2 4-4" />
+                        </svg>
+                        <span>Vignette</span>
+                      </h3>
+                      <span className="text-2xl font-mono text-charcoal font-bold">{vignette}%</span>
+                    </div>
+                    
+                    <div className="relative">
+                      <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-charcoal/80 to-charcoal rounded-full shadow-sm"
+                          style={{ width: `${vignette}%` }}
+                          animate={{ width: `${vignette}%` }}
+                          transition={{ duration: 0.2 }}
+                        />
+                      </div>
+                      
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={vignette}
+                        onChange={(e) => setVignette(Number(e.target.value))}
+                        className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
+                      />
+                      
+                      <motion.div
+                        className="absolute top-1/2 w-6 h-6 bg-charcoal border-3 border-cream rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
+                        style={{ left: `${vignette}%` }}
+                        animate={{ left: `${vignette}%` }}
+                        transition={{ duration: 0.2 }}
+                        whileHover={{ scale: 1.2 }}
+                      >
+                        <div className="absolute inset-1 bg-cream rounded-full"></div>
+                      </motion.div>
+                    </div>
+                    
+                    <div className="flex justify-between text-sm text-vintage-600">
+                      <span>None</span>
+                      <span>Subtle</span>
+                      <span>Strong</span>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -454,563 +1076,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                 </span>
               </motion.button>
             )}
-          </motion.div>
-
-          {/* Icon-Based Camera Controls */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="space-y-4"
-          >
-            
-            {/* Control Icons Row */}
-            <div className="flex justify-center space-x-4 mb-6">
-              {/* Brightness */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveControl(activeControl === 'brightness' ? null : 'brightness')}
-                className={`p-4 rounded-xl transition-all ${
-                  activeControl === 'brightness' 
-                    ? 'bg-gold text-cream shadow-lg' 
-                    : brightness !== 100 
-                      ? 'bg-copper/80 text-cream'
-                      : 'bg-vintage-200 text-charcoal hover:bg-vintage-300'
-                }`}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </motion.button>
-
-              {/* Contrast */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveControl(activeControl === 'contrast' ? null : 'contrast')}
-                className={`p-4 rounded-xl transition-all ${
-                  activeControl === 'contrast' 
-                    ? 'bg-gold text-cream shadow-lg' 
-                    : contrast !== 100 
-                      ? 'bg-copper/80 text-cream'
-                      : 'bg-vintage-200 text-charcoal hover:bg-vintage-300'
-                }`}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </motion.button>
-
-              {/* Saturation */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveControl(activeControl === 'saturation' ? null : 'saturation')}
-                className={`p-4 rounded-xl transition-all ${
-                  activeControl === 'saturation' 
-                    ? 'bg-gold text-cream shadow-lg' 
-                    : saturation !== 100 
-                      ? 'bg-copper/80 text-cream'
-                      : 'bg-vintage-200 text-charcoal hover:bg-vintage-300'
-                }`}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                        d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 3H5v10h2V3zM17 21a4 4 0 004-4V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4zM17 3h2v10h-2V3z" />
-                </svg>
-              </motion.button>
-
-              {/* Temperature */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveControl(activeControl === 'temperature' ? null : 'temperature')}
-                className={`p-4 rounded-xl transition-all ${
-                  activeControl === 'temperature' 
-                    ? 'bg-gold text-cream shadow-lg' 
-                    : temperature !== 0 
-                      ? 'bg-copper/80 text-cream'
-                      : 'bg-vintage-200 text-charcoal hover:bg-vintage-300'
-                }`}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </motion.button>
-
-              {/* Grain */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveControl(activeControl === 'grain' ? null : 'grain')}
-                className={`p-4 rounded-xl transition-all ${
-                  activeControl === 'grain' 
-                    ? 'bg-gold text-cream shadow-lg' 
-                    : grain !== 0 
-                      ? 'bg-copper/80 text-cream'
-                      : 'bg-vintage-200 text-charcoal hover:bg-vintage-300'
-                }`}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                        d="M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2V3a2 2 0 00-2-2H5zM5 7h14v10a11 11 0 01-11-11V7z" />
-                </svg>
-              </motion.button>
-
-              {/* Fade */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveControl(activeControl === 'fade' ? null : 'fade')}
-                className={`p-4 rounded-xl transition-all ${
-                  activeControl === 'fade' 
-                    ? 'bg-gold text-cream shadow-lg' 
-                    : fade !== 0 
-                      ? 'bg-copper/80 text-cream'
-                      : 'bg-vintage-200 text-charcoal hover:bg-vintage-300'
-                }`}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                        d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </motion.button>
-
-              {/* Vignette */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveControl(activeControl === 'vignette' ? null : 'vignette')}
-                className={`p-4 rounded-xl transition-all ${
-                  activeControl === 'vignette' 
-                    ? 'bg-gold text-cream shadow-lg' 
-                    : vignette !== 0 
-                      ? 'bg-copper/80 text-cream'
-                      : 'bg-vintage-200 text-charcoal hover:bg-vintage-300'
-                }`}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                        d="M9 12l2 2 4-4" />
-                </svg>
-              </motion.button>
-
-              {/* Reset Button */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  setBrightness(100);
-                  setContrast(100);
-                  setSaturation(100);
-                  setGrain(0);
-                  setTemperature(0);
-                  setFade(0);
-                  setVignette(0);
-                  setActiveControl(null);
-                }}
-                className="p-4 rounded-xl bg-vintage-400 text-charcoal hover:bg-vintage-500 transition-all"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-              </motion.button>
-            </div>
-
-            {/* Enhanced Slider Control */}
-            <AnimatePresence>
-              {activeControl && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -20, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                  className="bg-gradient-to-br from-vintage-100/95 to-vintage-200/95 backdrop-blur-sm rounded-2xl p-6 border border-vintage-300/50 shadow-xl"
-                >
-                  {/* Brightness Control */}
-                  {activeControl === 'brightness' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                          </svg>
-                          <span>Brightness</span>
-                        </h3>
-                        <span className="text-2xl font-mono text-charcoal font-bold">{brightness}%</span>
-                      </div>
-                      
-                      <div className="relative">
-                        <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
-                          <motion.div
-                            className="h-full bg-gradient-to-r from-gold/80 to-gold rounded-full shadow-sm"
-                            style={{ width: `${((brightness - 50) / (200 - 50)) * 100}%` }}
-                            animate={{ width: `${((brightness - 50) / (200 - 50)) * 100}%` }}
-                            transition={{ duration: 0.2 }}
-                          />
-                        </div>
-                        
-                        <input
-                          type="range"
-                          min="50"
-                          max="200"
-                          step="1"
-                          value={brightness}
-                          onChange={(e) => setBrightness(Number(e.target.value))}
-                          className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
-                        />
-                        
-                        <motion.div
-                          className="absolute top-1/2 w-6 h-6 bg-gold border-3 border-cream rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
-                          style={{ left: `${((brightness - 50) / (200 - 50)) * 100}%` }}
-                          animate={{ left: `${((brightness - 50) / (200 - 50)) * 100}%` }}
-                          transition={{ duration: 0.2 }}
-                          whileHover={{ scale: 1.2 }}
-                        >
-                          <div className="absolute inset-1 bg-cream rounded-full"></div>
-                        </motion.div>
-                      </div>
-                      
-                      <div className="flex justify-between text-sm text-vintage-600">
-                        <span>Dark</span>
-                        <span>Normal</span>
-                        <span>Bright</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Contrast Control */}
-                  {activeControl === 'contrast' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          <span>Contrast</span>
-                        </h3>
-                        <span className="text-2xl font-mono text-charcoal font-bold">{contrast}%</span>
-                      </div>
-                      
-                      <div className="relative">
-                        <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
-                          <motion.div
-                            className="h-full bg-gradient-to-r from-copper/80 to-copper rounded-full shadow-sm"
-                            style={{ width: `${((contrast - 50) / (200 - 50)) * 100}%` }}
-                            animate={{ width: `${((contrast - 50) / (200 - 50)) * 100}%` }}
-                            transition={{ duration: 0.2 }}
-                          />
-                        </div>
-                        
-                        <input
-                          type="range"
-                          min="50"
-                          max="200"
-                          step="1"
-                          value={contrast}
-                          onChange={(e) => setContrast(Number(e.target.value))}
-                          className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
-                        />
-                        
-                        <motion.div
-                          className="absolute top-1/2 w-6 h-6 bg-copper border-3 border-cream rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
-                          style={{ left: `${((contrast - 50) / (200 - 50)) * 100}%` }}
-                          animate={{ left: `${((contrast - 50) / (200 - 50)) * 100}%` }}
-                          transition={{ duration: 0.2 }}
-                          whileHover={{ scale: 1.2 }}
-                        >
-                          <div className="absolute inset-1 bg-cream rounded-full"></div>
-                        </motion.div>
-                      </div>
-                      
-                      <div className="flex justify-between text-sm text-vintage-600">
-                        <span>Flat</span>
-                        <span>Normal</span>
-                        <span>High</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Saturation Control */}
-                  {activeControl === 'saturation' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 3H5v10h2V3zM17 21a4 4 0 004-4V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4zM17 3h2v10h-2V3z" />
-                          </svg>
-                          <span>Saturation</span>
-                        </h3>
-                        <span className="text-2xl font-mono text-charcoal font-bold">{saturation}%</span>
-                      </div>
-                      
-                      <div className="relative">
-                        <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
-                          <motion.div
-                            className="h-full bg-gradient-to-r from-sepia/80 to-sepia rounded-full shadow-sm"
-                            style={{ width: `${(saturation / 200) * 100}%` }}
-                            animate={{ width: `${(saturation / 200) * 100}%` }}
-                            transition={{ duration: 0.2 }}
-                          />
-                        </div>
-                        
-                        <input
-                          type="range"
-                          min="0"
-                          max="200"
-                          step="1"
-                          value={saturation}
-                          onChange={(e) => setSaturation(Number(e.target.value))}
-                          className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
-                        />
-                        
-                        <motion.div
-                          className="absolute top-1/2 w-6 h-6 bg-sepia border-3 border-cream rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
-                          style={{ left: `${(saturation / 200) * 100}%` }}
-                          animate={{ left: `${(saturation / 200) * 100}%` }}
-                          transition={{ duration: 0.2 }}
-                          whileHover={{ scale: 1.2 }}
-                        >
-                          <div className="absolute inset-1 bg-cream rounded-full"></div>
-                        </motion.div>
-                      </div>
-                      
-                      <div className="flex justify-between text-sm text-vintage-600">
-                        <span>B&W</span>
-                        <span>Normal</span>
-                        <span>Vivid</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Temperature Control */}
-                  {activeControl === 'temperature' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                          </svg>
-                          <span>Temperature</span>
-                        </h3>
-                        <span className="text-2xl font-mono text-charcoal font-bold">
-                          {temperature > 0 ? '+' : ''}{temperature}
-                        </span>
-                      </div>
-                      
-                      <div className="relative">
-                        <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
-                          <motion.div
-                            className="h-full bg-gradient-to-r from-blue-400/80 via-vintage-400 to-orange-400/80 rounded-full shadow-sm"
-                            style={{ width: `${((temperature + 100) / 200) * 100}%` }}
-                            animate={{ width: `${((temperature + 100) / 200) * 100}%` }}
-                            transition={{ duration: 0.2 }}
-                          />
-                        </div>
-                        
-                        <input
-                          type="range"
-                          min="-100"
-                          max="100"
-                          step="1"
-                          value={temperature}
-                          onChange={(e) => setTemperature(Number(e.target.value))}
-                          className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
-                        />
-                        
-                        <motion.div
-                          className="absolute top-1/2 w-6 h-6 bg-bronze border-3 border-cream rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
-                          style={{ left: `${((temperature + 100) / 200) * 100}%` }}
-                          animate={{ left: `${((temperature + 100) / 200) * 100}%` }}
-                          transition={{ duration: 0.2 }}
-                          whileHover={{ scale: 1.2 }}
-                        >
-                          <div className="absolute inset-1 bg-cream rounded-full"></div>
-                        </motion.div>
-                      </div>
-                      
-                      <div className="flex justify-between text-sm text-vintage-600">
-                        <span>Cool</span>
-                        <span>Neutral</span>
-                        <span>Warm</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Grain Control */}
-                  {activeControl === 'grain' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                  d="M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2V3a2 2 0 00-2-2H5zM5 7h14v10a11 11 0 01-11-11V7z" />
-                          </svg>
-                          <span>Film Grain</span>
-                        </h3>
-                        <span className="text-2xl font-mono text-charcoal font-bold">{grain}%</span>
-                      </div>
-                      
-                      <div className="relative">
-                        <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
-                          <motion.div
-                            className="h-full bg-gradient-to-r from-vintage-600/80 to-vintage-800 rounded-full shadow-sm"
-                            style={{ width: `${grain}%` }}
-                            animate={{ width: `${grain}%` }}
-                            transition={{ duration: 0.2 }}
-                          />
-                        </div>
-                        
-                        <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          step="1"
-                          value={grain}
-                          onChange={(e) => setGrain(Number(e.target.value))}
-                          className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
-                        />
-                        
-                        <motion.div
-                          className="absolute top-1/2 w-6 h-6 bg-vintage-700 border-3 border-cream rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
-                          style={{ left: `${grain}%` }}
-                          animate={{ left: `${grain}%` }}
-                          transition={{ duration: 0.2 }}
-                          whileHover={{ scale: 1.2 }}
-                        >
-                          <div className="absolute inset-1 bg-cream rounded-full"></div>
-                        </motion.div>
-                      </div>
-                      
-                      <div className="flex justify-between text-sm text-vintage-600">
-                        <span>Clean</span>
-                        <span>Subtle</span>
-                        <span>Heavy</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Fade Control */}
-                  {activeControl === 'fade' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                  d="M13 10V3L4 14h7v7l9-11h-7z" />
-                          </svg>
-                          <span>Fade</span>
-                        </h3>
-                        <span className="text-2xl font-mono text-charcoal font-bold">{fade}%</span>
-                      </div>
-                      
-                      <div className="relative">
-                        <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
-                          <motion.div
-                            className="h-full bg-gradient-to-r from-cream/80 to-cream rounded-full shadow-sm"
-                            style={{ width: `${fade}%` }}
-                            animate={{ width: `${fade}%` }}
-                            transition={{ duration: 0.2 }}
-                          />
-                        </div>
-                        
-                        <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          step="1"
-                          value={fade}
-                          onChange={(e) => setFade(Number(e.target.value))}
-                          className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
-                        />
-                        
-                        <motion.div
-                          className="absolute top-1/2 w-6 h-6 bg-cream border-3 border-charcoal rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
-                          style={{ left: `${fade}%` }}
-                          animate={{ left: `${fade}%` }}
-                          transition={{ duration: 0.2 }}
-                          whileHover={{ scale: 1.2 }}
-                        >
-                          <div className="absolute inset-1 bg-charcoal rounded-full"></div>
-                        </motion.div>
-                      </div>
-                      
-                      <div className="flex justify-between text-sm text-vintage-600">
-                        <span>Sharp</span>
-                        <span>Dreamy</span>
-                        <span>Faded</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Vignette Control */}
-                  {activeControl === 'vignette' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-charcoal font-title text-xl flex items-center space-x-2">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                  d="M9 12l2 2 4-4" />
-                          </svg>
-                          <span>Vignette</span>
-                        </h3>
-                        <span className="text-2xl font-mono text-charcoal font-bold">{vignette}%</span>
-                      </div>
-                      
-                      <div className="relative">
-                        <div className="w-full h-4 bg-vintage-300 rounded-full overflow-hidden shadow-inner">
-                          <motion.div
-                            className="h-full bg-gradient-to-r from-charcoal/80 to-charcoal rounded-full shadow-sm"
-                            style={{ width: `${vignette}%` }}
-                            animate={{ width: `${vignette}%` }}
-                            transition={{ duration: 0.2 }}
-                          />
-                        </div>
-                        
-                        <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          step="1"
-                          value={vignette}
-                          onChange={(e) => setVignette(Number(e.target.value))}
-                          className="absolute inset-0 w-full h-4 opacity-0 cursor-pointer"
-                        />
-                        
-                        <motion.div
-                          className="absolute top-1/2 w-6 h-6 bg-charcoal border-3 border-cream rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
-                          style={{ left: `${vignette}%` }}
-                          animate={{ left: `${vignette}%` }}
-                          transition={{ duration: 0.2 }}
-                          whileHover={{ scale: 1.2 }}
-                        >
-                          <div className="absolute inset-1 bg-cream rounded-full"></div>
-                        </motion.div>
-                      </div>
-                      
-                      <div className="flex justify-between text-sm text-vintage-600">
-                        <span>None</span>
-                        <span>Subtle</span>
-                        <span>Strong</span>
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
           </motion.div>
 
           {/* Film Status and Info */}
