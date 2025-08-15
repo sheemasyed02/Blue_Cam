@@ -357,15 +357,15 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         )}
                         
                         {/* Soft Viewfinder Overlay */}
-                        <div className="absolute inset-0 pointer-events-none">
+                        <div className="absolute inset-0">
                           {/* Corner Guides */}
-                          <div className="absolute top-8 left-8 w-6 h-6 border-l-2 border-t-2 border-cream/80 rounded-tl-lg"></div>
-                          <div className="absolute top-8 right-8 w-6 h-6 border-r-2 border-t-2 border-cream/80 rounded-tr-lg"></div>
-                          <div className="absolute bottom-8 left-8 w-6 h-6 border-l-2 border-b-2 border-cream/80 rounded-bl-lg"></div>
-                          <div className="absolute bottom-8 right-8 w-6 h-6 border-r-2 border-b-2 border-cream/80 rounded-br-lg"></div>
+                          <div className="absolute top-8 left-8 w-6 h-6 border-l-2 border-t-2 border-cream/80 rounded-tl-lg pointer-events-none"></div>
+                          <div className="absolute top-8 right-8 w-6 h-6 border-r-2 border-t-2 border-cream/80 rounded-tr-lg pointer-events-none"></div>
+                          <div className="absolute bottom-8 left-8 w-6 h-6 border-l-2 border-b-2 border-cream/80 rounded-bl-lg pointer-events-none"></div>
+                          <div className="absolute bottom-8 right-8 w-6 h-6 border-r-2 border-b-2 border-cream/80 rounded-br-lg pointer-events-none"></div>
                           
                           {/* Center Focus */}
-                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
                             <motion.div 
                               className="w-12 h-12 border border-cream/60 rounded-full"
                               animate={{ scale: [1, 1.1, 1] }}
@@ -380,7 +380,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={switchCamera}
-                            className="absolute top-6 right-6 p-3 bg-vintage-800/80 text-cream rounded-xl backdrop-blur-sm border border-vintage-600/50"
+                            className="absolute top-6 right-6 p-3 bg-vintage-800/80 text-cream rounded-xl backdrop-blur-sm border border-vintage-600/50 z-10"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
@@ -393,7 +393,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setShowSettings(!showSettings)}
-                            className={`absolute bottom-6 right-6 p-3 backdrop-blur-sm border rounded-xl transition-all ${
+                            className={`absolute bottom-6 right-6 p-3 backdrop-blur-sm border rounded-xl transition-all z-10 ${
                               showSettings 
                                 ? 'bg-gold/90 text-cream border-gold/50 shadow-lg' 
                                 : 'bg-vintage-800/80 text-cream border-vintage-600/50'
