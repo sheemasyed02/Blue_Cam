@@ -27,6 +27,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   // Filters state
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string>('');
+  const [filterNotification, setFilterNotification] = useState<string | null>(null);
   
   // Camera editing controls (like normal camera apps)
   const [brightness, setBrightness] = useState(100);
@@ -101,6 +102,17 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
       setTimeout(() => setIsCapturing(false), 600);
     }
   }, [webcamRef, filmCount, activeFilter, brightness, contrast, saturation, temperature]);
+
+  // Function to apply filter with notification
+  const applyFilter = useCallback((filterCss: string, filterName: string) => {
+    setActiveFilter(filterCss);
+    setFilterNotification(filterName);
+    
+    // Clear notification after 2 seconds
+    setTimeout(() => {
+      setFilterNotification(null);
+    }, 2000);
+  }, []);
 
   const switchCamera = useCallback(() => {
     setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
@@ -495,6 +507,45 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-cream/80 rounded-full"></div>
                             </motion.div>
                           </div>
+                          
+                          {/* Active Filter Indicator */}
+                          {activeFilter && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 10 }}
+                              className="absolute top-6 left-6 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full border border-gold/30"
+                            >
+                              <div className="flex items-center space-x-2">
+                                <div className="w-2 h-2 bg-gold rounded-full"></div>
+                                <span className="text-cream text-sm font-body">
+                                  {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filter Applied'}
+                                </span>
+                              </div>
+                            </motion.div>
+                          )}
+                          
+                          {/* Filter Notification */}
+                          <AnimatePresence>
+                            {filterNotification && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                                className="absolute top-20 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full border border-gold/50"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <svg className="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                  </svg>
+                                  <span className="text-cream text-sm font-body font-medium">
+                                    {filterNotification} Applied
+                                  </span>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                           
                           {/* Camera Switch Button */}
                           <motion.button
@@ -1273,7 +1324,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowFilters(!showFilters)}
+                  onClick={() => {
+                    setShowFilters(!showFilters);
+                  }}
                   className="relative flex items-center justify-center"
                 >
                   <motion.div
@@ -1303,28 +1356,51 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
       {/* Bottom Filters Panel */}
       <AnimatePresence>
         {showFilters && (
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/80 to-transparent backdrop-blur-md z-40 pb-safe"
-          >
+          <>
+            {/* Backdrop overlay to close filters */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/20 z-30"
+              onClick={() => setShowFilters(false)}
+            />
+            
+            {/* Filters Panel */}
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/80 to-transparent backdrop-blur-md z-40 pb-safe"
+            >
             {/* Filters Container */}
             <div className="px-4 py-6">
               {/* Header */}
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-title text-cream">Vintage Filters</h3>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => {
-                    setActiveFilter('');
-                  }}
-                  className="text-sm text-cream/70 hover:text-cream transition-colors"
-                >
-                  Clear
-                </motion.button>
+                <div className="flex items-center space-x-3">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => {
+                      applyFilter('', 'Original');
+                    }}
+                    className="text-sm text-cream/70 hover:text-cream transition-colors"
+                  >
+                    Clear
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setShowFilters(false)}
+                    className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                  >
+                    <svg className="w-4 h-4 text-cream" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </motion.button>
+                </div>
               </div>
 
               {/* Horizontal Filter Scroll */}
@@ -1339,7 +1415,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => setActiveFilter('')}
+                    onClick={() => {
+                      applyFilter('', 'Original');
+                    }}
                     className="flex flex-col items-center space-y-2 min-w-[70px] cursor-pointer"
                   >
                     <div className={cn(
@@ -1367,7 +1445,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       key={filter.id}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => setActiveFilter(filter.cssFilter)}
+                      onClick={() => {
+                        applyFilter(filter.cssFilter, filter.name);
+                      }}
                       className="flex flex-col items-center space-y-2 min-w-[70px] cursor-pointer"
                     >
                       <div className={cn(
@@ -1376,11 +1456,16 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           ? "border-gold shadow-lg shadow-gold/30" 
                           : "border-white/30 hover:border-white/50"
                       )}>
-                        {/* Filter preview - using a sample image or gradient */}
-                        <div 
-                          className="w-full h-full bg-gradient-to-br from-vintage-200 via-peach to-vintage-300"
-                          style={{ filter: filter.cssFilter }}
-                        />
+                        {/* Filter preview - create a more realistic preview */}
+                        <div className="w-full h-full relative">
+                          {/* Base image simulation */}
+                          <div className="w-full h-full bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100"></div>
+                          {/* Filter overlay */}
+                          <div 
+                            className="absolute inset-0 bg-gradient-to-br from-vintage-200 via-peach to-vintage-300"
+                            style={{ filter: filter.cssFilter, mixBlendMode: 'multiply' }}
+                          />
+                        </div>
                       </div>
                       <div className={cn(
                         "text-xs font-body text-center transition-colors duration-300",
@@ -1394,6 +1479,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               </div>
             </div>
           </motion.div>
+          </>
         )}
       </AnimatePresence>
 
