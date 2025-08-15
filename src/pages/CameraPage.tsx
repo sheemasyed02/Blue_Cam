@@ -1059,21 +1059,44 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                 </motion.button>
               </div>
             ) : (
+              // Traditional Camera Shutter Button
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={capture}
                 disabled={isCapturing || filmCount === 0}
-                className="py-6 px-12 bg-gradient-to-br from-gold via-copper to-gold text-cream rounded-xl font-title text-lg tracking-wider shadow-2xl disabled:opacity-50 relative overflow-hidden group"
+                className="relative flex items-center justify-center disabled:opacity-50"
               >
-                <span className="relative z-10 flex items-center justify-center space-x-3">
-                  <motion.div 
-                    className="w-3 h-3 rounded-full bg-cream"
-                    animate={isCapturing ? { scale: [1, 1.2, 1] } : {}}
-                    transition={{ duration: 0.3, repeat: isCapturing ? Infinity : 0 }}
+                {/* Outer Golden Border - Polished Design */}
+                <motion.div
+                  className="w-20 h-20 rounded-2xl bg-gold p-0.5 shadow-xl ring-2 ring-gold/30 ring-offset-2 ring-offset-cream"
+                  animate={isCapturing ? { scale: [1, 1.1, 1] } : {}}
+                  transition={{ duration: 0.3, repeat: isCapturing ? Infinity : 0 }}
+                >
+                  {/* Inner Dark Center - Deep Black with Subtle Texture */}
+                  <div className="w-full h-full bg-black rounded-xl shadow-inner border border-charcoal/20 flex items-center justify-center relative overflow-hidden">
+                    {/* Subtle inner reflection for polished look */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent rounded-xl"></div>
+                    
+                    {/* Optional subtle inner glow when capturing */}
+                    {isCapturing && (
+                      <motion.div
+                        className="w-12 h-12 bg-gold/15 rounded-lg border border-gold/30"
+                        animate={{ opacity: [0.3, 0.7, 0.3] }}
+                        transition={{ duration: 0.5, repeat: Infinity }}
+                      />
+                    )}
+                  </div>
+                </motion.div>
+                
+                {/* Optional capture indicator (small dot when ready) */}
+                {!isCapturing && filmCount > 0 && (
+                  <motion.div
+                    className="absolute w-1.5 h-1.5 bg-gold rounded-full shadow-lg ring-1 ring-gold/50"
+                    animate={{ opacity: [0.6, 1, 0.6] }}
+                    transition={{ duration: 2, repeat: Infinity }}
                   />
-                  <span>{isCapturing ? 'CAPTURING...' : 'CAPTURE'}</span>
-                </span>
+                )}
               </motion.button>
             )}
           </motion.div>
