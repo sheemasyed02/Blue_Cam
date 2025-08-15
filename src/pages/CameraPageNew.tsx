@@ -40,6 +40,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   
   // Settings panel state
   const [showSettings, setShowSettings] = useState(false);
+  
+  // Reset notification
+  const [resetNotification, setResetNotification] = useState(false);
 
   const videoConstraints = {
     width: 1920,
@@ -250,6 +253,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         <span className="text-white text-sm font-mono">REC</span>
                       </div>
                       
+                      {/* Film Count */}
+                      <div className="px-2 py-1 bg-white/10 rounded">
+                        <span className="text-white text-xs font-mono">{filmCount} shots</span>
+                      </div>
+                      
                       {/* Active Filter Indicator */}
                       {activeFilter && (
                         <div className="px-3 py-1 bg-amber-500/20 border border-amber-400/30 rounded-full">
@@ -257,6 +265,34 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                             {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filter Active'}
                           </span>
                         </div>
+                      )}
+                      
+                      {/* Settings Active Indicator */}
+                      {showSettings && (
+                        <div className="px-3 py-1 bg-electric-500/20 border border-electric-400/30 rounded-full">
+                          <span className="text-electric-400 text-xs font-medium">Settings</span>
+                        </div>
+                      )}
+                      
+                      {/* Active Control Indicator */}
+                      {activeControl && (
+                        <div className="px-3 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full">
+                          <span className="text-purple-400 text-xs font-medium capitalize">
+                            {activeControl} Adjusting
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Reset Notification */}
+                      {resetNotification && (
+                        <motion.div 
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          className="px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 rounded-full"
+                        >
+                          <span className="text-emerald-400 text-xs font-medium">Settings Reset</span>
+                        </motion.div>
                       )}
                     </div>
                     
@@ -518,32 +554,85 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   )}
                 </motion.button>
               </div>
+              
               {/* Quick Settings Strip */}
-              {showSettings && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  className="mt-6 flex justify-center space-x-4"
-                >
-                  {['brightness', 'contrast', 'saturation', 'temperature'].map((control) => (
-                    <motion.button
-                      key={control}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setActiveControl(activeControl === control ? null : control)}
-                      className={cn(
-                        "p-3 rounded-xl backdrop-blur-sm border transition-all capitalize text-sm",
-                        activeControl === control
-                          ? "bg-electric-500/20 border-electric-400/50 text-electric-400"
-                          : "bg-white/10 border-white/20 text-white"
-                      )}
-                    >
-                      <span>{control}</span>
-                    </motion.button>
-                  ))}
-                </motion.div>
-              )}
+              <AnimatePresence>
+                {showSettings && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.3 }}
+                    className="mt-6"
+                  >
+                    {/* Control Buttons Row 1 */}
+                    <div className="flex justify-center space-x-3 mb-3">
+                      {['brightness', 'contrast', 'saturation', 'temperature'].map((control) => (
+                        <motion.button
+                          key={control}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setActiveControl(activeControl === control ? null : control)}
+                          className={cn(
+                            "p-3 rounded-xl backdrop-blur-sm border transition-all capitalize text-sm min-w-[80px]",
+                            activeControl === control
+                              ? "bg-electric-500/20 border-electric-400/50 text-electric-400"
+                              : "bg-white/10 border-white/20 text-white"
+                          )}
+                        >
+                          <span>{control}</span>
+                        </motion.button>
+                      ))}
+                    </div>
+                    
+                    {/* Control Buttons Row 2 */}
+                    <div className="flex justify-center space-x-3 mb-4">
+                      {['grain', 'fade', 'vignette'].map((control) => (
+                        <motion.button
+                          key={control}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setActiveControl(activeControl === control ? null : control)}
+                          className={cn(
+                            "p-3 rounded-xl backdrop-blur-sm border transition-all capitalize text-sm min-w-[80px]",
+                            activeControl === control
+                              ? "bg-electric-500/20 border-electric-400/50 text-electric-400"
+                              : "bg-white/10 border-white/20 text-white"
+                          )}
+                        >
+                          <span>{control}</span>
+                        </motion.button>
+                      ))}
+                      
+                      {/* Reset Button */}
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                          setBrightness(100);
+                          setContrast(100);
+                          setSaturation(100);
+                          setGrain(0);
+                          setTemperature(0);
+                          setFade(0);
+                          setVignette(0);
+                          setActiveControl(null);
+                          setResetNotification(true);
+                          setTimeout(() => setResetNotification(false), 2000);
+                        }}
+                        className="p-3 rounded-xl backdrop-blur-sm border border-red-500/50 bg-red-500/20 text-red-400 transition-all text-sm min-w-[80px] hover:bg-red-500/30 hover:border-red-400/70"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          <span>Reset</span>
+                        </div>
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -694,6 +783,110 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     <span>Cool</span>
                     <span>Neutral</span>
                     <span>Warm</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Grain Control */}
+              {activeControl === 'grain' && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-white font-title text-lg flex items-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2V3a2 2 0 00-2-2H5zM5 7h14v10a11 11 0 01-11-11V7z" />
+                      </svg>
+                      <span>Film Grain</span>
+                    </h3>
+                    <span className="text-xl font-mono text-white font-bold">{grain}%</span>
+                  </div>
+                  
+                  <div className="relative">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="1"
+                      value={grain}
+                      onChange={(e) => setGrain(Number(e.target.value))}
+                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                  </div>
+                  
+                  <div className="flex justify-between text-sm text-white/60">
+                    <span>Clean</span>
+                    <span>Subtle</span>
+                    <span>Heavy</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Fade Control */}
+              {activeControl === 'fade' && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-white font-title text-lg flex items-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span>Fade</span>
+                    </h3>
+                    <span className="text-xl font-mono text-white font-bold">{fade}%</span>
+                  </div>
+                  
+                  <div className="relative">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="1"
+                      value={fade}
+                      onChange={(e) => setFade(Number(e.target.value))}
+                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                  </div>
+                  
+                  <div className="flex justify-between text-sm text-white/60">
+                    <span>Sharp</span>
+                    <span>Dreamy</span>
+                    <span>Faded</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Vignette Control */}
+              {activeControl === 'vignette' && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-white font-title text-lg flex items-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M9 12l2 2 4-4" />
+                      </svg>
+                      <span>Vignette</span>
+                    </h3>
+                    <span className="text-xl font-mono text-white font-bold">{vignette}%</span>
+                  </div>
+                  
+                  <div className="relative">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="1"
+                      value={vignette}
+                      onChange={(e) => setVignette(Number(e.target.value))}
+                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                  </div>
+                  
+                  <div className="flex justify-between text-sm text-white/60">
+                    <span>None</span>
+                    <span>Subtle</span>
+                    <span>Strong</span>
                   </div>
                 </div>
               )}
