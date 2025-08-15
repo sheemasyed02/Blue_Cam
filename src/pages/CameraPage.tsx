@@ -52,19 +52,55 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   const capture = useCallback(() => {
     if (webcamRef.current && filmCount > 0) {
       setIsCapturing(true);
-      const imageSrc = webcamRef.current.getScreenshot();
-      setCapturedImage(imageSrc);
       
-      // Add to captured images array (newest first)
+      // Get the base screenshot from webcam
+      const imageSrc = webcamRef.current.getScreenshot();
+      
       if (imageSrc) {
-        setCapturedImages(prev => [imageSrc, ...prev]);
+        // If we have an active filter, apply it to the captured image
+        if (activeFilter) {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            if (ctx) {
+              canvas.width = img.width;
+              canvas.height = img.height;
+              
+              // Create the complete filter string (adjustments + vintage filter)
+              const adjustmentFilters = `
+                brightness(${brightness}%) 
+                contrast(${contrast}%) 
+                saturate(${saturation}%) 
+                hue-rotate(${temperature * 1.8}deg)
+              `.trim();
+              
+              const completeFilter = `${adjustmentFilters} ${activeFilter}`;
+              
+              // Apply the filter to the canvas context
+              ctx.filter = completeFilter;
+              ctx.drawImage(img, 0, 0);
+              
+              // Get the filtered image as data URL
+              const filteredImageSrc = canvas.toDataURL('image/jpeg', 0.9);
+              
+              setCapturedImage(filteredImageSrc);
+              setCapturedImages(prev => [filteredImageSrc, ...prev]);
+            }
+          };
+          img.src = imageSrc;
+        } else {
+          // No filter applied, use the original image
+          setCapturedImage(imageSrc);
+          setCapturedImages(prev => [imageSrc, ...prev]);
+        }
       }
       
       setFilmCount(prev => prev - 1);
-      
       setTimeout(() => setIsCapturing(false), 600);
     }
-  }, [webcamRef, filmCount]);
+  }, [webcamRef, filmCount, activeFilter, brightness, contrast, saturation, temperature]);
 
   const switchCamera = useCallback(() => {
     setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
@@ -384,7 +420,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       </motion.div>
                     ) : (
                       // Live Camera View
-                      <div className="relative w-full h-full">
+                      <div 
+                        className="relative w-full h-full cursor-pointer"
+                        onClick={capture}
+                        title="Tap to capture photo"
+                      >
                         <Webcam
                           ref={webcamRef}
                           audio={false}
@@ -397,6 +437,22 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           }}
                           mirrored={facingMode === 'user'}
                         />
+                        
+                        {/* Click Hint Overlay - Only show when not capturing */}
+                        {!isCapturing && (
+                          <div className="absolute inset-0 pointer-events-none opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <div className="bg-black/30 backdrop-blur-sm rounded-full p-4 border border-white/20">
+                              <svg className="w-10 h-10 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-white/80 text-sm font-body whitespace-nowrap">
+                                Tap to capture
+                              </div>
+                            </div>
+                          </div>
+                        )}
                         
                         {/* Film Grain Overlay */}
                         {grain > 0 && (
@@ -444,7 +500,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={switchCamera}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              switchCamera();
+                            }}
                             className="absolute top-6 right-6 p-3 bg-vintage-800/80 text-cream rounded-xl backdrop-blur-sm border border-vintage-600/50 z-10"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -457,7 +516,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={() => setShowSettings(!showSettings)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowSettings(!showSettings);
+                            }}
                             className={`absolute bottom-6 right-6 p-3 backdrop-blur-sm border rounded-xl transition-all z-10 ${
                               showSettings 
                                 ? 'bg-gold/90 text-cream border-gold/50 shadow-lg' 
