@@ -177,14 +177,75 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             {/* Camera Container */}
             <div className="relative w-full h-full max-w-6xl mx-auto">
               
-              {/* Soft Camera Housing */}
-              <div className="relative w-full h-full bg-gradient-to-br from-vintage-200/80 via-cream/90 to-vintage-300/80 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-vintage-300/50">
+              {/* Premium Professional Camera Housing */}
+              <div className="relative w-full h-full">
                 
-                {/* Inner Frame */}
-                <div className="relative w-full h-full bg-gradient-to-br from-charcoal/80 via-vintage-800/80 to-charcoal/80 rounded-2xl p-4 shadow-inner">
+                {/* Outer Decorative Frame with Vintage Professional Look */}
+                <div className="absolute inset-0 bg-gradient-to-br from-vintage-400 via-gold/40 to-copper/50 rounded-2xl shadow-2xl">
+                  {/* Corner Accent Details with Enhanced Styling */}
+                  <div className="absolute top-4 left-4 w-8 h-8 border-l-3 border-t-3 border-gold/80 rounded-tl-xl shadow-lg"></div>
+                  <div className="absolute top-4 right-4 w-8 h-8 border-r-3 border-t-3 border-gold/80 rounded-tr-xl shadow-lg"></div>
+                  <div className="absolute bottom-4 left-4 w-8 h-8 border-l-3 border-b-3 border-gold/80 rounded-bl-xl shadow-lg"></div>
+                  <div className="absolute bottom-4 right-4 w-8 h-8 border-r-3 border-b-3 border-gold/80 rounded-br-xl shadow-lg"></div>
                   
-                  {/* Camera Lens Area */}
-                  <div className="relative w-full h-full bg-black rounded-xl overflow-hidden shadow-xl">
+                  {/* Enhanced Side Ornamental Elements */}
+                  <div className="absolute top-1/2 left-2 transform -translate-y-1/2 w-2 h-24 bg-gradient-to-b from-gold via-copper to-gold rounded-full shadow-xl border border-gold/50"></div>
+                  <div className="absolute top-1/2 right-2 transform -translate-y-1/2 w-2 h-24 bg-gradient-to-b from-gold via-copper to-gold rounded-full shadow-xl border border-gold/50"></div>
+                  
+                  {/* Enhanced Top and Bottom Accents with Additional Details */}
+                  <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-24 h-2 bg-gradient-to-r from-gold via-copper to-gold rounded-full shadow-xl border border-gold/50"></div>
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-2 bg-gradient-to-r from-gold via-copper to-gold rounded-full shadow-xl border border-gold/50"></div>
+                  
+                  {/* Additional Corner Micro Details */}
+                  <div className="absolute top-2 left-2 w-3 h-3 bg-gold/60 rounded-full shadow-lg border border-gold/80"></div>
+                  <div className="absolute top-2 right-2 w-3 h-3 bg-gold/60 rounded-full shadow-lg border border-gold/80"></div>
+                  <div className="absolute bottom-2 left-2 w-3 h-3 bg-gold/60 rounded-full shadow-lg border border-gold/80"></div>
+                  <div className="absolute bottom-2 right-2 w-3 h-3 bg-gold/60 rounded-full shadow-lg border border-gold/80"></div>
+                  
+                  {/* Premium Edge Highlighting */}
+                  <div className="absolute inset-1 rounded-xl border border-gold/30 pointer-events-none"></div>
+                </div>
+
+                {/* Main Camera Frame - Premium Enhanced */}
+                <div className="absolute inset-3 bg-gradient-to-br from-charcoal via-vintage-900 to-charcoal rounded-xl shadow-inner border-2 border-gold/40">
+                  
+                  {/* Additional Inner Frame Layer for Depth */}
+                  <div className="absolute inset-1 bg-gradient-to-br from-vintage-800/50 to-charcoal/50 rounded-lg border border-copper/30"></div>
+                  
+                  {/* Inner Professional Frame */}
+                  <div className="relative w-full h-full p-2">
+                    
+                    {/* Enhanced Professional Camera Brand Plate */}
+                    {/* <div className="absolute top-1 left-1/2 transform -translate-x-1/2 z-10">
+                      <div className="bg-gradient-to-r from-gold via-copper to-gold px-8 py-2 rounded-full shadow-xl border-2 border-vintage-600/50 backdrop-blur-sm">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-2 h-2 bg-charcoal rounded-full shadow-inner"></div>
+                          <span className="text-charcoal font-title text-sm font-bold tracking-[0.25em] drop-shadow-sm">BLUE CAM </span>
+                          <div className="w-2 h-2 bg-charcoal rounded-full shadow-inner"></div>
+                        </div>
+                        <div className="absolute inset-1 bg-gradient-to-b from-white/20 to-transparent rounded-full pointer-events-none"></div>
+                      </div>
+                    </div> */}
+
+                    {/* Lens Housing with Enhanced Premium Finish */}
+                    <div className="relative w-full h-full bg-gradient-to-br from-black via-gray-900 to-black rounded-lg overflow-hidden shadow-2xl border-3 border-vintage-700/40">
+                      
+                      {/* Multiple Inner Lens Rings for Premium Depth */}
+                      <div className="absolute inset-1 rounded-lg border-2 border-gold/30 bg-gradient-to-br from-gray-900 to-black">
+                        <div className="absolute inset-2 rounded-md border border-copper/40 bg-gradient-to-br from-black to-gray-800">
+                          
+                          {/* Enhanced Professional Grid Overlay */}
+                          <div className="absolute inset-0 opacity-25">
+                            {/* Rule of thirds grid with enhanced styling */}
+                            <div className="absolute top-1/3 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cream/40 to-transparent"></div>
+                            <div className="absolute top-2/3 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cream/40 to-transparent"></div>
+                            <div className="absolute left-1/3 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-cream/40 to-transparent"></div>
+                            <div className="absolute left-2/3 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-cream/40 to-transparent"></div>
+                            
+                            {/* Enhanced center focus point */}
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 border border-cream/30 rounded-full"></div>
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-cream/20 rounded-full shadow-lg"></div>
+                          </div>
                     
                     {capturedImage ? (
                       // Captured Photo View
@@ -336,6 +397,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         )}
                       </div>
                     )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
