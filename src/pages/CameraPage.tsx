@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import Webcam from 'react-webcam';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils';
@@ -20,26 +20,20 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   
   // Gallery state for captured images
   const [capturedImages, setCapturedImages] = useState<string[]>([]);
-  const [showGallery, setShowGallery] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
   
   // Filters state
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string>('');
   const [filterNotification, setFilterNotification] = useState<string | null>(null);
   
-  // Camera editing controls (like normal camera apps)
-  const [brightness, setBrightness] = useState(100);
-  const [contrast, setContrast] = useState(100);
-  const [saturation, setSaturation] = useState(100);
-  const [grain, setGrain] = useState(0);
-  const [temperature, setTemperature] = useState(0);
-  const [fade, setFade] = useState(0);
-  const [vignette, setVignette] = useState(0);
-  
-  // Active editing control state
-  const [activeControl, setActiveControl] = useState<string | null>(null);
+  // Camera editing controls
+  const [brightness] = useState(100);
+  const [contrast] = useState(100);
+  const [saturation] = useState(100);
+  const [grain] = useState(0);
+  const [temperature] = useState(0);
+  const [fade] = useState(0);
+  const [vignette] = useState(0);
   
   // Settings panel state
   const [showSettings, setShowSettings] = useState(false);
@@ -206,169 +200,442 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
 
   return (
     <div className={cn(
-      "min-h-screen bg-gradient-to-br from-vintage-50 via-cream to-vintage-100 relative overflow-hidden",
+      "min-h-screen relative overflow-hidden flex flex-col",
+      "bg-gradient-to-br from-slate-950 via-slate-900 to-storm-950",
       className
     )}>
-      {/* Soft Background Effects */}
-      <div className="absolute inset-0">
-        {/* Gentle light overlay */}
-        <div className="absolute inset-0 opacity-40 bg-gradient-to-br from-gold/20 via-transparent to-peach/20"></div>
+      {/* Enhanced Background Effects */}
+      <div className="absolute inset-0 z-0">
+        {/* Dynamic gradient mesh */}
+        <div className="absolute inset-0 opacity-20 bg-gradient-mesh"></div>
         
-        {/* Soft floating elements */}
-        {[...Array(6)].map((_, i) => (
+        {/* Animated orbs with better positioning */}
+        <div className="absolute top-20 right-20 w-80 h-80 bg-gradient-to-br from-electric-500/25 to-amber-500/25 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-20 left-20 w-72 h-72 bg-gradient-to-tr from-emerald-500/20 to-electric-600/20 rounded-full blur-3xl animate-float"></div>
+        
+        {/* Premium backdrop */}
+        <div className="absolute inset-0 backdrop-blur-sm bg-black/10"></div>
+        
+        {/* Floating particles */}
+        {[...Array(12)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-2 h-2 bg-gold/20 rounded-full blur-sm"
+            className="absolute w-2 h-2 bg-gradient-to-r from-electric-400/40 to-amber-400/40 rounded-full"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
             }}
             animate={{
-              y: [-10, -30, -10],
-              opacity: [0.3, 0.6, 0.3],
+              y: [0, -40, 0],
+              opacity: [0.2, 0.8, 0.2],
+              scale: [0.8, 1.2, 0.8],
             }}
             transition={{
-              duration: 6 + Math.random() * 2,
+              duration: 4 + Math.random() * 3,
               repeat: Infinity,
               delay: Math.random() * 3,
             }}
           />
         ))}
       </div>
+        
+        {/* Professional grid overlay */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="h-full w-full" style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px'
+          }}></div>
+        </div>
+      </div>
 
-            {/* Modern Professional Navigation */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-charcoal via-vintage-800 to-charcoal backdrop-blur-md border-b border-gold/20 shadow-xl">
-        <div className="flex justify-between items-center px-8 py-3">
+      {/* Premium Modern Navigation */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-xl border-b border-white/10 shadow-glass">
+        <div className="flex justify-between items-center px-6 py-4">
           {/* Logo Section */}
           <div className="flex items-center space-x-3">
             <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-gold to-copper rounded-lg flex items-center justify-center shadow-lg">
-                <svg className="w-6 h-6 text-cream" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-gradient-to-br from-electric-500 to-amber-500 rounded-2xl flex items-center justify-center shadow-glow">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                         d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-gold rounded-full animate-pulse"></div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-emerald-400 to-electric-400 rounded-full animate-pulse shadow-glow"></div>
             </div>
             <div>
-              <h2 className="text-cream font-title text-xl font-bold tracking-wide">Blue Cam</h2>
-              <p className="text-gold/80 text-xs font-body tracking-widest uppercase">Vintage Vibes</p>
+              <h2 className="text-white font-title text-2xl font-bold tracking-wide">Blue Cam</h2>
+              <p className="text-slate-300 font-body text-sm">Professional Photography</p>
             </div>
           </div>
 
           {/* Navigation Controls */}
           <div className="flex items-center space-x-6">
             <Navigation currentPage="camera" onPageChange={onPageChange || (() => {})} />
-            
-            {/* Status Indicators */}
-            {/* <div className="hidden md:flex items-center space-x-4 text-sm">
-              <div className="flex items-center space-x-2 px-3 py-1 bg-gold/20 rounded-full">
-                <div className="w-2 h-2 bg-gold rounded-full animate-pulse"></div>
-                <span className="text-cream font-body text-xs">Live</span>
-              </div>
-              <div className="flex items-center space-x-2 px-3 py-1 bg-copper/20 rounded-full">
-                <svg className="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <span className="text-cream font-body text-xs">HD</span>
-              </div>
-            </div> */}
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 px-4 pt-20 pb-6">
-        <div className="max-w-7xl mx-auto">
-
-          {/* Main Camera Area - 75% of screen */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1 }}
-            className="mb-8"
-            style={{ height: '78vh' }}
-          >
-            {/* Camera Container */}
-            <div className="relative w-full h-full max-w-6xl mx-auto">
-              
-              {/* Premium Professional Camera Housing */}
-              <div className="relative w-full h-full">
+      {/* Main Content - Modern Layout */}
+      <div className="flex-1 relative z-10 pt-20">
+        
+        {/* Camera Viewport - Centered with Modern Controls */}
+        <div className="h-full flex flex-col">
+          
+          {/* Main Camera Area */}
+          <div className="flex-1 flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+              className="relative w-full max-w-4xl aspect-[4/3] max-h-[calc(100vh-200px)]"
+            >
+              {/* Modern Camera Housing */}
+              <div className="relative w-full h-full bg-slate-950/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
                 
-                {/* Outer Decorative Frame with Vintage Professional Look */}
-                <div className="absolute inset-0 bg-gradient-to-br from-vintage-400 via-gold/40 to-copper/50 rounded-2xl shadow-2xl">
-                  {/* Corner Accent Details with Enhanced Styling */}
-                  <div className="absolute top-4 left-4 w-8 h-8 border-l-3 border-t-3 border-gold/80 rounded-tl-xl shadow-lg"></div>
-                  <div className="absolute top-4 right-4 w-8 h-8 border-r-3 border-t-3 border-gold/80 rounded-tr-xl shadow-lg"></div>
-                  <div className="absolute bottom-4 left-4 w-8 h-8 border-l-3 border-b-3 border-gold/80 rounded-bl-xl shadow-lg"></div>
-                  <div className="absolute bottom-4 right-4 w-8 h-8 border-r-3 border-b-3 border-gold/80 rounded-br-xl shadow-lg"></div>
-                  
-                  {/* Enhanced Side Ornamental Elements */}
-                  <div className="absolute top-1/2 left-2 transform -translate-y-1/2 w-2 h-24 bg-gradient-to-b from-gold via-copper to-gold rounded-full shadow-xl border border-gold/50"></div>
-                  <div className="absolute top-1/2 right-2 transform -translate-y-1/2 w-2 h-24 bg-gradient-to-b from-gold via-copper to-gold rounded-full shadow-xl border border-gold/50"></div>
-                  
-                  {/* Enhanced Top and Bottom Accents with Additional Details */}
-                  <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-24 h-2 bg-gradient-to-r from-gold via-copper to-gold rounded-full shadow-xl border border-gold/50"></div>
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-2 bg-gradient-to-r from-gold via-copper to-gold rounded-full shadow-xl border border-gold/50"></div>
-                  
-                  {/* Additional Corner Micro Details */}
-                  <div className="absolute top-2 left-2 w-3 h-3 bg-gold/60 rounded-full shadow-lg border border-gold/80"></div>
-                  <div className="absolute top-2 right-2 w-3 h-3 bg-gold/60 rounded-full shadow-lg border border-gold/80"></div>
-                  <div className="absolute bottom-2 left-2 w-3 h-3 bg-gold/60 rounded-full shadow-lg border border-gold/80"></div>
-                  <div className="absolute bottom-2 right-2 w-3 h-3 bg-gold/60 rounded-full shadow-lg border border-gold/80"></div>
-                  
-                  {/* Premium Edge Highlighting */}
-                  <div className="absolute inset-1 rounded-xl border border-gold/30 pointer-events-none"></div>
-                </div>
-
-                {/* Main Camera Frame - Premium Enhanced */}
-                <div className="absolute inset-3 bg-gradient-to-br from-charcoal via-vintage-900 to-charcoal rounded-xl shadow-inner border-2 border-gold/40">
-                  
-                  {/* Additional Inner Frame Layer for Depth */}
-                  <div className="absolute inset-1 bg-gradient-to-br from-vintage-800/50 to-charcoal/50 rounded-lg border border-copper/30"></div>
-                  
-                  {/* Inner Professional Frame */}
-                  <div className="relative w-full h-full p-2">
-                    
-                    {/* Enhanced Professional Camera Brand Plate */}
-                    {/* <div className="absolute top-1 left-1/2 transform -translate-x-1/2 z-10">
-                      <div className="bg-gradient-to-r from-gold via-copper to-gold px-8 py-2 rounded-full shadow-xl border-2 border-vintage-600/50 backdrop-blur-sm">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-2 h-2 bg-charcoal rounded-full shadow-inner"></div>
-                          <span className="text-charcoal font-title text-sm font-bold tracking-[0.25em] drop-shadow-sm">BLUE CAM </span>
-                          <div className="w-2 h-2 bg-charcoal rounded-full shadow-inner"></div>
-                        </div>
-                        <div className="absolute inset-1 bg-gradient-to-b from-white/20 to-transparent rounded-full pointer-events-none"></div>
+                {/* Camera Status Bar */}
+                <div className="absolute top-0 left-0 right-0 z-30 bg-black/50 backdrop-blur-sm p-4">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-3">
+                      {/* Recording Indicator */}
+                      <div className="flex items-center space-x-2">
+                        <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                        <span className="text-white text-sm font-mono">REC</span>
                       </div>
-                    </div> */}
-
-                    {/* Lens Housing with Enhanced Premium Finish */}
-                    <div className="relative w-full h-full bg-gradient-to-br from-black via-gray-900 to-black rounded-lg overflow-hidden shadow-2xl border-3 border-vintage-700/40">
                       
-                      {/* Multiple Inner Lens Rings for Premium Depth */}
-                      <div className="absolute inset-1 rounded-lg border-2 border-gold/30 bg-gradient-to-br from-gray-900 to-black">
-                        <div className="absolute inset-2 rounded-md border border-copper/40 bg-gradient-to-br from-black to-gray-800">
-                          
-                          {/* Enhanced Professional Grid Overlay */}
-                          <div className="absolute inset-0 opacity-25">
-                            {/* Rule of thirds grid with enhanced styling */}
-                            <div className="absolute top-1/3 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cream/40 to-transparent"></div>
-                            <div className="absolute top-2/3 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cream/40 to-transparent"></div>
-                            <div className="absolute left-1/3 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-cream/40 to-transparent"></div>
-                            <div className="absolute left-2/3 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-cream/40 to-transparent"></div>
-                            
-                            {/* Enhanced center focus point */}
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 border border-cream/30 rounded-full"></div>
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-cream/20 rounded-full shadow-lg"></div>
+                      {/* Active Filter Indicator */}
+                      {activeFilter && (
+                        <div className="px-3 py-1 bg-amber-500/20 border border-amber-400/30 rounded-full">
+                          <span className="text-amber-400 text-xs font-medium">
+                            {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filter Active'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Camera Switch Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        switchCamera();
+                      }}
+                      className="p-2 bg-white/10 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-all"
+                    >
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                      </svg>
+                    </motion.button>
+                  </div>
+                </div>
+                
+                {/* Main Camera Viewport */}
+                <div className="relative w-full h-full rounded-3xl overflow-hidden">
+                  
+                  {/* Professional Grid Overlay */}
+                  <div className="absolute inset-0 pointer-events-none z-20 opacity-30">
+                    {/* Rule of thirds */}
+                    <div className="absolute top-1/3 left-0 right-0 h-px bg-white/50"></div>
+                    <div className="absolute top-2/3 left-0 right-0 h-px bg-white/50"></div>
+                    <div className="absolute left-1/3 top-0 bottom-0 w-px bg-white/50"></div>
+                    <div className="absolute left-2/3 top-0 bottom-0 w-px bg-white/50"></div>
+                    
+                    {/* Center focus indicator */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                      <motion.div 
+                        className="w-20 h-20 border-2 border-electric-400/70 rounded-full"
+                        animate={{ scale: [1, 1.1, 1], opacity: [0.7, 1, 0.7] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <div className="w-full h-full border border-white/30 rounded-full"></div>
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-electric-400 rounded-full"></div>
+                      </motion.div>
+                    </div>
+                    
+                    {/* Corner frame indicators */}
+                    <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-electric-400/60"></div>
+                    <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-electric-400/60"></div>
+                    <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-electric-400/60"></div>
+                    <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-electric-400/60"></div>
+                  </div>
+                  
+                  {/* Camera Content */}
+                  {capturedImage ? (
+                    // Captured Photo Display
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 1.05 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="relative w-full h-full"
+                    >
+                      <img 
+                        src={capturedImage} 
+                        alt="Captured" 
+                        className="w-full h-full object-cover rounded-3xl"
+                        style={{ 
+                          filter: generateFilterString(),
+                          boxShadow: vignette > 0 ? `inset 0 0 ${vignette * 2}px rgba(0,0,0,${vignette / 100})` : 'none'
+                        }}
+                      />
+                      
+                      {/* Photo Actions */}
+                      <div className="absolute bottom-6 right-6 flex space-x-3">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={savePhoto}
+                          className="p-4 bg-electric-500/90 text-white rounded-xl backdrop-blur-sm shadow-glow border border-electric-400/50"
+                        >
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </motion.button>
+                        
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => onPageChange && onPageChange('editor')}
+                          className="p-4 bg-amber-500/90 text-white rounded-xl backdrop-blur-sm shadow-glow border border-amber-400/50"
+                        >
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </motion.button>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    // Live Camera Feed
+                    <div 
+                      className="relative w-full h-full cursor-pointer rounded-3xl overflow-hidden"
+                      onClick={capture}
+                      title="Tap to capture photo"
+                    >
+                      <Webcam
+                        ref={webcamRef}
+                        audio={false}
+                        screenshotFormat="image/jpeg"
+                        videoConstraints={videoConstraints}
+                        className="w-full h-full object-cover"
+                        style={{ 
+                          filter: generateFilterString(),
+                          boxShadow: vignette > 0 ? `inset 0 0 ${vignette * 2}px rgba(0,0,0,${vignette / 100})` : 'none'
+                        }}
+                        mirrored={facingMode === 'user'}
+                      />
+                      
+                      {/* Capture Hint */}
+                      {!isCapturing && (
+                        <motion.div 
+                          className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center bg-black/20"
+                          initial={{ opacity: 0 }}
+                          whileHover={{ opacity: 1 }}
+                        >
+                          <div className="bg-black/60 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                            <svg className="w-12 h-12 text-white mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <div className="text-white text-sm text-center font-medium">Tap to Capture</div>
                           </div>
+                        </motion.div>
+                      )}
+                      
+                      {/* Effects Overlays */}
+                      {grain > 0 && (
+                        <div 
+                          className="absolute inset-0 pointer-events-none opacity-20 mix-blend-multiply"
+                          style={{
+                            backgroundImage: `radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px)`,
+                            backgroundSize: `${2}px ${2}px`,
+                            opacity: grain / 100
+                          }}
+                        />
+                      )}
+                      
+                      {fade > 0 && (
+                        <div 
+                          className="absolute inset-0 pointer-events-none"
+                          style={{
+                            background: `rgba(255, 255, 255, ${fade / 200})`,
+                            mixBlendMode: 'screen'
+                          }}
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+          
+          {/* Modern Control Dock */}
+          <div className="relative z-30 p-6 bg-gradient-to-t from-black/50 to-transparent">
+            <div className="max-w-4xl mx-auto">
+              
+              {/* Main Controls Row */}
+              <div className="flex items-center justify-between">
+                
+                {/* Left: Gallery */}
+                <div className="flex items-center space-x-4">
+                  {capturedImages.length > 0 ? (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setShowGallery(true)}
+                      className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-white/20 shadow-glow"
+                    >
+                      <img 
+                        src={capturedImages[0]} 
+                        alt="Recent capture"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-1 right-1 w-3 h-3 bg-amber-400 rounded-full shadow-glow"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity">
+                        <div className="absolute bottom-1 left-1 text-white text-xs font-bold">{capturedImages.length}</div>
+                      </div>
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setShowGallery(true)}
+                      className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl border-2 border-white/20 flex items-center justify-center"
+                    >
+                      <svg className="w-8 h-8 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </motion.button>
+                  )}
+                </div>
+                
+                {/* Center: Capture Button */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={capture}
+                  disabled={isCapturing || filmCount === 0}
+                  className="relative flex items-center justify-center disabled:opacity-50"
+                >
+                  <motion.div
+                    className="w-20 h-20 rounded-full bg-gradient-to-br from-electric-500 to-amber-500 p-1 shadow-glow"
+                    animate={isCapturing ? { scale: [1, 1.1, 1] } : {}}
+                    transition={{ duration: 0.3, repeat: isCapturing ? Infinity : 0 }}
+                  >
+                    <div className="w-full h-full bg-white rounded-full shadow-inner flex items-center justify-center">
+                      {isCapturing ? (
+                        <motion.div
+                          className="w-6 h-6 bg-red-500 rounded-sm"
+                          animate={{ scale: [1, 0.8, 1] }}
+                          transition={{ duration: 0.5, repeat: Infinity }}
+                        />
+                      ) : (
+                        <div className="w-6 h-6 bg-gradient-to-br from-electric-500 to-amber-500 rounded-full"></div>
+                      )}
+                    </div>
+                  </motion.div>
+                </motion.button>
+                
+                {/* Right: Filters */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={cn(
+                    "w-16 h-16 rounded-2xl backdrop-blur-sm border-2 flex items-center justify-center transition-all",
+                    showFilters 
+                      ? "bg-amber-500/20 border-amber-400/50 text-amber-400" 
+                      : "bg-white/10 border-white/20 text-white"
+                  )}
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  </svg>
+                  {activeFilter && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full shadow-glow"></div>
+                  )}
+                </motion.button>
+              </div>
+              
+              {/* Quick Settings Strip */}
+              {showSettings && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className="mt-6 flex justify-center space-x-4"
+                >
+                  {['brightness', 'contrast', 'saturation', 'temperature'].map((control) => (
+                    <motion.button
+                      key={control}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setActiveControl(activeControl === control ? null : control)}
+                      className={cn(
+                        "p-3 rounded-xl backdrop-blur-sm border transition-all",
+                        activeControl === control
+                          ? "bg-electric-500/20 border-electric-400/50 text-electric-400"
+                          : "bg-white/10 border-white/20 text-white"
+                      )}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                    </motion.button>
+                  ))}
+                </motion.div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+                  </div>
+                  
+                  {/* Modern Camera Viewport */}
+                  <div className="relative w-full h-full rounded-2xl overflow-hidden">
+                    
+                    {/* Professional Focus Grid */}
+                    <div className="absolute inset-0 pointer-events-none z-10 opacity-20">
+                      {/* Rule of thirds grid */}
+                      <div className="absolute top-1/3 left-0 right-0 h-px bg-white/40"></div>
+                      <div className="absolute top-2/3 left-0 right-0 h-px bg-white/40"></div>
+                      <div className="absolute left-1/3 top-0 bottom-0 w-px bg-white/40"></div>
+                      <div className="absolute left-2/3 top-0 bottom-0 w-px bg-white/40"></div>
+                      
+                      {/* Center focus indicator */}
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <div className="w-16 h-16 border border-electric-400/60 rounded-full">
+                          <div className="w-full h-full border-2 border-transparent border-t-amber-400/80 rounded-full animate-spin-slow"></div>
+                        </div>
+                      </div>
+                      
+                      {/* Corner Focus Points */}
+                      <div className="absolute top-8 left-8 w-6 h-6 border-l-2 border-t-2 border-electric-400/60"></div>
+                      <div className="absolute top-8 right-8 w-6 h-6 border-r-2 border-t-2 border-electric-400/60"></div>
+                      <div className="absolute bottom-8 left-8 w-6 h-6 border-l-2 border-b-2 border-electric-400/60"></div>
+                      <div className="absolute bottom-8 right-8 w-6 h-6 border-r-2 border-b-2 border-electric-400/60"></div>
+                    </div>
+                    
+                    {/* Scan Line Effect */}
+                    <div className="absolute inset-0 pointer-events-none z-20">
+                      <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-electric-400/40 to-transparent animate-scanner"></div>
+                    </div>
                     
                     {capturedImage ? (
-                      // Captured Photo View
+                      // Captured Photo View with Modern Styling
                       <motion.div 
                         initial={{ opacity: 0, scale: 1.05 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="relative w-full h-full"
+                        className="relative w-full h-full rounded-2xl overflow-hidden"
                       >
                         <img 
                           src={capturedImage} 
@@ -403,13 +670,13 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           />
                         )}
                         
-                        {/* Photo Actions */}
+                        {/* Modern Photo Actions */}
                         <div className="absolute top-6 right-6 flex space-x-3">
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={savePhoto}
-                            className="p-4 bg-gold/90 text-cream rounded-full backdrop-blur-sm shadow-xl border border-gold/50"
+                            className="p-4 bg-electric-500/90 text-white rounded-xl backdrop-blur-sm shadow-glow border border-electric-400/50 hover:bg-electric-400/90 transition-all duration-200"
                           >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
@@ -421,7 +688,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => onPageChange && onPageChange('editor')}
-                            className="p-4 bg-copper/90 text-cream rounded-full backdrop-blur-sm shadow-xl border border-copper/50"
+                            className="p-4 bg-amber-500/90 text-white rounded-xl backdrop-blur-sm shadow-glow border border-amber-400/50 hover:bg-amber-400/90 transition-all duration-200"
                           >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
@@ -431,9 +698,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         </div>
                       </motion.div>
                     ) : (
-                      // Live Camera View
+                      // Live Camera View with Modern Interface
                       <div 
-                        className="relative w-full h-full cursor-pointer"
+                        className="relative w-full h-full cursor-pointer rounded-2xl overflow-hidden"
                         onClick={capture}
                         title="Tap to capture photo"
                       >
@@ -442,7 +709,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           audio={false}
                           screenshotFormat="image/jpeg"
                           videoConstraints={videoConstraints}
-                          className="w-full h-full object-cover transition-all duration-300"
+                          className="w-full h-full object-cover transition-all duration-300 hover:scale-[1.02]"
                           style={{ 
                             filter: generateFilterString(),
                             boxShadow: vignette > 0 ? `inset 0 0 ${vignette * 2}px rgba(0,0,0,${vignette / 100})` : 'none'
@@ -450,17 +717,17 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           mirrored={facingMode === 'user'}
                         />
                         
-                        {/* Click Hint Overlay - Only show when not capturing */}
+                        {/* Modern Click Hint Overlay */}
                         {!isCapturing && (
                           <div className="absolute inset-0 pointer-events-none opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                            <div className="bg-black/30 backdrop-blur-sm rounded-full p-4 border border-white/20">
-                              <svg className="w-10 h-10 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-glow">
+                              <svg className="w-12 h-12 text-white/90 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
                                       d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                               </svg>
-                              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-white/80 text-sm font-body whitespace-nowrap">
-                                Tap to capture
+                              <div className="text-white/90 text-sm font-body text-center">
+                                Tap to Capture
                               </div>
                             </div>
                           </div>
@@ -489,36 +756,36 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           />
                         )}
                         
-                        {/* Soft Viewfinder Overlay */}
+                        {/* Modern Viewfinder Elements */}
                         <div className="absolute inset-0">
-                          {/* Corner Guides */}
-                          <div className="absolute top-8 left-8 w-6 h-6 border-l-2 border-t-2 border-cream/80 rounded-tl-lg pointer-events-none"></div>
-                          <div className="absolute top-8 right-8 w-6 h-6 border-r-2 border-t-2 border-cream/80 rounded-tr-lg pointer-events-none"></div>
-                          <div className="absolute bottom-8 left-8 w-6 h-6 border-l-2 border-b-2 border-cream/80 rounded-bl-lg pointer-events-none"></div>
-                          <div className="absolute bottom-8 right-8 w-6 h-6 border-r-2 border-b-2 border-cream/80 rounded-br-lg pointer-events-none"></div>
+                          {/* Enhanced Corner Guides */}
+                          <div className="absolute top-8 left-8 w-8 h-8 border-l-2 border-t-2 border-electric-400/80 rounded-tl-lg pointer-events-none"></div>
+                          <div className="absolute top-8 right-8 w-8 h-8 border-r-2 border-t-2 border-electric-400/80 rounded-tr-lg pointer-events-none"></div>
+                          <div className="absolute bottom-8 left-8 w-8 h-8 border-l-2 border-b-2 border-electric-400/80 rounded-bl-lg pointer-events-none"></div>
+                          <div className="absolute bottom-8 right-8 w-8 h-8 border-r-2 border-b-2 border-electric-400/80 rounded-br-lg pointer-events-none"></div>
                           
-                          {/* Center Focus */}
+                          {/* Enhanced Center Focus with Modern Animation */}
                           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
                             <motion.div 
-                              className="w-12 h-12 border border-cream/60 rounded-full"
-                              animate={{ scale: [1, 1.1, 1] }}
+                              className="w-16 h-16 border-2 border-electric-400/70 rounded-full"
+                              animate={{ scale: [1, 1.1, 1], opacity: [0.7, 1, 0.7] }}
                               transition={{ duration: 2, repeat: Infinity }}
                             >
-                              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-cream/80 rounded-full"></div>
+                              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-electric-400/80 rounded-full shadow-glow"></div>
                             </motion.div>
                           </div>
                           
-                          {/* Active Filter Indicator */}
+                          {/* Active Filter Indicator with Modern Design */}
                           {activeFilter && (
                             <motion.div
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: 10 }}
-                              className="absolute top-6 left-6 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full border border-gold/30"
+                              className="absolute top-6 left-6 bg-black/50 backdrop-blur-md px-4 py-2 rounded-xl border border-electric-400/30 shadow-glow"
                             >
                               <div className="flex items-center space-x-2">
-                                <div className="w-2 h-2 bg-gold rounded-full"></div>
-                                <span className="text-cream text-sm font-body">
+                                <div className="w-2 h-2 bg-electric-400 rounded-full animate-pulse"></div>
+                                <span className="text-white text-sm font-body">
                                   {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filter Applied'}
                                 </span>
                               </div>
@@ -815,9 +1082,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         )}
                       </div>
                     )}
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
