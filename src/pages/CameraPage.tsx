@@ -3,7 +3,9 @@ import Webcam from 'react-webcam';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils';
 import { Navigation } from '../components';
+import { FiltersPanel } from '../components/FiltersPanel';
 import { downloadImage } from '../utils/imageUtils';
+import { vintageFilters } from '../filters/cssFilters';
 
 interface CameraPageProps {
   className?: string;
@@ -22,6 +24,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   const [showGallery, setShowGallery] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
+  
+  // Filters state
+  const [showFilters, setShowFilters] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<string>('');
   
   // Camera editing controls (like normal camera apps)
   const [brightness, setBrightness] = useState(100);
@@ -140,12 +146,15 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
 
   // Generate CSS filter string from adjustment values
   const generateFilterString = () => {
-    return `
+    const adjustmentFilters = `
       brightness(${brightness}%) 
       contrast(${contrast}%) 
       saturate(${saturation}%) 
       hue-rotate(${temperature * 1.8}deg)
     `.trim();
+    
+    // Combine adjustment filters with active vintage filter
+    return activeFilter ? `${adjustmentFilters} ${activeFilter}` : adjustmentFilters;
   };
 
   return (
@@ -1199,8 +1208,27 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   )}
                 </motion.button>
 
-                {/* Placeholder for right side to maintain center alignment */}
-                <div className="w-16 h-16"></div>
+                {/* Filters Button - Right side */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowFilters(true)}
+                  className="relative flex items-center justify-center"
+                >
+                  <motion.div
+                    className="w-16 h-16 rounded-xl bg-vintage-200 border-2 border-vintage-400 shadow-lg flex items-center justify-center hover:border-gold/50 transition-colors duration-300"
+                  >
+                    {/* Filter/Editing Icon */}
+                    <svg className="w-8 h-8 text-vintage-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                    {/* Active filter indicator */}
+                    {activeFilter && (
+                      <div className="absolute top-1 right-1 w-2 h-2 bg-gold rounded-full"></div>
+                    )}
+                  </motion.div>
+                </motion.button>
               </>
             )}
           </motion.div>
@@ -1518,6 +1546,109 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                 >
                   Delete
                 </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Filters Modal */}
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowFilters(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 50 }}
+              transition={{ duration: 0.3 }}
+              className="bg-gradient-to-br from-vintage-100 to-vintage-200 rounded-2xl max-w-4xl max-h-[80vh] overflow-hidden border border-vintage-300/50 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Filters Header */}
+              <div className="flex items-center justify-between p-6 border-b border-vintage-300/50">
+                <h2 className="text-2xl font-title text-charcoal flex items-center space-x-2">
+                  <svg className="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                  </svg>
+                  <span>Vintage Filters</span>
+                </h2>
+                
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowFilters(false)}
+                  className="p-2 rounded-full bg-vintage-300 text-charcoal hover:bg-vintage-400 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </motion.button>
+              </div>
+
+              {/* Filters Content */}
+              <div className="p-6">
+                {/* Preview Image - Use latest captured image or placeholder */}
+                <div className="mb-6">
+                  <div className="aspect-video w-full max-w-md mx-auto bg-vintage-200 rounded-lg overflow-hidden border border-vintage-300/50">
+                    {capturedImages.length > 0 ? (
+                      <img 
+                        src={capturedImages[0]} 
+                        alt="Filter preview"
+                        className="w-full h-full object-cover transition-all duration-300"
+                        style={{ filter: activeFilter }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-vintage-600">
+                        <div className="text-center">
+                          <svg className="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <p className="text-sm font-body">Take a photo to preview filters</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Filters Panel */}
+                <FiltersPanel
+                  selectedImage={capturedImages.length > 0 ? capturedImages[0] : null}
+                  onFilterApply={(filter) => setActiveFilter(filter)}
+                  activeFilter={activeFilter}
+                  className="max-h-64 overflow-y-auto"
+                />
+
+                {/* Action Buttons */}
+                <div className="flex justify-center space-x-4 mt-6 pt-4 border-t border-vintage-300/50">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      setActiveFilter('');
+                      setShowFilters(false);
+                    }}
+                    className="py-3 px-6 bg-vintage-300 text-charcoal rounded-lg font-body hover:bg-vintage-400 transition-colors"
+                  >
+                    Clear Filter
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setShowFilters(false)}
+                    className="py-3 px-6 bg-gradient-to-br from-copper to-gold text-cream rounded-lg font-body shadow-lg border border-gold/50"
+                  >
+                    Apply Filter
+                  </motion.button>
+                </div>
               </div>
             </motion.div>
           </motion.div>
