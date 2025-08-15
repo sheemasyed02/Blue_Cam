@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils';
@@ -20,6 +20,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   // Gallery state for captured images
   const [capturedImages, setCapturedImages] = useState<string[]>([]);
   const [showGallery, setShowGallery] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
   
   // Camera editing controls (like normal camera apps)
   const [brightness, setBrightness] = useState(100);
@@ -74,6 +76,67 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
       downloadImage(capturedImage, `vintage-capture-${timestamp}.jpg`);
     }
   }, [capturedImage]);
+
+  // Delete a specific image from the gallery
+  const deleteImage = useCallback((indexToDelete: number) => {
+    setCapturedImages(prev => prev.filter((_, index) => index !== indexToDelete));
+    setShowDeleteConfirm(null);
+    
+    // If viewing the deleted image, close the viewer
+    if (selectedImageIndex === indexToDelete) {
+      setSelectedImageIndex(null);
+    } else if (selectedImageIndex !== null && selectedImageIndex > indexToDelete) {
+      // Adjust the selected index if it's after the deleted image
+      setSelectedImageIndex(selectedImageIndex - 1);
+    }
+  }, [selectedImageIndex]);
+
+  // Navigate between images in viewer
+  const navigateImage = useCallback((direction: 'prev' | 'next') => {
+    if (selectedImageIndex === null) return;
+    
+    if (direction === 'prev' && selectedImageIndex > 0) {
+      setSelectedImageIndex(selectedImageIndex - 1);
+    } else if (direction === 'next' && selectedImageIndex < capturedImages.length - 1) {
+      setSelectedImageIndex(selectedImageIndex + 1);
+    }
+  }, [selectedImageIndex, capturedImages.length]);
+
+  // Keyboard navigation for image viewer
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (selectedImageIndex !== null) {
+        switch (e.key) {
+          case 'ArrowLeft':
+            e.preventDefault();
+            navigateImage('prev');
+            break;
+          case 'ArrowRight':
+            e.preventDefault();
+            navigateImage('next');
+            break;
+          case 'Escape':
+            e.preventDefault();
+            setSelectedImageIndex(null);
+            break;
+          case 'Delete':
+          case 'Backspace':
+            e.preventDefault();
+            setShowDeleteConfirm(selectedImageIndex);
+            break;
+        }
+      }
+      
+      // Close delete confirmation with Escape
+      if (showDeleteConfirm !== null && e.key === 'Escape') {
+        e.preventDefault();
+        setShowDeleteConfirm(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [selectedImageIndex, showDeleteConfirm, navigateImage]);
 
   // Generate CSS filter string from adjustment values
   const generateFilterString = () => {
@@ -1203,38 +1266,80 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.1, duration: 0.3 }}
-                      className="relative group"
+                      className="relative group cursor-pointer"
                     >
                       <div className="relative aspect-square rounded-xl overflow-hidden shadow-lg border-2 border-vintage-300/50 group-hover:border-gold/50 transition-all duration-300">
                         <img 
                           src={image} 
                           alt={`Captured photo ${index + 1}`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover transition-transform duration-300"
                         />
                         
                         {/* Recently captured indicator */}
                         {index === 0 && (
-                          <div className="absolute top-2 right-2 bg-gold text-cream text-xs px-2 py-1 rounded-full font-body font-medium">
+                          <div className="absolute top-2 right-2 bg-gold text-cream text-xs px-2 py-1 rounded-full font-body font-medium z-10">
                             Latest
                           </div>
                         )}
                         
-                        {/* Download button on hover */}
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => {
-                              const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-                              downloadImage(image, `vintage-capture-${timestamp}.jpg`);
-                            }}
-                            className="p-3 bg-gold rounded-full text-cream shadow-lg"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                          </motion.button>
+                        {/* Action buttons overlay - Always visible for better accessibility */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          {/* Button container at bottom */}
+                          <div className="absolute bottom-2 left-2 right-2 flex items-center justify-center space-x-2">
+                            {/* View button */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSelectedImageIndex(index);
+                              }}
+                              className="p-2 bg-gold/90 hover:bg-gold rounded-full text-cream shadow-lg transition-all duration-200 transform hover:scale-110 z-20"
+                              title="View image"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            </button>
+
+                            {/* Download button */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                                downloadImage(image, `vintage-capture-${timestamp}.jpg`);
+                              }}
+                              className="p-2 bg-gold/90 hover:bg-gold rounded-full text-cream shadow-lg transition-all duration-200 transform hover:scale-110 z-20"
+                              title="Download image"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                            </button>
+
+                            {/* Delete button */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setShowDeleteConfirm(index);
+                              }}
+                              className="p-2 bg-gold/90 hover:bg-gold rounded-full text-cream shadow-lg transition-all duration-200 transform hover:scale-110 z-20"
+                              title="Delete image"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
                       
@@ -1269,6 +1374,183 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   </motion.button>
                 </div>
               )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Image Viewer Modal */}
+      <AnimatePresence>
+        {selectedImageIndex !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/90 backdrop-blur-sm z-60 flex items-center justify-center p-4"
+            onClick={() => setSelectedImageIndex(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="relative max-w-[90vw] max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Main Image */}
+              <img 
+                src={capturedImages[selectedImageIndex]} 
+                alt={`Photo ${selectedImageIndex + 1}`}
+                className="w-full h-full object-contain rounded-2xl"
+              />
+
+              {/* Close Button */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setSelectedImageIndex(null)}
+                className="absolute top-4 right-4 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </motion.button>
+
+              {/* Navigation Arrows */}
+              {selectedImageIndex > 0 && (
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => navigateImage('prev')}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </motion.button>
+              )}
+
+              {selectedImageIndex < capturedImages.length - 1 && (
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => navigateImage('next')}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </motion.button>
+              )}
+
+              {/* Image Info */}
+              <div className="absolute bottom-4 left-4 bg-black/50 rounded-lg px-3 py-2 text-white">
+                <span className="text-sm font-body">
+                  {selectedImageIndex + 1} of {capturedImages.length}
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="absolute bottom-4 right-4 flex space-x-2">
+                {/* Download Button */}
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => {
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    downloadImage(capturedImages[selectedImageIndex], `vintage-capture-${timestamp}.jpg`);
+                  }}
+                  className="p-2 bg-gold rounded-full text-cream shadow-lg hover:bg-gold/80 transition-colors"
+                  title="Download image"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </motion.button>
+
+                {/* Delete Button */}
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowDeleteConfirm(selectedImageIndex)}
+                  className="p-2 bg-red-500 rounded-full text-cream shadow-lg hover:bg-red-600 transition-colors"
+                  title="Delete image"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteConfirm !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-70 flex items-center justify-center p-4"
+            onClick={() => setShowDeleteConfirm(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-gradient-to-br from-vintage-100 to-vintage-200 rounded-2xl p-6 max-w-md border border-vintage-300/50 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Confirmation Header */}
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="p-2 bg-red-100 rounded-full">
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-title text-charcoal">Delete Photo</h3>
+              </div>
+
+              {/* Image Preview */}
+              <div className="mb-4">
+                <img 
+                  src={capturedImages[showDeleteConfirm]} 
+                  alt="Photo to delete"
+                  className="w-full h-32 object-cover rounded-lg border border-vintage-300"
+                />
+              </div>
+
+              {/* Confirmation Text */}
+              <p className="text-charcoal font-body mb-6">
+                Are you sure you want to delete this photo? This action cannot be undone.
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex space-x-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowDeleteConfirm(null)}
+                  className="flex-1 py-3 px-4 bg-vintage-300 text-charcoal rounded-lg font-body hover:bg-vintage-400 transition-colors"
+                >
+                  Cancel
+                </motion.button>
+                
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => deleteImage(showDeleteConfirm)}
+                  className="flex-1 py-3 px-4 bg-red-500 text-cream rounded-lg font-body hover:bg-red-600 transition-colors"
+                >
+                  Delete
+                </motion.button>
+              </div>
             </motion.div>
           </motion.div>
         )}
