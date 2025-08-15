@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:wght@400;500;600&display=swap');
 
 @layer base {
   html {
@@ -28,4 +28,118 @@
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Cinematic effects */
+@keyframes filmGrain {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.2; }
+}
+
+@keyframes dustParticles {
+  0% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.3; }
+  90% { opacity: 0.3; }
+  100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+}
+
+@keyframes vintageFlicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.98; }
+}
+
+@keyframes cinematicPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(197, 162, 124, 0.3); }
+  70% { box-shadow: 0 0 0 10px rgba(197, 162, 124, 0); }
+}
+
+/* Cinematic utility classes */
+.film-grain::before {
+  animation: filmGrain 0.2s infinite;
+}
+
+.vintage-flicker {
+  animation: vintageFlicker 4s infinite;
+}
+
+.cinematic-pulse {
+  animation: cinematicPulse 2s infinite;
+}
+
+/* Custom gradient overlays */
+.dusty-overlay {
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(197, 162, 124, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(90, 78, 60, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(228, 195, 161, 0.06) 0%, transparent 50%);
+}
+
+/* Premium camera effects */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
+.premium-shadow {
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(197, 162, 124, 0.1);
+}
+
+.camera-housing {
+  background: 
+    linear-gradient(145deg, rgba(90, 78, 60, 0.95), rgba(90, 78, 60, 0.98)),
+    radial-gradient(circle at 30% 30%, rgba(197, 162, 124, 0.1), transparent 60%);
+}
+
+/* Professional viewfinder effects */
+.viewfinder-glow {
+  box-shadow: 
+    inset 0 0 20px rgba(197, 162, 124, 0.1),
+    0 0 40px rgba(197, 162, 124, 0.15);
+}
+
+.professional-grid::before {
+  content: '';
+  position: absolute;
+  inset: 1.5rem;
+  background: 
+    linear-gradient(to right, rgba(197, 162, 124, 0.2) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(197, 162, 124, 0.2) 1px, transparent 1px);
+  background-size: 33.333% 33.333%;
+  pointer-events: none;
+}
+
+/* Premium button effects */
+.premium-button {
+  background: linear-gradient(145deg, #c5a27c, #b8956f);
+  box-shadow: 
+    0 8px 32px rgba(197, 162, 124, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.premium-button:hover {
+  background: linear-gradient(145deg, #d4b189, #c5a27c);
+  box-shadow: 
+    0 12px 40px rgba(197, 162, 124, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Lana Del Rey dreamy aesthetics */
+.dreamy-blur {
+  backdrop-filter: blur(8px) saturate(1.2);
+}
+
+.retro-border {
+  background: linear-gradient(45deg, transparent, rgba(197, 162, 124, 0.1), transparent);
+  background-size: 200% 200%;
+  animation: borderShine 3s infinite;
+}
+
+@keyframes borderShine {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
