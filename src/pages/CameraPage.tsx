@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import Webcam from 'react-webcam';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils';
@@ -15,7 +15,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const [isCapturing, setIsCapturing] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [filmCount, setFilmCount] = useState(24);
   
   // Camera editing controls (like normal camera apps)
@@ -32,12 +31,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   
   // Settings panel state
   const [showSettings, setShowSettings] = useState(false);
-
-  // Update time every second
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const videoConstraints = {
     width: 1920,
@@ -71,15 +64,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
       downloadImage(capturedImage, `vintage-capture-${timestamp}.jpg`);
     }
   }, [capturedImage]);
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour12: false, 
-      hour: '2-digit', 
-      minute: '2-digit',
-      second: '2-digit'
-    });
-  };
 
   // Generate CSS filter string from adjustment values
   const generateFilterString = () => {
@@ -1101,55 +1085,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             )}
           </motion.div>
 
-          {/* Film Status and Info */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4"
-          >
-            {/* Film Counter */}
-            <div className="bg-gradient-to-br from-vintage-100/90 to-vintage-200/90 backdrop-blur-sm rounded-xl p-4 border border-vintage-300/50">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-charcoal font-body text-sm font-medium">Film Remaining</span>
-                <div className="w-2 h-2 bg-gold rounded-full animate-pulse"></div>
-              </div>
-              <div className="text-2xl font-title text-charcoal">{filmCount.toString().padStart(2, '0')}</div>
-              <div className="w-full bg-vintage-300 rounded-full h-2 mt-2">
-                <motion.div 
-                  className="bg-gradient-to-r from-gold to-copper h-2 rounded-full"
-                  style={{ width: `${(filmCount / 36) * 100}%` }}
-                  transition={{ duration: 0.5 }}
-                />
-              </div>
-            </div>
 
-            {/* Camera Info */}
-            <div className="bg-gradient-to-br from-vintage-100/90 to-vintage-200/90 backdrop-blur-sm rounded-xl p-4 border border-vintage-300/50">
-              <div className="text-charcoal font-body text-sm font-medium mb-2">Live Adjustments</div>
-              <div className="space-y-1 text-sm text-vintage-700">
-                <div>Brightness: {brightness}% • Contrast: {contrast}%</div>
-                <div>Saturation: {saturation}% • Temperature: {temperature > 0 ? '+' : ''}{temperature}</div>
-                <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full ${filmCount > 0 ? 'bg-gold' : 'bg-red-500'}`}></div>
-                  <span>Film {filmCount > 0 ? 'Loaded' : 'Empty'}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Time Display */}
-            <div className="bg-gradient-to-br from-vintage-100/90 to-vintage-200/90 backdrop-blur-sm rounded-xl p-4 border border-vintage-300/50">
-              <div className="text-charcoal font-body text-sm font-medium mb-2">Current Time</div>
-              <div className="text-xl font-mono text-charcoal">{formatTime(currentTime)}</div>
-              <div className="text-vintage-600 text-sm mt-1">
-                {currentTime.toLocaleDateString('en-US', { 
-                  weekday: 'short', 
-                  month: 'short', 
-                  day: 'numeric' 
-                })}
-              </div>
-            </div>
-          </motion.div>
         </div>
       </div>
     </div>
