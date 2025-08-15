@@ -120,28 +120,51 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
         ))}
       </div>
 
-      {/* Navigation */}
-      <Navigation currentPage="camera" onPageChange={onPageChange || (() => {})} />
+            {/* Modern Professional Navigation */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-charcoal via-vintage-800 to-charcoal backdrop-blur-md border-b border-gold/20 shadow-xl">
+        <div className="flex justify-between items-center px-8 py-3">
+          {/* Logo Section */}
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <div className="w-10 h-10 bg-gradient-to-br from-gold to-copper rounded-lg flex items-center justify-center shadow-lg">
+                <svg className="w-6 h-6 text-cream" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-gold rounded-full animate-pulse"></div>
+            </div>
+            <div>
+              <h2 className="text-cream font-title text-xl font-bold tracking-wide">Blue Cam</h2>
+              <p className="text-gold/80 text-xs font-body tracking-widest uppercase">Vintage Vibes</p>
+            </div>
+          </div>
+
+          {/* Navigation Controls */}
+          <div className="flex items-center space-x-6">
+            <Navigation currentPage="camera" onPageChange={onPageChange || (() => {})} />
+            
+            {/* Status Indicators */}
+            {/* <div className="hidden md:flex items-center space-x-4 text-sm">
+              <div className="flex items-center space-x-2 px-3 py-1 bg-gold/20 rounded-full">
+                <div className="w-2 h-2 bg-gold rounded-full animate-pulse"></div>
+                <span className="text-cream font-body text-xs">Live</span>
+              </div>
+              <div className="flex items-center space-x-2 px-3 py-1 bg-copper/20 rounded-full">
+                <svg className="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span className="text-cream font-body text-xs">HD</span>
+              </div>
+            </div> */}
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
-      <div className="relative z-10 px-4 pt-16 pb-6">
+      <div className="relative z-10 px-4 pt-20 pb-6">
         <div className="max-w-7xl mx-auto">
-          
-          {/* Header */}
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-6"
-          >
-            <h1 className="font-title text-4xl md:text-5xl text-charcoal mb-2 tracking-wide">
-              <span className="bg-gradient-to-r from-charcoal via-vintage-700 to-copper bg-clip-text text-transparent">
-                Vintage Camera
-              </span>
-            </h1>
-            <p className="font-body text-vintage-600 text-sm tracking-wider uppercase">
-              Capture Beautiful Moments
-            </p>
-          </motion.div>
 
           {/* Main Camera Area - 75% of screen */}
           <motion.div 
@@ -149,7 +172,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
             className="mb-8"
-            style={{ height: '75vh' }}
+            style={{ height: '80vh' }}
           >
             {/* Camera Container */}
             <div className="relative w-full h-full max-w-6xl mx-auto">
@@ -157,15 +180,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               {/* Soft Camera Housing */}
               <div className="relative w-full h-full bg-gradient-to-br from-vintage-200/80 via-cream/90 to-vintage-300/80 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border border-vintage-300/50">
                 
-                {/* Top Camera Info */}
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-gold/80 via-peach/80 to-gold/80 px-8 py-2 rounded-full shadow-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-charcoal/60 rounded-full"></div>
-                    <span className="text-charcoal font-title text-sm font-medium tracking-widest">VINTAGE</span>
-                    <div className="w-2 h-2 bg-charcoal/60 rounded-full"></div>
-                  </div>
-                </div>
-
                 {/* Inner Frame */}
                 <div className="relative w-full h-full bg-gradient-to-br from-charcoal/80 via-vintage-800/80 to-charcoal/80 rounded-2xl p-4 shadow-inner">
                   
