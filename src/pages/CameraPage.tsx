@@ -17,6 +17,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   const [isCapturing, setIsCapturing] = useState(false);
   const [filmCount, setFilmCount] = useState(24);
   
+  // Gallery state for captured images
+  const [capturedImages, setCapturedImages] = useState<string[]>([]);
+  const [showGallery, setShowGallery] = useState(false);
+  
   // Camera editing controls (like normal camera apps)
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
@@ -43,6 +47,12 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
       setIsCapturing(true);
       const imageSrc = webcamRef.current.getScreenshot();
       setCapturedImage(imageSrc);
+      
+      // Add to captured images array (newest first)
+      if (imageSrc) {
+        setCapturedImages(prev => [imageSrc, ...prev]);
+      }
+      
       setFilmCount(prev => prev - 1);
       
       setTimeout(() => setIsCapturing(false), 600);
@@ -1021,7 +1031,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            className="flex justify-center mb-6"
+            className="flex justify-center items-center mb-6 space-x-6"
           >
             {capturedImage ? (
               <div className="flex space-x-4">
@@ -1043,51 +1053,226 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                 </motion.button>
               </div>
             ) : (
-              // Traditional Camera Shutter Button
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={capture}
-                disabled={isCapturing || filmCount === 0}
-                className="relative flex items-center justify-center disabled:opacity-50"
-              >
-                {/* Outer Golden Border - Polished Design */}
-                <motion.div
-                  className="w-20 h-20 rounded-2xl bg-gold p-0.5 shadow-xl ring-2 ring-gold/30 ring-offset-2 ring-offset-cream"
-                  animate={isCapturing ? { scale: [1, 1.1, 1] } : {}}
-                  transition={{ duration: 0.3, repeat: isCapturing ? Infinity : 0 }}
-                >
-                  {/* Inner Dark Center - Deep Black with Subtle Texture */}
-                  <div className="w-full h-full bg-black rounded-xl shadow-inner border border-charcoal/20 flex items-center justify-center relative overflow-hidden">
-                    {/* Subtle inner reflection for polished look */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent rounded-xl"></div>
-                    
-                    {/* Optional subtle inner glow when capturing */}
-                    {isCapturing && (
-                      <motion.div
-                        className="w-12 h-12 bg-gold/15 rounded-lg border border-gold/30"
-                        animate={{ opacity: [0.3, 0.7, 0.3] }}
-                        transition={{ duration: 0.5, repeat: Infinity }}
+              <>
+                {/* Gallery Button - Left side */}
+                {capturedImages.length > 0 && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowGallery(true)}
+                    className="relative flex items-center justify-center"
+                  >
+                    <motion.div
+                      className="w-16 h-16 rounded-xl bg-vintage-200 border-2 border-vintage-400 shadow-lg overflow-hidden"
+                    >
+                      {/* Show the most recent captured image as thumbnail */}
+                      <img 
+                        src={capturedImages[0]} 
+                        alt="Recent capture"
+                        className="w-full h-full object-cover"
                       />
-                    )}
-                  </div>
-                </motion.div>
-                
-                {/* Optional capture indicator (small dot when ready) */}
-                {!isCapturing && filmCount > 0 && (
-                  <motion.div
-                    className="absolute w-1.5 h-1.5 bg-gold rounded-full shadow-lg ring-1 ring-gold/50"
-                    animate={{ opacity: [0.6, 1, 0.6] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
+                      {/* Gallery indicator */}
+                      <div className="absolute top-1 right-1 w-2 h-2 bg-gold rounded-full"></div>
+                    </motion.div>
+                  </motion.button>
                 )}
-              </motion.button>
+                
+                {/* Default Gallery Icon when no images */}
+                {capturedImages.length === 0 && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowGallery(true)}
+                    className="relative flex items-center justify-center opacity-50"
+                  >
+                    <motion.div
+                      className="w-16 h-16 rounded-xl bg-vintage-200 border-2 border-vintage-300 shadow-lg flex items-center justify-center"
+                    >
+                      <svg className="w-8 h-8 text-vintage-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </motion.div>
+                  </motion.button>
+                )}
+
+                {/* Traditional Camera Shutter Button - Center */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={capture}
+                  disabled={isCapturing || filmCount === 0}
+                  className="relative flex items-center justify-center disabled:opacity-50"
+                >
+                  {/* Outer Golden Border - Polished Design */}
+                  <motion.div
+                    className="w-20 h-20 rounded-2xl bg-gold p-0.5 shadow-xl ring-2 ring-gold/30 ring-offset-2 ring-offset-cream"
+                    animate={isCapturing ? { scale: [1, 1.1, 1] } : {}}
+                    transition={{ duration: 0.3, repeat: isCapturing ? Infinity : 0 }}
+                  >
+                    {/* Inner Dark Center - Deep Black with Subtle Texture */}
+                    <div className="w-full h-full bg-black rounded-xl shadow-inner border border-charcoal/20 flex items-center justify-center relative overflow-hidden">
+                      {/* Subtle inner reflection for polished look */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent rounded-xl"></div>
+                      
+                      {/* Optional subtle inner glow when capturing */}
+                      {isCapturing && (
+                        <motion.div
+                          className="w-12 h-12 bg-gold/15 rounded-lg border border-gold/30"
+                          animate={{ opacity: [0.3, 0.7, 0.3] }}
+                          transition={{ duration: 0.5, repeat: Infinity }}
+                        />
+                      )}
+                    </div>
+                  </motion.div>
+                  
+                  {/* Optional capture indicator (small dot when ready) */}
+                  {!isCapturing && filmCount > 0 && (
+                    <motion.div
+                      className="absolute w-1.5 h-1.5 bg-gold rounded-full shadow-lg ring-1 ring-gold/50"
+                      animate={{ opacity: [0.6, 1, 0.6] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  )}
+                </motion.button>
+
+                {/* Placeholder for right side to maintain center alignment */}
+                <div className="w-16 h-16"></div>
+              </>
             )}
           </motion.div>
 
-
         </div>
       </div>
+
+      {/* Gallery Modal */}
+      <AnimatePresence>
+        {showGallery && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowGallery(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-gradient-to-br from-vintage-100 to-vintage-200 rounded-2xl p-6 max-w-4xl max-h-[80vh] overflow-auto border border-vintage-300/50 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Gallery Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-title text-charcoal flex items-center space-x-2">
+                  <svg className="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span>Captured Photos ({capturedImages.length})</span>
+                </h2>
+                
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowGallery(false)}
+                  className="p-2 text-vintage-600 hover:text-charcoal transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </motion.button>
+              </div>
+
+              {/* Gallery Content */}
+              {capturedImages.length === 0 ? (
+                <div className="text-center py-12">
+                  <svg className="w-16 h-16 text-vintage-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <p className="text-vintage-600 font-body text-lg">No photos captured yet</p>
+                  <p className="text-vintage-500 font-body text-sm mt-2">Start taking photos to see them here</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {capturedImages.map((image, index) => (
+                    <motion.div
+                      key={`${image}-${index}`}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.1, duration: 0.3 }}
+                      className="relative group"
+                    >
+                      <div className="relative aspect-square rounded-xl overflow-hidden shadow-lg border-2 border-vintage-300/50 group-hover:border-gold/50 transition-all duration-300">
+                        <img 
+                          src={image} 
+                          alt={`Captured photo ${index + 1}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        
+                        {/* Recently captured indicator */}
+                        {index === 0 && (
+                          <div className="absolute top-2 right-2 bg-gold text-cream text-xs px-2 py-1 rounded-full font-body font-medium">
+                            Latest
+                          </div>
+                        )}
+                        
+                        {/* Download button on hover */}
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => {
+                              const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                              downloadImage(image, `vintage-capture-${timestamp}.jpg`);
+                            }}
+                            className="p-3 bg-gold rounded-full text-cream shadow-lg"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </motion.button>
+                        </div>
+                      </div>
+                      
+                      {/* Photo number */}
+                      <div className="text-center mt-2">
+                        <span className="text-vintage-600 font-body text-sm">
+                          #{capturedImages.length - index}
+                        </span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+
+              {/* Gallery Footer */}
+              {capturedImages.length > 0 && (
+                <div className="mt-6 pt-4 border-t border-vintage-300/50 flex items-center justify-between">
+                  <p className="text-vintage-600 font-body text-sm">
+                    Photos are sorted from newest to oldest
+                  </p>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      // Download all images as a zip would be complex, so let's keep it simple
+                      // Each image can be downloaded individually
+                      setShowGallery(false);
+                    }}
+                    className="px-4 py-2 bg-gradient-to-r from-gold to-copper text-cream rounded-lg font-body text-sm shadow-lg hover:shadow-xl transition-all"
+                  >
+                    Close Gallery
+                  </motion.button>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
