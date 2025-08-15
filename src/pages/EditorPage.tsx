@@ -114,9 +114,9 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
 
   const presets = [
     { name: 'Vintage', filter: 'sepia(80%) brightness(110%) contrast(110%)' },
-    { name: 'Blue Tone', filter: 'hue-rotate(150deg) saturate(100%)' },
+    { name: 'Blue Tone', filter: 'hue-rotate(180deg) saturate(90%)' },
     { name: 'Warm', filter: 'sepia(30%) saturate(120%) brightness(110%)' },
-    { name: 'Cool', filter: 'hue-rotate(150deg) saturate(110%)' },
+    { name: 'Cool', filter: 'hue-rotate(160deg) saturate(110%)' },
     { name: 'Black & White', filter: 'grayscale(100%) contrast(110%)' },
     { name: 'High Contrast', filter: 'contrast(150%) saturate(130%)' }
   ];
