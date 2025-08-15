@@ -21,7 +21,7 @@ export const Navigation = ({ currentPage, onPageChange, className }: NavigationP
             : "bg-transparent text-cream hover:bg-white/20"
         )}
       >
-        📷 Camera
+        Camera
       </motion.button>
       
       <motion.button
@@ -35,7 +35,7 @@ export const Navigation = ({ currentPage, onPageChange, className }: NavigationP
             : "bg-transparent text-cream hover:bg-white/20"
         )}
       >
-        ✨ Editor
+        Editor
       </motion.button>
     </div>
   );

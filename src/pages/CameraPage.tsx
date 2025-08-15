@@ -165,7 +165,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                                  transition-all duration-200 shadow-lg hover:shadow-xl
                                  text-lg md:text-xl"
                       >
-                        � Save Photo
+                          Save Photo
                       </motion.button>
                       
                       {/* Retake Button */}
@@ -176,7 +176,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         className="w-full py-3 px-6 bg-charcoal text-cream rounded-xl font-body font-medium
                                  transition-all duration-200 hover:bg-charcoal/80 shadow-md"
                       >
-                        �📷 Retake Photo
+                       Retake Photo
                       </motion.button>
                     </>
                   ) : (
@@ -191,7 +191,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                                disabled:opacity-50 disabled:cursor-not-allowed
                                text-lg md:text-xl"
                     >
-                      {isCapturing ? '📸 Capturing...' : '📷 Capture Photo'}
+                      {isCapturing ? 'Capturing...' : 'Capture Photo'}
                     </motion.button>
                   )}
 

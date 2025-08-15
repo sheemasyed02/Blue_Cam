@@ -20,4 +20,8 @@ export interface GalleryProps {
 }
 
 export { Navigation } from './Navigation';
+export { FiltersPanel } from './FiltersPanel';
+export { AdjustmentsPanel } from './AdjustmentsPanel';
+export { ExportPanel } from './ExportPanel';
+export type { ImageAdjustments } from './AdjustmentsPanel';
 export { FilterList } from './FilterList';

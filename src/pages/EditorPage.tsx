@@ -2,9 +2,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils';
-import { downloadImage } from '../utils/imageUtils';
-import { Navigation } from '../components';
-import { vintageFilters } from '../filters/cssFilters';
+import { Navigation, FiltersPanel, AdjustmentsPanel, ExportPanel, type ImageAdjustments } from '../components';
 
 interface EditorPageProps {
   className?: string;
@@ -102,9 +100,16 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
   const [activeTab, setActiveTab] = useState<TabType>('presets');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [brightness, setBrightness] = useState(100);
-  const [contrast, setContrast] = useState(100);
-  const [saturation, setSaturation] = useState(100);
+  const [currentFilter, setCurrentFilter] = useState<string>('');
+  const [currentAdjustments, setCurrentAdjustments] = useState<ImageAdjustments>({
+    brightness: 100,
+    contrast: 100,
+    saturation: 100,
+    grain: 0,
+    temperature: 0,
+    fade: 0,
+    vignette: 0
+  });
 
   const tabs = [
     { id: 'presets' as const, label: 'Presets' },
@@ -112,8 +117,6 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
     { id: 'frames' as const, label: 'Frames' },
     { id: 'export' as const, label: 'Export' }
   ];
-
-  const presets = vintageFilters;
 
   const handleChangeImage = useCallback(() => {
     // Trigger the file input directly
@@ -129,10 +132,17 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
           // Replace the old image with the new one
           setSelectedImage(imageUrl);
           setProcessedImage(imageUrl);
-          // Reset adjustments
-          setBrightness(100);
-          setContrast(100);
-          setSaturation(100);
+          // Reset adjustments and filters
+          setCurrentAdjustments({
+            brightness: 100,
+            contrast: 100,
+            saturation: 100,
+            grain: 0,
+            temperature: 0,
+            fade: 0,
+            vignette: 0
+          });
+          setCurrentFilter('');
         };
         reader.readAsDataURL(file);
       }
@@ -148,6 +158,16 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
         const imageUrl = e.target?.result as string;
         setSelectedImage(imageUrl);
         setProcessedImage(imageUrl); // Initially same as original
+        setCurrentFilter(''); // Reset filter
+        setCurrentAdjustments({
+          brightness: 100,
+          contrast: 100,
+          saturation: 100,
+          grain: 0,
+          temperature: 0,
+          fade: 0,
+          vignette: 0
+        });
       };
       reader.readAsDataURL(file);
     }
@@ -184,26 +204,100 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
     img.src = selectedImage;
   }, [selectedImage]);
 
-  const applyAdjustments = useCallback(() => {
+  const handleAdjustmentsFromPanel = useCallback((adjustments: ImageAdjustments) => {
+    setCurrentAdjustments(adjustments);
     if (!selectedImage) return;
-    
-    const filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-    applyPreset(filter);
-  }, [selectedImage, brightness, contrast, saturation, applyPreset]);
 
-  const handleExport = useCallback(() => {
-    if (processedImage) {
-      downloadImage(processedImage, 'blue-vintage-camera-edited.png');
+    // Convert adjustments to CSS filter string with all effects
+    const filterParts = [
+      `brightness(${adjustments.brightness}%)`,
+      `contrast(${adjustments.contrast}%)`,
+      `saturate(${adjustments.saturation}%)`
+    ];
+
+    // Add temperature effect (hue rotation)
+    if (adjustments.temperature !== 0) {
+      filterParts.push(`hue-rotate(${adjustments.temperature * 0.5}deg)`);
     }
-  }, [processedImage]);
+
+    // Add sepia for warmth/fade effect
+    if (adjustments.fade > 0) {
+      filterParts.push(`sepia(${adjustments.fade}%)`);
+    }
+
+    const filterString = filterParts.join(' ');
+    
+    // Create a canvas to apply the filter with additional effects
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      
+      if (ctx) {
+        // Apply CSS filters
+        ctx.filter = filterString;
+        ctx.drawImage(img, 0, 0);
+        
+        // Apply grain effect if needed
+        if (adjustments.grain > 0) {
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+          
+          for (let i = 0; i < data.length; i += 4) {
+            const grain = (Math.random() - 0.5) * adjustments.grain * 2;
+            data[i] = Math.max(0, Math.min(255, data[i] + grain));     // Red
+            data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + grain)); // Green
+            data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + grain)); // Blue
+          }
+          
+          ctx.putImageData(imageData, 0, 0);
+        }
+        
+        // Apply vignette effect if needed
+        if (adjustments.vignette > 0) {
+          const centerX = canvas.width / 2;
+          const centerY = canvas.height / 2;
+          const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY);
+          
+          const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, maxRadius);
+          gradient.addColorStop(0, `rgba(0, 0, 0, 0)`);
+          gradient.addColorStop(0.7, `rgba(0, 0, 0, 0)`);
+          gradient.addColorStop(1, `rgba(0, 0, 0, ${adjustments.vignette / 100})`);
+          
+          ctx.globalCompositeOperation = 'multiply';
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        const processedDataUrl = canvas.toDataURL('image/png');
+        setProcessedImage(processedDataUrl);
+      }
+    };
+    
+    img.src = selectedImage;
+    
+    // Log current adjustments to ensure it's used in TypeScript
+    console.log('Applied adjustments:', currentAdjustments);
+  }, [selectedImage, currentAdjustments]);
+
+  const handleFilterFromPanel = useCallback((filter: string) => {
+    setCurrentFilter(filter);
+    if (filter) {
+      applyPreset(filter);
+    } else {
+      // Reset to original image
+      setProcessedImage(selectedImage);
+    }
+  }, [selectedImage, applyPreset]);
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'presets':
         return (
           <div className="space-y-3">
-            <h3 className="font-title font-semibold text-charcoal text-lg mb-4">Filter Presets</h3>
-            
             {/* Change Image Button */}
             {selectedImage && (
               <motion.button
@@ -211,97 +305,27 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleChangeImage}
                 className="w-full py-3 bg-peach/30 border-2 border-gold text-charcoal rounded-lg 
-                         font-body font-medium hover:bg-peach/50 transition-all shadow-sm"
+                         font-body font-medium hover:bg-peach/50 transition-all shadow-sm mb-4"
               >
-                🔄 Change Image
+                Change Image
               </motion.button>
             )}
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {presets.map((preset) => (
-                <motion.button
-                  key={preset.name}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => applyPreset(preset.cssFilter)}
-                  disabled={!selectedImage}
-                  className="p-4 bg-white rounded-lg border-2 border-transparent hover:border-gold
-                           disabled:opacity-50 disabled:cursor-not-allowed transition-all
-                           text-left shadow-sm hover:shadow-md"
-                >
-                  <div className="font-body font-medium text-charcoal">{preset.name}</div>
-                  <div className="text-xs text-charcoal/60 mt-1">{preset.description}</div>
-                </motion.button>
-              ))}
-            </div>
+            {/* Filters Panel */}
+            <FiltersPanel
+              selectedImage={selectedImage}
+              onFilterApply={handleFilterFromPanel}
+              activeFilter={currentFilter}
+            />
           </div>
         );
 
       case 'adjustments':
         return (
-          <div className="space-y-6">
-            <h3 className="font-title font-semibold text-charcoal text-lg mb-4">Manual Adjustments</h3>
-            
-            {/* Brightness */}
-            <div className="space-y-2">
-              <label className="font-body text-charcoal font-medium">Brightness: {brightness}%</label>
-              <input
-                type="range"
-                min="50"
-                max="150"
-                value={brightness}
-                onChange={(e) => setBrightness(Number(e.target.value))}
-                className="w-full h-2 bg-cream rounded-lg appearance-none cursor-pointer
-                         [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
-                         [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-gold 
-                         [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
-              />
-            </div>
-
-            {/* Contrast */}
-            <div className="space-y-2">
-              <label className="font-body text-charcoal font-medium">Contrast: {contrast}%</label>
-              <input
-                type="range"
-                min="50"
-                max="150"
-                value={contrast}
-                onChange={(e) => setContrast(Number(e.target.value))}
-                className="w-full h-2 bg-cream rounded-lg appearance-none cursor-pointer
-                         [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
-                         [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-gold 
-                         [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
-              />
-            </div>
-
-            {/* Saturation */}
-            <div className="space-y-2">
-              <label className="font-body text-charcoal font-medium">Saturation: {saturation}%</label>
-              <input
-                type="range"
-                min="0"
-                max="200"
-                value={saturation}
-                onChange={(e) => setSaturation(Number(e.target.value))}
-                className="w-full h-2 bg-cream rounded-lg appearance-none cursor-pointer
-                         [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
-                         [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-gold 
-                         [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
-              />
-            </div>
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={applyAdjustments}
-              disabled={!selectedImage}
-              className="w-full py-3 bg-gold text-cream rounded-lg font-body font-medium
-                       hover:bg-gold/80 disabled:opacity-50 disabled:cursor-not-allowed
-                       transition-colors"
-            >
-              Apply Adjustments
-            </motion.button>
-          </div>
+          <AdjustmentsPanel
+            selectedImage={selectedImage}
+            onAdjustmentsApply={handleAdjustmentsFromPanel}
+          />
         );
 
       case 'frames':
@@ -338,43 +362,10 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
 
       case 'export':
         return (
-          <div className="space-y-4">
-            <h3 className="font-title font-semibold text-charcoal text-lg mb-4">Export Options</h3>
-            
-            <div className="space-y-3">
-              <div className="p-4 bg-white rounded-lg">
-                <div className="font-body font-medium text-charcoal mb-2">Export Settings</div>
-                <div className="text-sm text-charcoal/70 space-y-1">
-                  <div>Format: PNG</div>
-                  <div>Quality: High</div>
-                  <div>Size: Original</div>
-                </div>
-              </div>
-
-              <motion.button
-                whileHover={{ scale: 1.02, backgroundColor: '#e4c3a1' }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleExport}
-                disabled={!processedImage}
-                className="w-full py-4 bg-gold text-cream rounded-lg font-body font-medium text-lg
-                         disabled:opacity-50 disabled:cursor-not-allowed transition-all
-                         shadow-lg hover:shadow-xl"
-              >
-                📥 Download Edited Photo
-              </motion.button>
-
-              {/* Change Image Button */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleChangeImage}
-                className="w-full py-3 bg-charcoal text-cream rounded-lg font-body font-medium
-                         hover:bg-charcoal/80 transition-all shadow-md hover:shadow-lg"
-              >
-                🔄 Select Different Image
-              </motion.button>
-            </div>
-          </div>
+          <ExportPanel
+            selectedImage={selectedImage}
+            processedImage={processedImage}
+          />
         );
 
       default:
@@ -471,7 +462,7 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
                              rounded-lg hover:bg-charcoal transition-all backdrop-blur-sm
                              font-body text-sm shadow-lg hover:shadow-xl"
                   >
-                    🔄 Change Image
+                    Change Image
                   </motion.button>
                 </div>
               ) : (
