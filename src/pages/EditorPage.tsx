@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils';
 import { downloadImage } from '../utils/imageUtils';
 import { Navigation } from '../components';
+import { vintageFilters } from '../filters/cssFilters';
 
 interface EditorPageProps {
   className?: string;
@@ -112,14 +113,7 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
     { id: 'export' as const, label: 'Export' }
   ];
 
-  const presets = [
-    { name: 'Vintage', filter: 'sepia(80%) brightness(110%) contrast(110%)' },
-    { name: 'Blue Tone', filter: 'hue-rotate(180deg) saturate(90%)' },
-    { name: 'Warm', filter: 'sepia(30%) saturate(120%) brightness(110%)' },
-    { name: 'Cool', filter: 'hue-rotate(160deg) saturate(110%)' },
-    { name: 'Black & White', filter: 'grayscale(100%) contrast(110%)' },
-    { name: 'High Contrast', filter: 'contrast(150%) saturate(130%)' }
-  ];
+  const presets = vintageFilters;
 
   const handleChangeImage = useCallback(() => {
     // Trigger the file input directly
@@ -229,14 +223,14 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
                   key={preset.name}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => applyPreset(preset.filter)}
+                  onClick={() => applyPreset(preset.cssFilter)}
                   disabled={!selectedImage}
                   className="p-4 bg-white rounded-lg border-2 border-transparent hover:border-gold
                            disabled:opacity-50 disabled:cursor-not-allowed transition-all
                            text-left shadow-sm hover:shadow-md"
                 >
                   <div className="font-body font-medium text-charcoal">{preset.name}</div>
-                  <div className="text-xs text-charcoal/60 mt-1">Vintage style filter</div>
+                  <div className="text-xs text-charcoal/60 mt-1">{preset.description}</div>
                 </motion.button>
               ))}
             </div>
