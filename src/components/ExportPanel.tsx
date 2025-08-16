@@ -294,7 +294,7 @@ export const ExportPanel = ({
                     transition={{ delay: 1.2, duration: 0.5 }}
                     className="font-title text-serelune-700 text-sm"
                   >
-                    SERELUNE Camera
+                    Have a good dayyy! ✨
                   </motion.div>
                 </div>
               </div>

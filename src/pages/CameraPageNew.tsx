@@ -118,10 +118,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
           setIsPhotoboothActive(false);
           setShowPhotoboothResult(true);
         } else {
-          // Start next photo countdown
-          setTimeout(() => {
-            setCountdown(photoboothSettings.timerSeconds);
-          }, 1000);
+          // Start next photo countdown immediately without delay
+          setCountdown(photoboothSettings.timerSeconds);
         }
       }
     }
@@ -172,7 +170,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 18px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('SERELUNE PHOTOBOOTH', canvas.width / 2, 35);
+    ctx.fillText('Have a good dayyy! ✨', canvas.width / 2, 35);
     
     ctx.font = '12px Arial';
     ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, 50);
@@ -660,9 +658,28 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                             initial={{ scale: 0.5, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 1.5, opacity: 0 }}
-                            className="text-white text-8xl font-bold font-mono"
+                            className="text-white text-6xl lg:text-8xl font-bold font-mono text-center"
                           >
-                            {countdown === 1 ? 'SMILE!' : countdown}
+                            {countdown === 1 ? 'SMILE! 😊' : countdown}
+                          </motion.div>
+                        </motion.div>
+                      )}
+                      
+                      {/* Photo Capture Flash */}
+                      {countdown === 0 && isPhotoboothActive && (
+                        <motion.div 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: [0, 1, 0] }}
+                          transition={{ duration: 0.3 }}
+                          className="absolute inset-0 flex items-center justify-center bg-white/90"
+                        >
+                          <motion.div
+                            initial={{ scale: 0.5, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 1.5, opacity: 0 }}
+                            className="text-serelune-600 text-4xl lg:text-6xl font-bold font-mono"
+                          >
+                            CLICK! 📸
                           </motion.div>
                         </motion.div>
                       )}
@@ -843,22 +860,12 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
           )}>
             <div className="max-w-4xl mx-auto">
               
-              {/* Main Controls Row - Mobile-First Layout */}
-              <div className={cn(
-                // Mobile: Single row with proper spacing
-                "flex items-center justify-center space-x-6",
-                // Larger mobile: More space
-                "sm:space-x-8",
-                // Desktop: Original spacing
-                "lg:justify-between lg:space-x-0"
-              )}>
+              {/* Main Controls Row - Centered with 2px gaps */}
+              <div className="flex items-center justify-center">
                 
-                {/* Left: Gallery - Responsive */}
-                <div className={cn(
-                  "flex items-center",
-                  // Mobile: Smaller gallery button
-                  "lg:space-x-4"
-                )}>
+                {/* Gallery, Photobooth, Capture & Filters - All with 2px gaps */}
+                <div className="flex items-center gap-0.5">
+                  {/* Gallery Button */}
                   {capturedImages.length > 0 ? (
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -902,20 +909,46 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="w-16 h-16 bg-white/30 backdrop-blur-sm rounded-2xl border-2 border-serelune-200/50 flex flex-col items-center justify-center hover:bg-white/40 transition-all"
+                      className="w-12 h-12 lg:w-16 lg:h-16 bg-white/30 backdrop-blur-sm rounded-2xl border-2 border-serelune-200/50 flex flex-col items-center justify-center hover:bg-white/40 transition-all"
                       title="No photos captured yet"
                     >
                       <svg className="w-6 h-6 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                               d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      {/* <span className="text-xs text-moonlight-600 mt-1">Gallery</span> */}
                     </motion.button>
                   )}
-                </div>
-                
-                {/* Center: Capture & Photobooth Buttons - Responsive */}
-                <div className="flex items-center space-x-3">
+
+                  {/* Photobooth Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowPhotoboothSettings(true)}
+                    disabled={isCapturing || isPhotoboothActive}
+                    className="relative flex items-center justify-center disabled:opacity-50"
+                    title="Start Photobooth Mode"
+                  >
+                    <motion.div
+                      className={cn(
+                        "rounded-2xl border-2 bg-gradient-to-br shadow-glow p-1",
+                        isPhotoboothActive 
+                          ? "border-serelune-400 from-serelune-500 to-blush-500" 
+                          : "border-moonlight-400 from-moonlight-400 to-serelune-400",
+                        // Mobile: Slightly smaller
+                        "w-12 h-12 lg:w-16 lg:h-16"
+                      )}
+                      animate={isPhotoboothActive ? { scale: [1, 1.1, 1] } : {}}
+                      transition={{ duration: 0.3, repeat: isPhotoboothActive ? Infinity : 0 }}
+                    >
+                      <div className="w-full h-full rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                        </svg>
+                      </div>
+                    </motion.div>
+                  </motion.button>
+
                   {/* Capture Button */}
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -951,69 +984,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       </div>
                     </motion.div>
                   </motion.button>
-                  
-                  {/* Photobooth Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowPhotoboothSettings(true)}
-                    disabled={isCapturing || isPhotoboothActive}
-                    className="relative flex items-center justify-center disabled:opacity-50"
-                    title="Start Photobooth Mode"
-                  >
-                    <motion.div
-                      className={cn(
-                        "rounded-2xl border-2 bg-gradient-to-br shadow-glow p-1",
-                        isPhotoboothActive 
-                          ? "border-serelune-400 from-serelune-500 to-blush-500" 
-                          : "border-moonlight-400 from-moonlight-400 to-serelune-400",
-                        // Mobile: Slightly smaller
-                        "w-12 h-12 lg:w-16 lg:h-16"
-                      )}
-                      animate={isPhotoboothActive ? { scale: [1, 1.1, 1] } : {}}
-                      transition={{ duration: 0.3, repeat: isPhotoboothActive ? Infinity : 0 }}
-                    >
-                      <div className="w-full h-full rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                        </svg>
-                      </div>
-                    </motion.div>
-                  </motion.button>
-                </div>
-                
-                {/* Right: Filters & Controls - Responsive */}
-                <div className={cn(
-                  "flex items-center",
-                  // Mobile: Smaller spacing
-                  "space-x-2 lg:space-x-3"
-                )}>
-                  {/* Quick Gallery Access */}
-                  {capturedImages.length > 0 && (
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => {
-                        setSelectedImageIndex(0);
-                        setShowGallery(true);
-                      }}
-                      className={cn(
-                        "flex items-center space-x-2 bg-gradient-to-r from-serelune-300/30 to-blush-300/30 border border-serelune-400/40 text-serelune-700 rounded-xl backdrop-blur-sm hover:from-serelune-400/40 hover:to-blush-400/40 transition-all",
-                        // Mobile: Smaller padding
-                        "px-3 py-2 lg:px-4 lg:py-2"
-                      )}
-                      title="View all captured photos"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span className="text-sm font-medium">{capturedImages.length}</span>
-                    </motion.button>
-                  )}
-                  
-                  {/* Filters Button */}
+
+                  {/* Filters Button - Now next to capture with 2px gap */}
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -1028,13 +1000,13 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     )}
                   >
                     <svg className={cn(
-                      // Mobile: Smaller icon
-                      "w-6 h-6 lg:w-8 lg:h-8"
+                      // Mobile: Bigger circles to fit the icon box better
+                      "w-8 h-8 lg:w-11 lg:h-11"
                     )} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      {/* Flower-like 3 circles design */}
-                      <circle cx="12" cy="8" r="3" strokeWidth={2} fill="none" />
-                      <circle cx="8" cy="16" r="3" strokeWidth={2} fill="none" />
-                      <circle cx="16" cy="16" r="3" strokeWidth={2} fill="none" />
+                      {/* 3 interlocking circles design - bigger radius */}
+                      <circle cx="12" cy="8" r="5" strokeWidth={2} fill="none" />
+                      <circle cx="8" cy="16" r="5" strokeWidth={2} fill="none" />
+                      <circle cx="16" cy="16" r="5" strokeWidth={2} fill="none" />
                     </svg>
                     {activeFilter && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-serelune-500 rounded-full shadow-glow animate-sparkle"></div>
