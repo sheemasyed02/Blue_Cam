@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils';
@@ -31,9 +31,17 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   const [activeFilter, setActiveFilter] = useState<string>('');
   const [filterNotification, setFilterNotification] = useState<string | null>(null);
   
-  // Frames state
-  const [showFrames, setShowFrames] = useState(false);
-  const [activeFrame, setActiveFrame] = useState<string>('');
+  // Photobooth state
+  const [photoboothSettings, setPhotoboothSettings] = useState({
+    photoCount: 4,
+    timerSeconds: 5
+  });
+  const [isPhotoboothActive, setIsPhotoboothActive] = useState(false);
+  const [photoboothImages, setPhotoboothImages] = useState<string[]>([]);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [countdown, setCountdown] = useState(0);
+  const [showPhotoboothResult, setShowPhotoboothResult] = useState(false);
+  const [showPhotoboothSettings, setShowPhotoboothSettings] = useState(false);
   
   // Camera editing controls
   const [brightness, setBrightness] = useState(100);
@@ -60,57 +68,163 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   // Camera preview for filter thumbnails
   const [cameraPreview, setCameraPreview] = useState<string | null>(null);
 
-  // Frame styles for camera
-  const frameStyles = [
-    {
-      id: 'none',
-      name: 'No Frame',
-      description: 'Original image without frame',
-      category: 'basic'
-    },
-    {
-      id: 'classic',
-      name: 'Classic White',
-      description: 'Elegant white matted frame',
-      category: 'classic'
-    },
-    {
-      id: 'polaroid',
-      name: 'Polaroid Instant',
-      description: 'Authentic instant photo look',
-      category: 'vintage'
-    },
-    {
-      id: 'filmstrip',
-      name: 'Film Strip 35mm',
-      description: 'Professional film perforations',
-      category: 'vintage'
-    },
-    {
-      id: 'aesthetic',
-      name: 'Modern Minimal',
-      description: 'Clean contemporary design',
-      category: 'modern'
-    },
-    {
-      id: 'vintage',
-      name: 'Vintage Wood',
-      description: 'Rich wooden frame with details',
-      category: 'vintage'
-    },
-    {
-      id: 'golden',
-      name: 'Ornate Gold',
-      description: 'Luxurious golden frame',
-      category: 'classic'
-    },
-    {
-      id: 'scrapbook',
-      name: 'Scrapbook Memory',
-      description: 'Decorative scrapbook style',
-      category: 'decorative'
+  // Photobooth functions
+  const startPhotobooth = useCallback(() => {
+    setIsPhotoboothActive(true);
+    setPhotoboothImages([]);
+    setCurrentPhotoIndex(0);
+    setCountdown(photoboothSettings.timerSeconds);
+  }, [photoboothSettings.timerSeconds]);
+
+  const capturePhotoboothPhoto = useCallback(() => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      if (imageSrc) {
+        // Apply filter if active
+        if (activeFilter) {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            if (ctx) {
+              canvas.width = img.width;
+              canvas.height = img.height;
+              
+              const adjustmentFilters = `
+                brightness(${brightness}%) 
+                contrast(${contrast}%) 
+                saturate(${saturation}%) 
+                hue-rotate(${temperature * 1.8}deg)
+              `.trim();
+              
+              const completeFilter = `${adjustmentFilters} ${activeFilter}`;
+              ctx.filter = completeFilter;
+              ctx.drawImage(img, 0, 0);
+              
+              const filteredImageSrc = canvas.toDataURL('image/jpeg', 0.9);
+              setPhotoboothImages(prev => [...prev, filteredImageSrc]);
+            }
+          };
+          img.src = imageSrc;
+        } else {
+          setPhotoboothImages(prev => [...prev, imageSrc]);
+        }
+        
+        setCurrentPhotoIndex(prev => prev + 1);
+        
+        // Check if we've taken all photos
+        if (currentPhotoIndex + 1 >= photoboothSettings.photoCount) {
+          setIsPhotoboothActive(false);
+          setShowPhotoboothResult(true);
+        } else {
+          // Start next photo countdown
+          setTimeout(() => {
+            setCountdown(photoboothSettings.timerSeconds);
+          }, 1000);
+        }
+      }
     }
-  ];
+  }, [activeFilter, brightness, contrast, saturation, temperature, currentPhotoIndex, photoboothSettings.photoCount, photoboothSettings.timerSeconds]);
+
+  // Countdown effect
+  useEffect(() => {
+    let timer: number;
+    
+    if (isPhotoboothActive && countdown > 0) {
+      timer = setTimeout(() => {
+        setCountdown(prev => prev - 1);
+      }, 1000);
+    } else if (isPhotoboothActive && countdown === 0) {
+      capturePhotoboothPhoto();
+    }
+    
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [countdown, isPhotoboothActive, capturePhotoboothPhoto]);
+
+  const downloadPhotobooth = useCallback(() => {
+    if (photoboothImages.length === 0) return;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    if (!ctx) return;
+
+    // Calculate dimensions for photobooth strip
+    const stripWidth = 300;
+    const photoHeight = 200;
+    const padding = 20;
+    const headerHeight = 60;
+    
+    canvas.width = stripWidth;
+    canvas.height = headerHeight + (photoHeight * photoboothImages.length) + (padding * (photoboothImages.length + 1));
+    
+    // White background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Header
+    ctx.fillStyle = '#8b5cf6';
+    ctx.fillRect(0, 0, canvas.width, headerHeight);
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 18px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('SERELUNE PHOTOBOOTH', canvas.width / 2, 35);
+    
+    ctx.font = '12px Arial';
+    ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, 50);
+    
+    // Load and draw each photo
+    let loadedCount = 0;
+    const loadPromises = photoboothImages.map((imageSrc, index) => {
+      return new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const y = headerHeight + padding + (index * (photoHeight + padding));
+          const photoWidth = stripWidth - (padding * 2);
+          
+          // Draw photo border
+          ctx.fillStyle = '#f3f4f6';
+          ctx.fillRect(padding - 5, y - 5, photoWidth + 10, photoHeight + 10);
+          
+          // Draw photo
+          ctx.drawImage(img, padding, y, photoWidth, photoHeight);
+          
+          // Photo number
+          ctx.fillStyle = '#6b7280';
+          ctx.font = 'bold 14px Arial';
+          ctx.textAlign = 'right';
+          ctx.fillText(`${index + 1}`, stripWidth - padding - 10, y + 20);
+          
+          loadedCount++;
+          if (loadedCount === photoboothImages.length) {
+            // Download the photobooth
+            const link = document.createElement('a');
+            link.download = `serelune-photobooth-${new Date().toISOString().slice(0, 10)}.png`;
+            link.href = canvas.toDataURL();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+          resolve();
+        };
+        img.src = imageSrc;
+      });
+    });
+    
+    Promise.all(loadPromises);
+  }, [photoboothImages]);
+
+  const resetPhotobooth = useCallback(() => {
+    setPhotoboothImages([]);
+    setCurrentPhotoIndex(0);
+    setShowPhotoboothResult(false);
+    setIsPhotoboothActive(false);
+    setCountdown(0);
+  }, []);
 
   const videoConstraints = {
     width: 1920,
@@ -131,25 +245,14 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   // Update preview when filters panel opens
   const handleFiltersToggle = useCallback(() => {
     if (!showFilters) {
-      // Opening filters - capture preview and close frames
+      // Opening filters - capture preview
       capturePreview();
-      setShowFrames(false);
     }
     setShowFilters(!showFilters);
   }, [showFilters, capturePreview]);
 
-  // Update preview when frames panel opens
-  const handleFramesToggle = useCallback(() => {
-    if (!showFrames) {
-      // Opening frames - capture preview and close filters
-      capturePreview();
-      setShowFilters(false);
-    }
-    setShowFrames(!showFrames);
-  }, [showFrames, capturePreview]);
-
   const capture = useCallback(() => {
-    if (webcamRef.current && filmCount > 0) {
+    if (webcamRef.current && filmCount > 0 && !isPhotoboothActive) {
       setIsCapturing(true);
       
       const imageSrc = webcamRef.current.getScreenshot();
@@ -204,7 +307,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
       setFilmCount(prev => prev - 1);
       setTimeout(() => setIsCapturing(false), 500);
     }
-  }, [webcamRef, activeFilter, brightness, contrast, saturation, temperature, filmCount]);
+  }, [webcamRef, activeFilter, brightness, contrast, saturation, temperature, filmCount, isPhotoboothActive]);
 
   const switchCamera = useCallback(() => {
     setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
@@ -381,11 +484,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         </div>
                       )}
                       
-                      {/* Active Frame Indicator */}
-                      {activeFrame && activeFrame !== 'none' && (
-                        <div className="px-3 py-1 bg-blush-500/20 border border-blush-400/30 rounded-full">
-                          <span className="text-blush-700 text-xs font-medium">
-                            {frameStyles.find(f => f.id === activeFrame)?.name || 'Frame Active'}
+                      {/* Photobooth Active Indicator */}
+                      {isPhotoboothActive && (
+                        <div className="px-3 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full">
+                          <span className="text-purple-700 text-xs font-medium">
+                            Photobooth Mode - Photo {currentPhotoIndex + 1}/{photoboothSettings.photoCount}
                           </span>
                         </div>
                       )}
@@ -544,8 +647,28 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         mirrored={facingMode === 'user'}
                       />
                       
+                      {/* Photobooth Countdown Overlay */}
+                      {countdown > 0 && (
+                        <motion.div 
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 1.5 }}
+                          className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                        >
+                          <motion.div
+                            key={countdown}
+                            initial={{ scale: 0.5, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 1.5, opacity: 0 }}
+                            className="text-white text-8xl font-bold font-mono"
+                          >
+                            {countdown === 1 ? 'SMILE!' : countdown}
+                          </motion.div>
+                        </motion.div>
+                      )}
+                      
                       {/* Capture Hint */}
-                      {!isCapturing && (
+                      {!isCapturing && !isPhotoboothActive && countdown === 0 && (
                         <motion.div 
                           className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center bg-serelune-200/20"
                           initial={{ opacity: 0 }}
@@ -709,121 +832,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             )}
           </AnimatePresence>
           
-          {/* Mobile Frames Panel - Only visible on mobile when showFrames is true */}
-          <AnimatePresence>
-            {showFrames && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="lg:hidden overflow-hidden bg-white/20 backdrop-blur-sm border-t border-serelune-200/30"
-              >
-                <div className="p-4">
-                  {/* Mobile Frame Header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-moonlight-800 font-title text-lg font-bold">Frames</h3>
-                    <button
-                      onClick={() => setShowFrames(false)}
-                      className="p-2 bg-blush-500/20 rounded-lg hover:bg-blush-500/30 transition-all"
-                    >
-                      <svg className="w-4 h-4 text-moonlight-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* Active Frame Display */}
-                  {activeFrame && activeFrame !== 'none' && (
-                    <div className="mb-3 p-2 bg-blush-500/20 border border-blush-400/30 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-blush-500 rounded-full animate-pulse"></div>
-                        <span className="text-blush-700 text-sm font-medium">
-                          {frameStyles.find(f => f.id === activeFrame)?.name || 'Frame Active'}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Scrollable Frame Grid */}
-                  <div className="overflow-x-auto">
-                    <div className="flex space-x-3 pb-2">
-                      {/* No Frame Option */}
-                      <div className="flex-shrink-0 w-20">
-                        <button
-                          onClick={() => {
-                            setActiveFrame('none');
-                          }}
-                          className={cn(
-                            "w-full flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
-                            (!activeFrame || activeFrame === 'none') 
-                              ? "bg-blush-500/20 border-2 border-blush-400" 
-                              : "bg-white/30 border-2 border-transparent hover:border-blush-300"
-                          )}
-                        >
-                          <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 flex items-center justify-center">
-                            {cameraPreview ? (
-                              <img 
-                                src={cameraPreview} 
-                                alt="No frame preview"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <svg className="w-8 h-8 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            )}
-                          </div>
-                          <span className={cn(
-                            "text-xs font-medium text-center w-full truncate",
-                            (!activeFrame || activeFrame === 'none') ? "text-blush-700" : "text-moonlight-600"
-                          )}>No Frame</span>
-                        </button>
-                      </div>
-
-                      {/* Frame Options */}
-                      {frameStyles.filter(frame => frame.id !== 'none').map((frame) => (
-                        <div key={frame.id} className="flex-shrink-0 w-20">
-                          <button
-                            onClick={() => {
-                              setActiveFrame(frame.id);
-                            }}
-                            className={cn(
-                              "w-full flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
-                              activeFrame === frame.id 
-                                ? "bg-blush-500/20 border-2 border-blush-400" 
-                                : "bg-white/30 border-2 border-transparent hover:border-blush-300"
-                            )}
-                          >
-                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 relative p-2">
-                              {cameraPreview ? (
-                                <div className="w-full h-full relative">
-                                  <img 
-                                    src={cameraPreview} 
-                                    alt={`${frame.name} preview`}
-                                    className="w-full h-full object-cover rounded-sm"
-                                  />
-                                  {/* Frame preview overlay */}
-                                  <div className="absolute inset-0 border-2 border-white/80 rounded-sm shadow-sm"></div>
-                                </div>
-                              ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-blush-200 to-serelune-200 rounded-sm border-2 border-white/80 shadow-sm"></div>
-                              )}
-                            </div>
-                            <span className={cn(
-                              "text-xs font-medium text-center w-full truncate",
-                              activeFrame === frame.id ? "text-blush-700" : "text-moonlight-600"
-                            )}>{frame.name}</span>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          
+          {/* REMOVED: Mobile Frames Panel */}
           {/* Modern Control Dock - Responsive */}
           <div className={cn(
             "relative z-30 bg-gradient-to-t from-white/30 to-transparent backdrop-blur-sm",
@@ -905,41 +914,74 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   )}
                 </div>
                 
-                {/* Center: Capture Button - Responsive */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={capture}
-                  disabled={isCapturing || filmCount === 0}
-                  className="relative flex items-center justify-center disabled:opacity-50"
-                >
-                  <motion.div
-                    className={cn(
-                      "rounded-2xl border-2 border-serelune-400 bg-black shadow-glow p-1",
-                      // Mobile: Slightly smaller
-                      "w-16 h-12 lg:w-20 lg:h-16"
-                    )}
-                    animate={isCapturing ? { scale: [1, 1.1, 1] } : {}}
-                    transition={{ duration: 0.3, repeat: isCapturing ? Infinity : 0 }}
+                {/* Center: Capture & Photobooth Buttons - Responsive */}
+                <div className="flex items-center space-x-3">
+                  {/* Capture Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={capture}
+                    disabled={isCapturing || filmCount === 0 || isPhotoboothActive}
+                    className="relative flex items-center justify-center disabled:opacity-50"
                   >
-                    {/* First inner layer - dark gray */}
-                    <div className="w-full h-full rounded-xl bg-gray-900 p-1">
-                      {/* Second inner layer - darker */}
-                      <div className="w-full h-full rounded-lg bg-gray-800 p-1">
-                        {/* Third inner layer - darkest with subtle gradient */}
-                        <div className="w-full h-full rounded-lg bg-gradient-to-br from-gray-700 to-black flex items-center justify-center">
-                          {isCapturing && (
-                            <motion.div
-                              className="w-8 h-2 rounded-full bg-gray-600"
-                              animate={{ opacity: [0.5, 1, 0.5] }}
-                              transition={{ duration: 0.5, repeat: Infinity }}
-                            />
-                          )}
+                    <motion.div
+                      className={cn(
+                        "rounded-2xl border-2 border-serelune-400 bg-black shadow-glow p-1",
+                        // Mobile: Slightly smaller
+                        "w-16 h-12 lg:w-20 lg:h-16"
+                      )}
+                      animate={isCapturing ? { scale: [1, 1.1, 1] } : {}}
+                      transition={{ duration: 0.3, repeat: isCapturing ? Infinity : 0 }}
+                    >
+                      {/* First inner layer - dark gray */}
+                      <div className="w-full h-full rounded-xl bg-gray-900 p-1">
+                        {/* Second inner layer - darker */}
+                        <div className="w-full h-full rounded-lg bg-gray-800 p-1">
+                          {/* Third inner layer - darkest with subtle gradient */}
+                          <div className="w-full h-full rounded-lg bg-gradient-to-br from-gray-700 to-black flex items-center justify-center">
+                            {isCapturing && (
+                              <motion.div
+                                className="w-8 h-2 rounded-full bg-gray-600"
+                                animate={{ opacity: [0.5, 1, 0.5] }}
+                                transition={{ duration: 0.5, repeat: Infinity }}
+                              />
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                </motion.button>
+                    </motion.div>
+                  </motion.button>
+                  
+                  {/* Photobooth Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowPhotoboothSettings(true)}
+                    disabled={isCapturing || isPhotoboothActive}
+                    className="relative flex items-center justify-center disabled:opacity-50"
+                    title="Start Photobooth Mode"
+                  >
+                    <motion.div
+                      className={cn(
+                        "rounded-2xl border-2 bg-gradient-to-br shadow-glow p-1",
+                        isPhotoboothActive 
+                          ? "border-serelune-400 from-serelune-500 to-blush-500" 
+                          : "border-moonlight-400 from-moonlight-400 to-serelune-400",
+                        // Mobile: Slightly smaller
+                        "w-12 h-12 lg:w-16 lg:h-16"
+                      )}
+                      animate={isPhotoboothActive ? { scale: [1, 1.1, 1] } : {}}
+                      transition={{ duration: 0.3, repeat: isPhotoboothActive ? Infinity : 0 }}
+                    >
+                      <div className="w-full h-full rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                        </svg>
+                      </div>
+                    </motion.div>
+                  </motion.button>
+                </div>
                 
                 {/* Right: Filters & Controls - Responsive */}
                 <div className={cn(
@@ -994,32 +1036,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     </svg>
                     {activeFilter && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-serelune-500 rounded-full shadow-glow animate-sparkle"></div>
-                    )}
-                  </motion.button>
-                  
-                  {/* Frames Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleFramesToggle}
-                    className={cn(
-                      "rounded-2xl backdrop-blur-sm border-2 flex items-center justify-center transition-all",
-                      // Mobile: Smaller size
-                      "w-12 h-12 lg:w-16 lg:h-16",
-                      showFrames 
-                        ? "bg-blush-500/20 border-blush-400/50 text-blush-600 shadow-glow" 
-                        : "bg-white/30 border-serelune-200/50 text-moonlight-700"
-                    )}
-                  >
-                    <svg className={cn(
-                      // Mobile: Smaller icon
-                      "w-6 h-6 lg:w-8 lg:h-8"
-                    )} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    {activeFrame && activeFrame !== 'none' && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-blush-500 rounded-full shadow-glow animate-sparkle"></div>
                     )}
                   </motion.button>
                 </div>
@@ -1562,7 +1578,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
 
         {/* Desktop Sidebar - Only visible on large screens */}
         <AnimatePresence>
-          {(showFilters || showFrames) && (
+          {showFilters && (
             <motion.div
               initial={{ x: 300, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -1585,22 +1601,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     >
                       Filters
                     </button>
-                    <button
-                      onClick={() => setShowFrames(!showFrames)}
-                      className={cn(
-                        "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
-                        showFrames 
-                          ? "bg-blush-500/20 text-blush-700 border border-blush-400/30" 
-                          : "text-moonlight-600 hover:text-moonlight-800 hover:bg-white/20"
-                      )}
-                    >
-                      Frames
-                    </button>
                   </div>
                   <button
                     onClick={() => {
                       setShowFilters(false);
-                      setShowFrames(false);
                     }}
                     className="p-2 bg-pearl-500/20 rounded-lg hover:bg-pearl-500/30 transition-all"
                   >
@@ -1699,101 +1703,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                               "text-xs font-medium text-center w-full truncate",
                               activeFilter === filter.cssFilter ? "text-serelune-700" : "text-moonlight-600"
                             )}>{filter.name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Frames Panel Content */}
-                  {showFrames && (
-                    <div className="p-6 h-full overflow-y-auto">
-                      <h3 className="text-moonlight-800 font-title text-xl font-bold mb-4">Frames</h3>
-                      
-                      {/* Active Frame Display */}
-                      {activeFrame && activeFrame !== 'none' && (
-                        <div className="mb-4 p-3 bg-blush-500/20 border border-blush-400/30 rounded-lg">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-blush-500 rounded-full animate-pulse"></div>
-                            <span className="text-blush-700 text-sm font-medium">
-                              {frameStyles.find(f => f.id === activeFrame)?.name || 'Frame Active'}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Frame Grid - Single column layout */}
-                      <div className="grid grid-cols-1 gap-3">
-                        {/* No Frame Option */}
-                        <button
-                          onClick={() => {
-                            setActiveFrame('none');
-                          }}
-                          className={cn(
-                            "flex items-center space-x-3 p-3 rounded-lg transition-all",
-                            (!activeFrame || activeFrame === 'none') 
-                              ? "bg-blush-500/20 border-2 border-blush-400" 
-                              : "bg-white/30 border-2 border-transparent hover:border-blush-300"
-                          )}
-                        >
-                          <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 flex items-center justify-center flex-shrink-0">
-                            {cameraPreview ? (
-                              <img 
-                                src={cameraPreview} 
-                                alt="No frame preview"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <svg className="w-6 h-6 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            )}
-                          </div>
-                          <div className="flex-1 text-left">
-                            <span className={cn(
-                              "text-sm font-medium block",
-                              (!activeFrame || activeFrame === 'none') ? "text-blush-700" : "text-moonlight-600"
-                            )}>No Frame</span>
-                            <span className="text-xs text-moonlight-500">Original image</span>
-                          </div>
-                        </button>
-
-                        {/* Frame Options */}
-                        {frameStyles.filter(frame => frame.id !== 'none').map((frame) => (
-                          <button
-                            key={frame.id}
-                            onClick={() => {
-                              setActiveFrame(frame.id);
-                            }}
-                            className={cn(
-                              "flex items-center space-x-3 p-3 rounded-lg transition-all",
-                              activeFrame === frame.id 
-                                ? "bg-blush-500/20 border-2 border-blush-400" 
-                                : "bg-white/30 border-2 border-transparent hover:border-blush-300"
-                            )}
-                          >
-                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 relative p-2 flex-shrink-0">
-                              {cameraPreview ? (
-                                <div className="w-full h-full relative">
-                                  <img 
-                                    src={cameraPreview} 
-                                    alt={`${frame.name} preview`}
-                                    className="w-full h-full object-cover rounded-sm"
-                                  />
-                                  {/* Simple frame preview overlay */}
-                                  <div className="absolute inset-0 border border-white/60 rounded-sm"></div>
-                                </div>
-                              ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-blush-200 to-serelune-200 rounded-sm border border-white/60"></div>
-                              )}
-                            </div>
-                            <div className="flex-1 text-left">
-                              <span className={cn(
-                                "text-sm font-medium block",
-                                activeFrame === frame.id ? "text-blush-700" : "text-moonlight-600"
-                              )}>{frame.name}</span>
-                              <span className="text-xs text-moonlight-500">{frame.description}</span>
-                            </div>
                           </button>
                         ))}
                       </div>
@@ -2016,6 +1925,150 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     </svg>
                   </motion.button>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Photobooth Settings Modal */}
+      <AnimatePresence>
+        {showPhotoboothSettings && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowPhotoboothSettings(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-gradient-to-br from-pearl-50/95 to-serelune-50/95 backdrop-blur-xl rounded-3xl border border-pearl-200/50 p-6 max-w-md w-full"
+            >
+              <h3 className="text-moonlight-800 font-title text-xl font-bold mb-4">Photobooth Settings</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-moonlight-700 text-sm font-medium mb-2">
+                    Number of Photos (max 5)
+                  </label>
+                  <div className="flex space-x-2">
+                    {[1, 2, 3, 4, 5].map((num) => (
+                      <button
+                        key={num}
+                        onClick={() => setPhotoboothSettings(prev => ({ ...prev, photoCount: num }))}
+                        className={cn(
+                          "w-10 h-10 rounded-lg font-bold transition-all",
+                          photoboothSettings.photoCount === num
+                            ? "bg-serelune-500 text-white shadow-glow"
+                            : "bg-white/70 text-moonlight-600 hover:bg-serelune-100"
+                        )}
+                      >
+                        {num}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-moonlight-700 text-sm font-medium mb-2">
+                    Timer Duration (seconds)
+                  </label>
+                  <div className="flex space-x-2">
+                    {[3, 5, 7, 10].map((seconds) => (
+                      <button
+                        key={seconds}
+                        onClick={() => setPhotoboothSettings(prev => ({ ...prev, timerSeconds: seconds }))}
+                        className={cn(
+                          "px-3 py-2 rounded-lg font-medium transition-all",
+                          photoboothSettings.timerSeconds === seconds
+                            ? "bg-serelune-500 text-white shadow-glow"
+                            : "bg-white/70 text-moonlight-600 hover:bg-serelune-100"
+                        )}
+                      >
+                        {seconds}s
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex space-x-3 mt-6">
+                <button
+                  onClick={() => setShowPhotoboothSettings(false)}
+                  className="flex-1 py-2 px-4 bg-white/70 text-moonlight-700 rounded-lg font-medium hover:bg-white/90 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowPhotoboothSettings(false);
+                    startPhotobooth();
+                  }}
+                  className="flex-1 py-2 px-4 bg-serelune-500 text-white rounded-lg font-medium hover:bg-serelune-600 transition-all shadow-glow"
+                >
+                  Start Photobooth
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Photobooth Result Modal */}
+      <AnimatePresence>
+        {showPhotoboothResult && photoboothImages.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowPhotoboothResult(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-gradient-to-br from-pearl-50/95 to-serelune-50/95 backdrop-blur-xl rounded-3xl border border-pearl-200/50 p-6 max-w-md w-full"
+            >
+              <h3 className="text-moonlight-800 font-title text-xl font-bold mb-4 text-center">Photobooth Strip Ready!</h3>
+              
+              <div className="mb-6 flex justify-center">
+                <div className="bg-white rounded-2xl p-4 shadow-soft">
+                  <div className="w-64 h-80 bg-white rounded-lg overflow-hidden relative">
+                    {photoboothImages.map((img, index) => (
+                      <div key={index} className="w-full h-20 border-b border-gray-200 last:border-b-0">
+                        <img 
+                          src={img} 
+                          alt={`Photo ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                    <div className="absolute bottom-2 left-2 text-xs font-bold text-gray-600">
+                      SERELUNE
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex space-x-3">
+                <button
+                  onClick={resetPhotobooth}
+                  className="flex-1 py-2 px-4 bg-white/70 text-moonlight-700 rounded-lg font-medium hover:bg-white/90 transition-all"
+                >
+                  Reset
+                </button>
+                <button
+                  onClick={downloadPhotobooth}
+                  className="flex-1 py-2 px-4 bg-serelune-500 text-white rounded-lg font-medium hover:bg-serelune-600 transition-all shadow-glow"
+                >
+                  Download Strip
+                </button>
               </div>
             </motion.div>
           </motion.div>
