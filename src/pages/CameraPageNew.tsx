@@ -8,7 +8,7 @@ import { vintageFilters } from '../filters/cssFilters';
 
 interface CameraPageProps {
   className?: string;
-  onPageChange?: (page: 'camera' | 'editor') => void;
+  onPageChange?: (page: 'camera' | 'editor', imageData?: string) => void;
 }
 
 export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
@@ -475,7 +475,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => onPageChange && onPageChange('editor')}
+                          onClick={() => onPageChange && onPageChange('editor', capturedImage || undefined)}
                           className="p-4 bg-blush-500/90 text-white rounded-xl backdrop-blur-sm shadow-blush border border-blush-400/50"
                         >
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1564,7 +1564,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     onClick={() => {
                       setShowGallery(false);
                       if (onPageChange) {
-                        onPageChange('editor');
+                        onPageChange('editor', capturedImages[selectedImageIndex].dataUrl);
                       }
                     }}
                     className="p-3 sm:p-4 bg-serelune-500/90 text-white rounded-xl shadow-glow hover:bg-serelune-600 transition-all"

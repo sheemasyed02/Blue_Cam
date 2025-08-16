@@ -6,7 +6,8 @@ import { Navigation, FiltersPanel, AdjustmentsPanel, ExportPanel, type ImageAdju
 
 interface EditorPageProps {
   className?: string;
-  onPageChange?: (page: 'camera' | 'editor') => void;
+  onPageChange?: (page: 'camera' | 'editor', imageData?: string) => void;
+  initialImage?: string;
 }
 
 type TabType = 'presets' | 'adjustments' | 'frames' | 'export';
@@ -96,9 +97,9 @@ const BeforeAfterSlider = ({ beforeImage, afterImage, className }: BeforeAfterSl
   );
 };
 
-export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
+export const EditorPage = ({ className, onPageChange, initialImage }: EditorPageProps) => {
   const [activeTab, setActiveTab] = useState<TabType>('presets');
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(initialImage || null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [currentFilter, setCurrentFilter] = useState<string>('');
   const [currentAdjustments, setCurrentAdjustments] = useState<ImageAdjustments>({

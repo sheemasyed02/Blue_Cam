@@ -3,14 +3,28 @@ import { CameraPage, EditorPage } from './pages';
 
 type PageType = 'camera' | 'editor';
 
-function App() {
-  const [currentPage, setCurrentPage] = useState<PageType>('camera');
+interface AppState {
+  currentPage: PageType;
+  editingImage?: string;
+}
 
-  if (currentPage === 'editor') {
-    return <EditorPage onPageChange={setCurrentPage} />;
+function App() {
+  const [appState, setAppState] = useState<AppState>({
+    currentPage: 'camera'
+  });
+
+  const handlePageChange = (page: PageType, imageData?: string) => {
+    setAppState({
+      currentPage: page,
+      editingImage: imageData
+    });
+  };
+
+  if (appState.currentPage === 'editor') {
+    return <EditorPage onPageChange={handlePageChange} initialImage={appState.editingImage} />;
   }
 
-  return <CameraPage onPageChange={setCurrentPage} />;
+  return <CameraPage onPageChange={handlePageChange} />;
 }
 
 export default App
