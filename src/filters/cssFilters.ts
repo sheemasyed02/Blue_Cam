@@ -36,92 +36,92 @@ export const vintageFilters: FilterEffect[] = [
   {
     name: 'Summertime Sadness',
     id: 'summertime-sadness',
-    cssFilter: 'sepia(35%) hue-rotate(320deg) saturate(120%) brightness(110%) contrast(100%)',
-    description: 'Warm orange-pink fade'
+    cssFilter: 'brightness(95%) contrast(85%) saturate(80%) hue-rotate(25deg) sepia(20%) blur(0.5px)',
+    description: 'Dreamy nostalgic warm tragedy - faded summer film reels with golden haze and soft tragic-romantic glow'
   },
   {
     name: 'Honeymoon',
     id: 'honeymoon',
-    cssFilter: 'sepia(60%) saturate(80%) brightness(105%) contrast(95%) hue-rotate(25deg)',
-    description: 'Sepia romantic fade'
+    cssFilter: 'brightness(105%) contrast(90%) saturate(75%) hue-rotate(15deg) sepia(15%) blur(0.4px)',
+    description: 'Luxurious vintage cinematic postcard - muted warm tones with 1960s glam filter and pinkish-magenta romance'
   },
   {
     name: 'Ride',
     id: 'ride',
-    cssFilter: 'sepia(45%) hue-rotate(15deg) saturate(125%) brightness(100%) contrast(115%) grayscale(5%)',
-    description: 'Desert dusk orange with heavy grain'
+    cssFilter: 'brightness(100%) contrast(90%) saturate(85%) hue-rotate(30deg) sepia(10%) blur(0.3px)',
+    description: 'Cinematic Americana - dusty golden deserts, faded vintage road-trip freedom with gritty film grain'
   },
   {
     name: 'Love',
     id: 'love',
-    cssFilter: 'saturate(70%) brightness(110%) contrast(90%) hue-rotate(300deg) sepia(15%)',
-    description: 'Pastel haze'
+    cssFilter: 'brightness(110%) contrast(85%) saturate(80%) hue-rotate(330deg) sepia(20%) blur(0.6px)',
+    description: 'Ethereal cosmic dream - soft glowing pastels with outer-space surreal tones and heavenly glow'
   },
   {
     name: 'Doin\' Time',
     id: 'doin-time',
-    cssFilter: 'saturate(150%) brightness(110%) contrast(110%) hue-rotate(180deg) sepia(10%)',
-    description: 'High saturation beach tones'
+    cssFilter: 'brightness(105%) contrast(95%) saturate(85%) hue-rotate(20deg) sepia(20%) blur(0.35px)',
+    description: 'Retro California dream - 90s VHS summer haze with faded beach tones and laid-back vintage feel'
   },
   {
     name: 'Cherry',
     id: 'cherry',
-    cssFilter: 'hue-rotate(350deg) saturate(140%) brightness(95%) contrast(120%) sepia(20%)',
-    description: 'Deep red highlights with warm shadows'
+    cssFilter: 'brightness(90%) contrast(115%) saturate(90%) hue-rotate(350deg) sepia(10%) blur(0.3px)',
+    description: 'Intimate raw sultry passion - deep reds, smoky shadows, moody cinematic spotlight with dark glamour'
   },
   {
     name: 'Venice Bitch',
     id: 'venice-bitch',
-    cssFilter: 'saturate(75%) brightness(105%) contrast(85%) hue-rotate(90deg) sepia(25%)',
-    description: 'Washed film with muted greens'
+    cssFilter: 'brightness(105%) contrast(85%) saturate(80%) hue-rotate(15deg) sepia(25%) blur(0.5px)',
+    description: 'Psychedelic dreamy Americana - faded film tones with golden haze and surreal washed retro pastels'
   },
   {
     name: 'Brooklyn Baby',
     id: 'brooklyn-baby',
-    cssFilter: 'hue-rotate(210deg) saturate(70%) brightness(105%) contrast(80%) sepia(15%)',
-    description: 'Low contrast vintage blues'
+    cssFilter: 'brightness(100%) contrast(95%) saturate(85%) hue-rotate(320deg) sepia(15%) blur(0.25px)',
+    description: 'Hip ironic vintage NYC - muted urban tones with playful 70s-retro styling and cool city vibes'
   },
   {
     name: 'Shades of Cool',
     id: 'shades-of-cool',
-    cssFilter: 'hue-rotate(170deg) saturate(90%) brightness(110%) contrast(105%) sepia(10%)',
-    description: 'Teal shadows with warm highlights'
+    cssFilter: 'brightness(95%) contrast(85%) saturate(80%) hue-rotate(180deg) sepia(25%) blur(0.7px)',
+    description: 'Ethereal underwater haze - glowing cyan/teal tones, ghostly softness, surreal dreamy cinematic blur'
   },
   {
     name: 'Ultraviolence',
     id: 'ultraviolence',
-    cssFilter: 'contrast(160%) brightness(90%) saturate(80%) grayscale(15%) sepia(5%)',
-    description: 'Deep shadows with high contrast whites'
+    cssFilter: 'brightness(85%) contrast(110%) saturate(70%) hue-rotate(0deg) sepia(20%) blur(0.25px)',
+    description: 'Raw dark vintage noir - faded blacks, muted grays, gritty Americana with moody cinema spotlight'
   },
   {
     name: 'Terrence Loves You',
     id: 'terrence-loves-you',
-    cssFilter: 'hue-rotate(280deg) saturate(85%) brightness(115%) contrast(90%) blur(0.3px) sepia(20%)',
-    description: 'Dreamy haze with lavender tint'
+    cssFilter: 'brightness(95%) contrast(85%) saturate(75%) hue-rotate(210deg) sepia(20%) blur(0.6px)',
+    description: 'Spacey haunting jazz-lounge - muted blues, smoky atmosphere, dreamy mist with cool vintage sadness'
   },
   {
     name: 'Mariners Apartment Complex',
     id: 'mariners-apartment-complex',
-    cssFilter: 'hue-rotate(200deg) saturate(95%) brightness(105%) contrast(100%) sepia(15%) hue-rotate(30deg)',
-    description: 'Cool navy with golden skin tones'
+    cssFilter: 'brightness(100%) contrast(90%) saturate(80%) hue-rotate(200deg) sepia(15%) blur(0.4px)',
+    description: 'Moody coastal twilight - soft blues, golden dusk, faded film feel with dreamy ocean melancholy'
   },
   {
     name: 'Norman Rockwell',
     id: 'norman-rockwell',
-    cssFilter: 'brightness(120%) contrast(90%) saturate(85%) hue-rotate(200deg) sepia(10%)',
-    description: 'Bright whites with faded blues'
+    cssFilter: 'brightness(110%) contrast(90%) saturate(85%) hue-rotate(320deg) sepia(15%) blur(0.4px)',
+    description: 'Bright ironic Americana - pastel coastal tones, painterly soft edges with romantic dreamy glow'
   },
   {
     name: 'Salvatore',
     id: 'salvatore',
-    cssFilter: 'sepia(50%) hue-rotate(25deg) saturate(110%) brightness(108%) contrast(95%)',
-    description: 'Retro Italian warm fade'
+    cssFilter: 'brightness(105%) contrast(95%) saturate(90%) hue-rotate(330deg) sepia(20%) blur(0.5px)',
+    description: 'Whimsical surreal pastel vintage Italy - candy-colored faded tones with dreamy gelato postcard vibe'
   },
   {
     name: 'Video Games',
     id: 'video-games',
-    cssFilter: 'brightness(88%) contrast(78%) saturate(8%) hue-rotate(198deg) sepia(35%) blur(0.5px) grayscale(20%)',
-    description: 'Ultra-dreamy cinematic haze with heavy desaturation and vintage grain'
+    cssFilter: 'brightness(95%) contrast(90%) saturate(75%) hue-rotate(330deg) sepia(25%) blur(0.6px)',
+    description: 'Nostalgic vintage home-video aesthetic - muted tones, dreamy faded glow with romantic VHS nostalgia'
   },
   {
     name: 'Tragic Romance',
