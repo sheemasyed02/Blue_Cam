@@ -147,28 +147,30 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   return (
     <div className={cn(
       "min-h-screen relative overflow-hidden flex flex-col",
-      "bg-gradient-to-br from-slate-950 via-slate-900 to-storm-950",
+      "bg-gradient-to-br from-serelune-50 via-blush-50 to-lavender-100",
       className
     )}>
-      {/* Enhanced Background Effects */}
+      {/* Dreamy Background Effects */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 opacity-20 bg-gradient-mesh"></div>
-        <div className="absolute top-20 right-20 w-80 h-80 bg-gradient-to-br from-electric-500/25 to-amber-500/25 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-20 left-20 w-72 h-72 bg-gradient-to-tr from-emerald-500/20 to-electric-600/20 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute inset-0 backdrop-blur-sm bg-black/10"></div>
+        <div className="absolute inset-0 opacity-30 bg-gradient-dreamy"></div>
+        <div className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-serelune-300/40 to-blush-300/40 rounded-full blur-3xl animate-pulse-soft"></div>
+        <div className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-tr from-lavender-300/30 to-serelune-400/30 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-blush-200/20 to-serelune-200/20 rounded-full blur-2xl animate-pulse-soft"></div>
+        <div className="absolute inset-0 bg-gradient-moonbeam"></div>
         
-        {[...Array(12)].map((_, i) => (
+        {/* Sparkle Effects */}
+        {[...Array(15)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-2 h-2 bg-gradient-to-r from-electric-400/40 to-amber-400/40 rounded-full"
+            className="absolute w-2 h-2 bg-gradient-to-r from-serelune-400/60 to-blush-400/60 rounded-full"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
             }}
             animate={{
-              y: [0, -40, 0],
-              opacity: [0.2, 0.8, 0.2],
-              scale: [0.8, 1.2, 0.8],
+              y: [0, -30, 0],
+              opacity: [0.3, 1, 0.3],
+              scale: [0.8, 1.4, 0.8],
             }}
             transition={{
               duration: 4 + Math.random() * 3,
@@ -180,26 +182,26 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
       </div>
 
       {/* Top Navigation Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-xl border-b border-white/10">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/20 backdrop-blur-xl border-b border-serelune-200/30">
         <div className="flex justify-between items-center px-6 py-4">
           {/* Logo & Status */}
           <div className="flex items-center space-x-4">
             <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-br from-electric-500 to-amber-500 rounded-2xl flex items-center justify-center shadow-glow">
+              <div className="w-12 h-12 bg-gradient-to-br from-serelune-400 to-blush-400 rounded-2xl flex items-center justify-center shadow-glow">
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                         d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-emerald-400 to-electric-400 rounded-full animate-pulse"></div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-blush-400 to-serelune-400 rounded-full animate-sparkle"></div>
             </div>
             
             <div>
-              <h2 className="text-white font-title text-xl font-bold">Blue Cam</h2>
-              <div className="flex items-center space-x-3 text-sm text-slate-300">
+              <h2 className="text-moonlight-800 font-title text-xl font-bold">SERELUNE</h2>
+              <div className="flex items-center space-x-3 text-sm text-moonlight-600">
                 <span className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-blush-400 rounded-full animate-pulse"></div>
                   <span>Live</span>
                 </span>
                 <span>•</span>
@@ -207,7 +209,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                 {activeFilter && (
                   <>
                     <span>•</span>
-                    <span className="text-amber-400">
+                    <span className="text-serelune-600">
                       {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filtered'}
                     </span>
                   </>
@@ -227,8 +229,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               className={cn(
                 "p-3 rounded-xl backdrop-blur-sm border transition-all",
                 showSettings 
-                  ? "bg-electric-500/20 border-electric-400/50 text-electric-400" 
-                  : "bg-white/5 border-white/20 text-white hover:bg-white/10"
+                  ? "bg-serelune-500/20 border-serelune-400/50 text-serelune-600 shadow-glow" 
+                  : "bg-white/30 border-serelune-200/30 text-moonlight-700 hover:bg-white/40"
               )}
             >
               <motion.svg 
@@ -263,27 +265,27 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               className="relative w-full max-w-4xl aspect-[4/3] max-h-[calc(100vh-200px)]"
             >
               {/* Modern Camera Housing */}
-              <div className="relative w-full h-full bg-slate-950/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
+              <div className="relative w-full h-full bg-white/40 backdrop-blur-xl rounded-3xl shadow-dreamy border border-serelune-200/50 overflow-hidden">
                 
                 {/* Camera Status Bar */}
-                <div className="absolute top-0 left-0 right-0 z-30 bg-black/50 backdrop-blur-sm p-4">
+                <div className="absolute top-0 left-0 right-0 z-30 bg-white/30 backdrop-blur-sm p-4">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-3">
                       {/* Recording Indicator */}
                       <div className="flex items-center space-x-2">
-                        <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                        <span className="text-white text-sm font-mono">REC</span>
+                        <div className="w-3 h-3 bg-blush-500 rounded-full animate-pulse"></div>
+                        <span className="text-moonlight-700 text-sm font-mono">REC</span>
                       </div>
                       
                       {/* Film Count */}
-                      <div className="px-2 py-1 bg-white/10 rounded">
-                        <span className="text-white text-xs font-mono">{filmCount} shots</span>
+                      <div className="px-2 py-1 bg-white/30 rounded border border-serelune-200/30">
+                        <span className="text-moonlight-700 text-xs font-mono">{filmCount} shots</span>
                       </div>
                       
                       {/* Active Filter Indicator */}
                       {activeFilter && (
-                        <div className="px-3 py-1 bg-amber-500/20 border border-amber-400/30 rounded-full">
-                          <span className="text-amber-400 text-xs font-medium">
+                        <div className="px-3 py-1 bg-serelune-500/20 border border-serelune-400/30 rounded-full">
+                          <span className="text-serelune-700 text-xs font-medium">
                             {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filter Active'}
                           </span>
                         </div>
@@ -291,15 +293,15 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       
                       {/* Settings Active Indicator */}
                       {showSettings && (
-                        <div className="px-3 py-1 bg-electric-500/20 border border-electric-400/30 rounded-full">
-                          <span className="text-electric-400 text-xs font-medium">Settings</span>
+                        <div className="px-3 py-1 bg-lavender-500/20 border border-lavender-400/30 rounded-full">
+                          <span className="text-lavender-700 text-xs font-medium">Settings</span>
                         </div>
                       )}
                       
                       {/* Active Control Indicator */}
                       {activeControl && (
-                        <div className="px-3 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full">
-                          <span className="text-purple-400 text-xs font-medium capitalize">
+                        <div className="px-3 py-1 bg-blush-500/20 border border-blush-400/30 rounded-full">
+                          <span className="text-blush-700 text-xs font-medium capitalize">
                             {activeControl} Adjusting
                           </span>
                         </div>
@@ -313,7 +315,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           exit={{ scale: 0, opacity: 0 }}
                           className="px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 rounded-full"
                         >
-                          <span className="text-emerald-400 text-xs font-medium">Settings Reset</span>
+                          <span className="text-emerald-600 text-xs font-medium">Settings Reset</span>
                         </motion.div>
                       )}
                     </div>
@@ -326,9 +328,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         e.stopPropagation();
                         switchCamera();
                       }}
-                      className="p-2 bg-white/10 rounded-lg backdrop-blur-sm hover:bg-white/20 transition-all"
+                      className="p-2 bg-white/30 rounded-lg backdrop-blur-sm hover:bg-white/40 transition-all border border-serelune-200/30"
                     >
-                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-moonlight-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                               d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                       </svg>
@@ -340,30 +342,30 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                 <div className="relative w-full h-full rounded-3xl overflow-hidden">
                   
                   {/* Professional Grid Overlay */}
-                  <div className="absolute inset-0 pointer-events-none z-20 opacity-30">
+                  <div className="absolute inset-0 pointer-events-none z-20 opacity-25">
                     {/* Rule of thirds */}
-                    <div className="absolute top-1/3 left-0 right-0 h-px bg-white/50"></div>
-                    <div className="absolute top-2/3 left-0 right-0 h-px bg-white/50"></div>
-                    <div className="absolute left-1/3 top-0 bottom-0 w-px bg-white/50"></div>
-                    <div className="absolute left-2/3 top-0 bottom-0 w-px bg-white/50"></div>
+                    <div className="absolute top-1/3 left-0 right-0 h-px bg-serelune-400/50"></div>
+                    <div className="absolute top-2/3 left-0 right-0 h-px bg-serelune-400/50"></div>
+                    <div className="absolute left-1/3 top-0 bottom-0 w-px bg-serelune-400/50"></div>
+                    <div className="absolute left-2/3 top-0 bottom-0 w-px bg-serelune-400/50"></div>
                     
                     {/* Center focus indicator */}
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                       <motion.div 
-                        className="w-20 h-20 border-2 border-electric-400/70 rounded-full"
+                        className="w-20 h-20 border-2 border-serelune-500/70 rounded-full"
                         animate={{ scale: [1, 1.1, 1], opacity: [0.7, 1, 0.7] }}
                         transition={{ duration: 2, repeat: Infinity }}
                       >
-                        <div className="w-full h-full border border-white/30 rounded-full"></div>
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-electric-400 rounded-full"></div>
+                        <div className="w-full h-full border border-blush-400/40 rounded-full"></div>
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-serelune-500 rounded-full"></div>
                       </motion.div>
                     </div>
                     
                     {/* Corner frame indicators */}
-                    <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-electric-400/60"></div>
-                    <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-electric-400/60"></div>
-                    <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-electric-400/60"></div>
-                    <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-electric-400/60"></div>
+                    <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-serelune-500/60"></div>
+                    <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-serelune-500/60"></div>
+                    <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-serelune-500/60"></div>
+                    <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-serelune-500/60"></div>
                   </div>
                   
                   {/* Camera Content */}
@@ -390,7 +392,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={retakePhoto}
-                          className="p-4 bg-slate-500/90 text-white rounded-xl backdrop-blur-sm shadow-glow border border-slate-400/50"
+                          className="p-4 bg-moonlight-400/90 text-white rounded-xl backdrop-blur-sm shadow-soft border border-moonlight-300/50"
                         >
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
@@ -402,7 +404,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={savePhoto}
-                          className="p-4 bg-electric-500/90 text-white rounded-xl backdrop-blur-sm shadow-glow border border-electric-400/50"
+                          className="p-4 bg-serelune-500/90 text-white rounded-xl backdrop-blur-sm shadow-glow border border-serelune-400/50"
                         >
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
@@ -414,7 +416,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => onPageChange && onPageChange('editor')}
-                          className="p-4 bg-amber-500/90 text-white rounded-xl backdrop-blur-sm shadow-glow border border-amber-400/50"
+                          className="p-4 bg-blush-500/90 text-white rounded-xl backdrop-blur-sm shadow-blush border border-blush-400/50"
                         >
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
@@ -446,17 +448,17 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       {/* Capture Hint */}
                       {!isCapturing && (
                         <motion.div 
-                          className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center bg-black/20"
+                          className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center bg-serelune-200/20"
                           initial={{ opacity: 0 }}
                           whileHover={{ opacity: 1 }}
                         >
-                          <div className="bg-black/60 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                            <svg className="w-12 h-12 text-white mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="bg-white/70 backdrop-blur-md rounded-2xl p-6 border border-serelune-300/50 shadow-dreamy">
+                            <svg className="w-12 h-12 text-serelune-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
                                     d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <div className="text-white text-sm text-center font-medium">Tap to Capture</div>
+                            <div className="text-moonlight-700 text-sm text-center font-medium">Tap to Capture</div>
                           </div>
                         </motion.div>
                       )}
@@ -490,7 +492,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
           </div>
           
           {/* Modern Control Dock */}
-          <div className="relative z-30 p-6 bg-gradient-to-t from-black/50 to-transparent">
+          <div className="relative z-30 p-6 bg-gradient-to-t from-white/30 to-transparent backdrop-blur-sm">
             <div className="max-w-4xl mx-auto">
               
               {/* Main Controls Row */}
@@ -506,7 +508,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         setSelectedImageIndex(0);
                         setShowGallery(true);
                       }}
-                      className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-white/20 shadow-glow bg-gradient-to-br from-electric-600/20 to-amber-600/20 backdrop-blur-sm"
+                      className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-serelune-300/50 shadow-soft bg-gradient-to-br from-serelune-100/40 to-blush-100/40 backdrop-blur-sm"
                       title={`View Gallery (${capturedImages.length} photos)`}
                     >
                       <img 
@@ -515,18 +517,18 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         className="w-full h-full object-cover"
                       />
                       {/* Gallery indicator badge */}
-                      <div className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-gradient-to-r from-electric-500 to-amber-500 rounded-full flex items-center justify-center shadow-glow">
+                      <div className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-gradient-to-r from-serelune-500 to-blush-500 rounded-full flex items-center justify-center shadow-glow">
                         <span className="text-white text-xs font-bold px-1">{capturedImages.length}</span>
                       </div>
                       {/* Gallery icon overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="absolute inset-0 bg-gradient-to-t from-serelune-600/50 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
                       {/* Recent timestamp */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs px-1 py-0.5 text-center">
+                      <div className="absolute bottom-0 left-0 right-0 bg-serelune-800/70 text-white text-xs px-1 py-0.5 text-center">
                         {capturedImages[0].timestamp.toLocaleTimeString([], { 
                           hour: '2-digit', 
                           minute: '2-digit' 
@@ -537,14 +539,14 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl border-2 border-white/20 flex flex-col items-center justify-center hover:bg-white/20 transition-all"
+                      className="w-16 h-16 bg-white/30 backdrop-blur-sm rounded-2xl border-2 border-serelune-200/50 flex flex-col items-center justify-center hover:bg-white/40 transition-all"
                       title="No photos captured yet"
                     >
-                      <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                               d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <span className="text-xs text-white/60 mt-1">Gallery</span>
+                      <span className="text-xs text-moonlight-600 mt-1">Gallery</span>
                     </motion.button>
                   )}
                 </div>
@@ -558,19 +560,19 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   className="relative flex items-center justify-center disabled:opacity-50"
                 >
                   <motion.div
-                    className="w-20 h-20 rounded-full bg-gradient-to-br from-electric-500 to-amber-500 p-1 shadow-glow"
+                    className="w-20 h-20 rounded-full bg-gradient-to-br from-serelune-500 to-blush-500 p-1 shadow-glow"
                     animate={isCapturing ? { scale: [1, 1.1, 1] } : {}}
                     transition={{ duration: 0.3, repeat: isCapturing ? Infinity : 0 }}
                   >
                     <div className="w-full h-full bg-white rounded-full shadow-inner flex items-center justify-center">
                       {isCapturing ? (
                         <motion.div
-                          className="w-6 h-6 bg-red-500 rounded-sm"
+                          className="w-6 h-6 bg-blush-500 rounded-sm"
                           animate={{ scale: [1, 0.8, 1] }}
                           transition={{ duration: 0.5, repeat: Infinity }}
                         />
                       ) : (
-                        <div className="w-6 h-6 bg-gradient-to-br from-electric-500 to-amber-500 rounded-full"></div>
+                        <div className="w-6 h-6 bg-gradient-to-br from-serelune-500 to-blush-500 rounded-full"></div>
                       )}
                     </div>
                   </motion.div>
@@ -587,7 +589,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         setSelectedImageIndex(0);
                         setShowGallery(true);
                       }}
-                      className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-electric-600/20 to-amber-600/20 border border-electric-400/30 text-electric-400 rounded-xl backdrop-blur-sm hover:from-electric-600/30 hover:to-amber-600/30 transition-all"
+                      className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-serelune-300/30 to-blush-300/30 border border-serelune-400/40 text-serelune-700 rounded-xl backdrop-blur-sm hover:from-serelune-400/40 hover:to-blush-400/40 transition-all"
                       title="View all captured photos"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -606,8 +608,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     className={cn(
                       "w-16 h-16 rounded-2xl backdrop-blur-sm border-2 flex items-center justify-center transition-all",
                       showFilters 
-                        ? "bg-amber-500/20 border-amber-400/50 text-amber-400" 
-                        : "bg-white/10 border-white/20 text-white"
+                        ? "bg-serelune-500/20 border-serelune-400/50 text-serelune-600 shadow-glow" 
+                        : "bg-white/30 border-serelune-200/50 text-moonlight-700"
                     )}
                   >
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -615,7 +617,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                     </svg>
                     {activeFilter && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full shadow-glow"></div>
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-serelune-500 rounded-full shadow-glow animate-sparkle"></div>
                     )}
                   </motion.button>
                 </div>
@@ -642,8 +644,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           className={cn(
                             "p-3 rounded-xl backdrop-blur-sm border transition-all capitalize text-sm min-w-[80px]",
                             activeControl === control
-                              ? "bg-electric-500/20 border-electric-400/50 text-electric-400"
-                              : "bg-white/10 border-white/20 text-white"
+                              ? "bg-serelune-500/20 border-serelune-400/50 text-serelune-700 shadow-glow"
+                              : "bg-white/30 border-serelune-200/50 text-moonlight-700"
                           )}
                         >
                           <span>{control}</span>
@@ -662,8 +664,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           className={cn(
                             "p-3 rounded-xl backdrop-blur-sm border transition-all capitalize text-sm min-w-[80px]",
                             activeControl === control
-                              ? "bg-electric-500/20 border-electric-400/50 text-electric-400"
-                              : "bg-white/10 border-white/20 text-white"
+                              ? "bg-serelune-500/20 border-serelune-400/50 text-serelune-700 shadow-glow"
+                              : "bg-white/30 border-serelune-200/50 text-moonlight-700"
                           )}
                         >
                           <span>{control}</span>
@@ -686,7 +688,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           setResetNotification(true);
                           setTimeout(() => setResetNotification(false), 2000);
                         }}
-                        className="p-3 rounded-xl backdrop-blur-sm border border-red-500/50 bg-red-500/20 text-red-400 transition-all text-sm min-w-[80px] hover:bg-red-500/30 hover:border-red-400/70"
+                        className="p-3 rounded-xl backdrop-blur-sm border border-rose-500/50 bg-rose-500/20 text-rose-600 transition-all text-sm min-w-[80px] hover:bg-rose-500/30 hover:border-rose-400/70"
                       >
                         <div className="flex items-center space-x-2">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -712,21 +714,21 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
             transition={{ type: 'spring', damping: 20 }}
-            className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/20 z-40 p-6"
+            className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-serelune-200/50 z-40 p-6"
           >
             <div className="max-w-4xl mx-auto">
               {/* Brightness Control */}
               {activeControl === 'brightness' && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-white font-title text-lg flex items-center space-x-2">
+                    <h3 className="text-moonlight-800 font-title text-lg flex items-center space-x-2">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                               d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                       <span>Brightness</span>
                     </h3>
-                    <span className="text-xl font-mono text-white font-bold">{brightness}%</span>
+                    <span className="text-xl font-mono text-serelune-700 font-bold">{brightness}%</span>
                   </div>
                   
                   <div className="relative">
@@ -963,7 +965,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveControl(null)}
-                  className="px-6 py-3 bg-white/10 text-white rounded-xl border border-white/20 hover:bg-white/20 transition-all"
+                  className="px-6 py-3 bg-serelune-500/20 text-serelune-700 rounded-xl border border-serelune-300/50 hover:bg-serelune-500/30 transition-all"
                 >
                   Close
                 </motion.button>
@@ -981,19 +983,19 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 20 }}
-            className="fixed top-0 right-0 h-full w-80 bg-black/80 backdrop-blur-xl border-l border-white/20 z-50 flex flex-col"
+            className="fixed top-0 right-0 h-full w-80 bg-white/90 backdrop-blur-xl border-l border-serelune-200/50 z-50 flex flex-col"
           >
             {/* Header */}
-            <div className="p-6 border-b border-white/10">
+            <div className="p-6 border-b border-serelune-200/30">
               <div className="flex justify-between items-center">
-                <h3 className="text-white font-title text-lg font-bold">Filters</h3>
+                <h3 className="text-moonlight-800 font-title text-lg font-bold">Filters</h3>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setShowFilters(false)}
-                  className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all"
+                  className="p-2 bg-serelune-500/20 rounded-lg hover:bg-serelune-500/30 transition-all"
                 >
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-moonlight-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </motion.button>
@@ -1001,7 +1003,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               
               {/* Active Filter Display */}
               {activeFilter && (
-                <div className="mt-4 p-3 bg-amber-500/20 border border-amber-400/30 rounded-lg">
+                <div className="mt-4 p-3 bg-serelune-500/20 border border-serelune-400/30 rounded-lg">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
                     <span className="text-amber-400 text-sm font-medium">
@@ -1123,11 +1125,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             initial={{ opacity: 0, scale: 0.8, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 50 }}
-            className="fixed bottom-6 left-6 bg-black/80 backdrop-blur-md px-4 py-3 rounded-xl border border-amber-400/30 z-40"
+            className="fixed bottom-6 left-6 bg-white/90 backdrop-blur-md px-4 py-3 rounded-xl border border-serelune-400/50 z-40 shadow-glow"
           >
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
-              <span className="text-white text-sm font-medium">
+              <div className="w-2 h-2 bg-serelune-500 rounded-full animate-pulse"></div>
+              <span className="text-moonlight-800 text-sm font-medium">
                 {filterNotification} Applied
               </span>
             </div>
@@ -1142,7 +1144,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-serelune-900/80 backdrop-blur-xl z-50 flex items-center justify-center p-4"
             onClick={() => setShowGallery(false)}
           >
             <motion.div
@@ -1150,13 +1152,13 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="max-w-4xl w-full bg-black/80 backdrop-blur-xl rounded-3xl border border-white/20 overflow-hidden"
+              className="max-w-4xl w-full bg-white/90 backdrop-blur-xl rounded-3xl border border-serelune-200/50 overflow-hidden"
             >
               {/* Gallery Header */}
-              <div className="p-6 border-b border-white/10 flex justify-between items-center">
+              <div className="p-6 border-b border-serelune-200/30 flex justify-between items-center">
                 <div>
-                  <h3 className="text-white font-title text-xl font-bold">Gallery ({capturedImages.length})</h3>
-                  <p className="text-white/60 text-sm mt-1">
+                  <h3 className="text-moonlight-800 font-title text-xl font-bold">Gallery ({capturedImages.length})</h3>
+                  <p className="text-moonlight-600 text-sm mt-1">
                     Recent captures • {capturedImages.length > 0 ? 
                       capturedImages[selectedImageIndex].timestamp.toLocaleDateString() : ''
                     }
@@ -1306,7 +1308,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       const filterSuffix = selectedImage.filter ? `-${selectedImage.filter.replace(/\s+/g, '-').toLowerCase()}` : '';
                       downloadImage(selectedImage.dataUrl, `blue-cam-${timestamp}${filterSuffix}.jpg`);
                     }}
-                    className="flex items-center space-x-2 px-6 py-3 bg-emerald-600 text-white rounded-xl font-medium shadow-glow hover:bg-emerald-700 transition-all"
+                    className="flex items-center space-x-2 px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium shadow-soft hover:bg-emerald-600 transition-all"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -1323,7 +1325,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         onPageChange('editor');
                       }
                     }}
-                    className="flex items-center space-x-2 px-6 py-3 bg-electric-600 text-white rounded-xl font-medium shadow-glow hover:bg-electric-700 transition-all"
+                    className="flex items-center space-x-2 px-6 py-3 bg-serelune-500 text-white rounded-xl font-medium shadow-glow hover:bg-serelune-600 transition-all"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1341,7 +1343,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         setShowGallery(false);
                       }
                     }}
-                    className="flex items-center space-x-2 px-6 py-3 bg-red-600 text-white rounded-xl font-medium shadow-glow hover:bg-red-700 transition-all"
+                    className="flex items-center space-x-2 px-6 py-3 bg-rose-500 text-white rounded-xl font-medium shadow-blush hover:bg-rose-600 transition-all"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

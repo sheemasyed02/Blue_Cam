@@ -304,8 +304,8 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleChangeImage}
-                className="w-full py-3 bg-peach/30 border-2 border-gold text-charcoal rounded-lg 
-                         font-body font-medium hover:bg-peach/50 transition-all shadow-sm mb-4"
+                className="w-full py-3 bg-blush-100/50 border-2 border-serelune-300 text-serelune-700 rounded-lg 
+                         font-body font-medium hover:bg-blush-100/70 transition-all shadow-soft mb-4"
               >
                 Change Image
               </motion.button>
@@ -337,24 +337,24 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 disabled={!selectedImage}
-                className="p-4 bg-white rounded-lg border-2 border-transparent hover:border-gold
+                className="p-4 bg-white rounded-lg border-2 border-transparent hover:border-serelune-400
                          disabled:opacity-50 disabled:cursor-not-allowed transition-all
-                         text-left shadow-sm hover:shadow-md"
+                         text-left shadow-soft hover:shadow-glow"
               >
-                <div className="font-body font-medium text-charcoal">Classic Border</div>
-                <div className="text-xs text-charcoal/60 mt-1">White vintage frame</div>
+                <div className="font-body font-medium text-serelune-700">Classic Border</div>
+                <div className="text-xs text-serelune-500/70 mt-1">White vintage frame</div>
               </motion.button>
               
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 disabled={!selectedImage}
-                className="p-4 bg-white rounded-lg border-2 border-transparent hover:border-gold
+                className="p-4 bg-white rounded-lg border-2 border-transparent hover:border-serelune-400
                          disabled:opacity-50 disabled:cursor-not-allowed transition-all
-                         text-left shadow-sm hover:shadow-md"
+                         text-left shadow-soft hover:shadow-glow"
               >
-                <div className="font-body font-medium text-charcoal">Film Strip</div>
-                <div className="text-xs text-charcoal/60 mt-1">Retro film edge effect</div>
+                <div className="font-body font-medium text-serelune-700">Film Strip</div>
+                <div className="text-xs text-serelune-500/70 mt-1">Retro film edge effect</div>
               </motion.button>
             </div>
           </div>
@@ -374,32 +374,39 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
   };
 
   return (
-    <div className={cn("min-h-screen bg-cream", className)}>
+    <div className={cn("min-h-screen bg-gradient-to-br from-serelune-50 via-blush-50 to-lavender-100", className)}>
+      {/* Dreamy Background Effects */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 opacity-20 bg-gradient-dreamy"></div>
+        <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-br from-serelune-300/30 to-blush-300/30 rounded-full blur-3xl animate-pulse-soft"></div>
+        <div className="absolute bottom-10 left-10 w-64 h-64 bg-gradient-to-tr from-lavender-300/20 to-serelune-400/20 rounded-full blur-3xl animate-float"></div>
+      </div>
+      
       {/* Header */}
-      <header className="bg-charcoal text-cream p-4 md:p-6">
+      <header className="relative z-10 bg-white/20 backdrop-blur-xl border-b border-serelune-200/30 text-moonlight-800 p-4 md:p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-2xl md:text-3xl font-title font-bold">
-              Photo Editor
+              SERELUNE Editor
             </h1>
             {onPageChange && (
               <Navigation currentPage="editor" onPageChange={onPageChange} />
             )}
           </div>
-          <p className="text-center mt-1 font-body text-peach text-sm md:text-base">
-            Enhance your photos with vintage filters and adjustments
+          <p className="text-center mt-1 font-body text-moonlight-600 text-sm md:text-base">
+            Transform your photos with dreamy filters and adjustments
           </p>
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto p-4 md:p-6">
+      <div className="relative z-10 max-w-7xl mx-auto p-4 md:p-6">
         <div className="flex flex-col lg:flex-row gap-6">
           
           {/* Left Column - Tabs and Controls */}
           <div className="lg:w-80 order-1 lg:order-none">
             {/* Vertical Tabs */}
-            <div className="bg-gold rounded-lg p-1 mb-6">
+            <div className="bg-white/40 backdrop-blur-sm rounded-lg p-1 mb-6 border border-serelune-200/50 shadow-soft">
               <div className="flex lg:flex-col gap-1">
                 {tabs.map((tab) => (
                   <button
@@ -407,10 +414,10 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
                       "flex-1 lg:w-full py-3 px-4 rounded-md font-body font-medium transition-all",
-                      "text-cream",
+                      "text-moonlight-700",
                       activeTab === tab.id
-                        ? "bg-white text-charcoal border-2 border-gold shadow-md"
-                        : "hover:bg-gold/80"
+                        ? "bg-serelune-500 text-white border-2 border-serelune-400 shadow-glow"
+                        : "hover:bg-serelune-100/50"
                     )}
                   >
                     {tab.label}
@@ -427,7 +434,7 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
-                className="bg-white/70 backdrop-blur-sm rounded-lg p-6"
+                className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-serelune-200/50 shadow-soft"
               >
                 {renderTabContent()}
               </motion.div>
@@ -472,20 +479,20 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
                     "aspect-video flex items-center justify-center border-2 border-dashed",
                     "cursor-pointer transition-colors p-8",
                     isDragActive 
-                      ? "border-gold bg-gold/10" 
-                      : "border-gray-300 hover:border-gold hover:bg-gold/5"
+                      ? "border-serelune-400 bg-serelune-50/50" 
+                      : "border-serelune-200 hover:border-serelune-400 hover:bg-serelune-50/30"
                   )}
                 >
                   <input {...getInputProps()} />
                   <div className="text-center">
                     <div className="text-6xl mb-4">📸</div>
-                    <h3 className="font-title text-xl text-charcoal mb-2">
+                    <h3 className="font-title text-xl text-serelune-700 mb-2">
                       {isDragActive ? 'Drop your photo here' : 'Upload a photo to edit'}
                     </h3>
-                    <p className="font-body text-charcoal/70">
+                    <p className="font-body text-serelune-600/80">
                       Drag and drop an image file, or click to browse
                     </p>
-                    <p className="font-body text-sm text-charcoal/50 mt-2">
+                    <p className="font-body text-sm text-serelune-500/70 mt-2">
                       Supports: PNG, JPG, JPEG, GIF, WebP
                     </p>
                   </div>

@@ -136,7 +136,7 @@ export const ExportPanel = ({
   if (!hasImageToExport) {
     return (
       <div className={cn("py-8", className)}>
-        <div className="text-center text-charcoal/50 font-body text-sm">
+        <div className="text-center text-serelune-500/60 font-body text-sm">
           No image available for export
         </div>
       </div>
@@ -152,17 +152,17 @@ export const ExportPanel = ({
     >
       {/* Panel Header */}
       <div className="flex items-center justify-between">
-        <h3 className="font-title font-semibold text-charcoal text-lg">
+        <h3 className="font-title font-semibold text-serelune-700 text-lg">
           Export Photo
         </h3>
-        <div className="text-xs text-charcoal/60 font-body">
+        <div className="text-xs text-serelune-500/70 font-body">
           {formatOptions.length} formats available
         </div>
       </div>
 
       {/* Format Selection */}
       <div className="space-y-4">
-        <h4 className="font-body font-medium text-charcoal/80 text-sm uppercase tracking-wide">
+        <h4 className="font-body font-medium text-serelune-600/80 text-sm uppercase tracking-wide">
           Choose Format
         </h4>
         
@@ -176,20 +176,20 @@ export const ExportPanel = ({
               className={cn(
                 "p-4 rounded-lg border-2 transition-all text-left",
                 selectedFormat === option.format
-                  ? "border-gold bg-gold/10 shadow-sm"
-                  : "border-gray-200 hover:border-gold/50 hover:bg-gold/5"
+                  ? "border-serelune-400 bg-serelune-100/40 shadow-soft"
+                  : "border-serelune-200/50 hover:border-serelune-300 hover:bg-serelune-50/30"
               )}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-body font-medium text-charcoal">
+                  <div className="font-body font-medium text-serelune-700">
                     {option.label}
                   </div>
-                  <div className="text-xs text-charcoal/60 mt-1">
+                  <div className="text-xs text-serelune-600/70 mt-1">
                     {option.description}
                   </div>
                 </div>
-                <div className="text-xs text-charcoal/50 font-mono">
+                <div className="text-xs text-serelune-500/70 font-mono">
                   {option.extension}
                 </div>
               </div>
@@ -199,8 +199,8 @@ export const ExportPanel = ({
                 <div className={cn(
                   "w-4 h-4 rounded-full border-2 transition-all",
                   selectedFormat === option.format
-                    ? "border-gold bg-gold"
-                    : "border-gray-300"
+                    ? "border-serelune-500 bg-serelune-500"
+                    : "border-serelune-300/70"
                 )}>
                   {selectedFormat === option.format && (
                     <motion.div
@@ -210,7 +210,7 @@ export const ExportPanel = ({
                     />
                   )}
                 </div>
-                <span className="ml-2 text-xs text-charcoal/70 font-body">
+                <span className="ml-2 text-xs text-serelune-600/80 font-body">
                   {selectedFormat === option.format ? 'Selected' : 'Select'}
                 </span>
               </div>
@@ -223,25 +223,25 @@ export const ExportPanel = ({
       <motion.button
         whileHover={{ 
           scale: 1.02,
-          backgroundColor: '#e4c3a1' 
+          backgroundColor: 'rgba(168, 85, 247, 0.8)' 
         }}
         whileTap={{ scale: 0.98 }}
         onClick={handleExport}
         disabled={isExporting || !hasImageToExport}
-        className="w-full py-4 px-6 bg-gold/60 text-charcoal rounded-lg 
+        className="w-full py-4 px-6 bg-serelune-500/70 text-white rounded-lg 
                  font-body font-medium text-lg transition-all duration-300
-                 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed
-                 border-2 border-gold/30 hover:border-gold"
+                 hover:shadow-glow disabled:opacity-50 disabled:cursor-not-allowed
+                 border-2 border-serelune-400/50 hover:border-serelune-400"
       >
         {isExporting ? 'Exporting...' : `Download as ${selectedFormat.toUpperCase()}`}
       </motion.button>
 
       {/* Export Info */}
-      <div className="bg-cream/50 rounded-lg p-4 border border-gold/20">
-        <h5 className="font-body font-medium text-charcoal text-sm mb-2">
+      <div className="bg-moonlight-50/70 rounded-lg p-4 border border-serelune-200/50 shadow-soft">
+        <h5 className="font-body font-medium text-serelune-700 text-sm mb-2">
           Export Information
         </h5>
-        <ul className="text-xs text-charcoal/70 space-y-1 font-body">
+        <ul className="text-xs text-serelune-600/80 space-y-1 font-body">
           <li>• Files are saved with timestamp for organization</li>
           <li>• Original image quality is preserved</li>
           <li>• All applied filters and adjustments included</li>
@@ -292,9 +292,9 @@ export const ExportPanel = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.2, duration: 0.5 }}
-                    className="font-title text-charcoal text-sm"
+                    className="font-title text-serelune-700 text-sm"
                   >
-                    Blue Vintage Camera
+                    SERELUNE Camera
                   </motion.div>
                 </div>
               </div>
@@ -306,10 +306,10 @@ export const ExportPanel = ({
                 transition={{ delay: 1.5, duration: 0.5 }}
                 className="text-center mt-4"
               >
-                <div className="font-body font-medium text-charcoal">
+                <div className="font-body font-medium text-serelune-700">
                   Exporting your photo...
                 </div>
-                <div className="text-xs text-charcoal/60 mt-1">
+                <div className="text-xs text-serelune-600/70 mt-1">
                   Download will start shortly
                 </div>
               </motion.div>

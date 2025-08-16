@@ -33,14 +33,14 @@ const FilterThumbnail = ({ filter, image, isActive, onClick }: FilterThumbnailPr
         className={cn(
           "relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300",
           isActive 
-            ? "border-gold shadow-lg shadow-gold/30 scale-105" 
-            : "border-transparent hover:border-gold/50"
+            ? "border-serelune-400 shadow-glow shadow-serelune-300/50 scale-105" 
+            : "border-transparent hover:border-serelune-300/50"
         )}
         whileHover={{ scale: isActive ? 1.05 : 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
         {/* Background placeholder */}
-        <div className="absolute inset-0 bg-gradient-to-br from-cream to-peach/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-moonlight-100 to-blush-50/50" />
         
         {/* Filter preview image */}
         <AnimatePresence mode="wait">
@@ -66,17 +66,17 @@ const FilterThumbnail = ({ filter, image, isActive, onClick }: FilterThumbnailPr
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="absolute inset-0 bg-gold/10 border-2 border-gold rounded-lg"
+            className="absolute inset-0 bg-serelune-400/10 border-2 border-serelune-400 rounded-lg"
           />
         )}
 
         {/* Loading state */}
         {!imageLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center bg-cream/50">
+          <div className="absolute inset-0 flex items-center justify-center bg-moonlight-50/70">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full"
+              className="w-4 h-4 border-2 border-serelune-400 border-t-transparent rounded-full"
             />
           </div>
         )}
@@ -86,10 +86,10 @@ const FilterThumbnail = ({ filter, image, isActive, onClick }: FilterThumbnailPr
       <motion.div
         className={cn(
           "text-xs font-body text-center transition-all duration-300",
-          isActive ? "text-gold font-semibold" : "text-charcoal/70"
+          isActive ? "text-serelune-600 font-semibold" : "text-serelune-500/70"
         )}
         animate={{
-          color: isActive ? "#c5a27c" : "#5a4e3c",
+          color: isActive ? "#a855f7" : "#8b5cf6",
           fontWeight: isActive ? 600 : 400
         }}
       >
@@ -159,7 +159,7 @@ export const FiltersPanel = ({
   if (!selectedImage) {
     return (
       <div className={cn("py-4", className)}>
-        <div className="text-center text-charcoal/50 font-body text-sm">
+        <div className="text-center text-serelune-500/60 font-body text-sm">
           Select an image to apply filters
         </div>
       </div>
@@ -175,10 +175,10 @@ export const FiltersPanel = ({
     >
       {/* Panel Header */}
       <div className="flex items-center justify-between mb-4 px-4">
-        <h3 className="font-title font-semibold text-charcoal text-lg">
+        <h3 className="font-title font-semibold text-serelune-700 text-lg">
           Vintage Filters
         </h3>
-        <div className="text-xs text-charcoal/60 font-body">
+        <div className="text-xs text-serelune-500/70 font-body">
           {allFilters.length} filters
         </div>
       </div>
@@ -186,8 +186,8 @@ export const FiltersPanel = ({
       {/* Horizontal Scroll Container */}
       <div className="relative">
         {/* Gradient overlays for scroll indication */}
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-cream to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-cream to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-moonlight-50 to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-moonlight-50 to-transparent z-10 pointer-events-none" />
         
         {/* Scrollable Filter List */}
         <div
@@ -226,20 +226,20 @@ export const FiltersPanel = ({
             transition={{ duration: 0.3 }}
             className="mt-4 px-4"
           >
-            <div className="bg-white/50 rounded-lg p-3 border border-gold/20">
+            <div className="bg-white/60 backdrop-blur-sm rounded-lg p-3 border border-serelune-200/50 shadow-soft">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-body font-medium text-charcoal">
+                  <div className="font-body font-medium text-serelune-700">
                     {allFilters.find(f => f.id === currentFilterId)?.name}
                   </div>
-                  <div className="text-xs text-charcoal/60 mt-1">
+                  <div className="text-xs text-serelune-500/70 mt-1">
                     {allFilters.find(f => f.id === currentFilterId)?.description}
                   </div>
                 </div>
                 <motion.div
                   animate={{ rotate: [0, 5, -5, 0] }}
                   transition={{ duration: 0.5 }}
-                  className="w-3 h-3 bg-gold rounded-full"
+                  className="w-3 h-3 bg-serelune-400 rounded-full"
                 />
               </div>
             </div>

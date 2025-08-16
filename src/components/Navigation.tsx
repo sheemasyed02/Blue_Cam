@@ -17,8 +17,8 @@ export const Navigation = ({ currentPage, onPageChange, className }: NavigationP
         className={cn(
           "px-4 py-2 rounded-lg font-body font-medium transition-all",
           currentPage === 'camera'
-            ? "bg-white text-charcoal shadow-md"
-            : "bg-transparent text-cream hover:bg-white/20"
+            ? "bg-serelune-500 text-white shadow-glow"
+            : "bg-transparent text-moonlight-700 hover:bg-serelune-100/50"
         )}
       >
         Camera
@@ -31,8 +31,8 @@ export const Navigation = ({ currentPage, onPageChange, className }: NavigationP
         className={cn(
           "px-4 py-2 rounded-lg font-body font-medium transition-all",
           currentPage === 'editor'
-            ? "bg-white text-charcoal shadow-md"
-            : "bg-transparent text-cream hover:bg-white/20"
+            ? "bg-serelune-500 text-white shadow-glow"
+            : "bg-transparent text-moonlight-700 hover:bg-serelune-100/50"
         )}
       >
         Editor

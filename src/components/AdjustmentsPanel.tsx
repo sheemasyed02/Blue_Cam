@@ -51,12 +51,12 @@ const CustomSlider = ({
       {/* Label and Value */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          {icon && <span className="text-gold text-sm">{icon}</span>}
-          <label className="font-body text-charcoal font-medium text-sm">
+          {icon && <span className="text-serelune-500 text-sm">{icon}</span>}
+          <label className="font-body text-serelune-700 font-medium text-sm">
             {label}
           </label>
         </div>
-        <div className="font-body text-charcoal/80 text-sm font-semibold">
+        <div className="font-body text-serelune-600/90 text-sm font-semibold">
           {value}{unit}
         </div>
       </div>
@@ -64,10 +64,10 @@ const CustomSlider = ({
       {/* Custom Slider */}
       <div className="relative">
         {/* Track */}
-        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-serelune-100/50 rounded-full overflow-hidden">
           {/* Progress */}
           <motion.div
-            className="h-full bg-gradient-to-r from-gold/60 to-gold rounded-full"
+            className="h-full bg-gradient-to-r from-serelune-300/80 to-serelune-500 rounded-full"
             style={{ width: `${percentage}%` }}
             animate={{ width: `${percentage}%` }}
             transition={{ duration: 0.2, ease: "easeOut" }}
@@ -87,7 +87,7 @@ const CustomSlider = ({
 
         {/* Custom Thumb */}
         <motion.div
-          className="absolute top-1/2 w-5 h-5 bg-gold border-2 border-white rounded-full shadow-lg cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
+          className="absolute top-1/2 w-5 h-5 bg-serelune-500 border-2 border-white rounded-full shadow-glow cursor-pointer transform -translate-y-1/2 -translate-x-1/2"
           style={{ left: `${percentage}%` }}
           animate={{ left: `${percentage}%` }}
           transition={{ duration: 0.2, ease: "easeOut" }}
@@ -145,7 +145,7 @@ export const AdjustmentsPanel = ({
   if (!selectedImage) {
     return (
       <div className={cn("py-8", className)}>
-        <div className="text-center text-charcoal/50 font-body text-sm">
+        <div className="text-center text-serelune-500/60 font-body text-sm">
           Select an image to make adjustments
         </div>
       </div>
@@ -161,7 +161,7 @@ export const AdjustmentsPanel = ({
     >
       {/* Panel Header */}
       <div className="flex items-center justify-between">
-        <h3 className="font-title font-semibold text-charcoal text-lg">
+        <h3 className="font-title font-semibold text-serelune-700 text-lg">
           Manual Adjustments
         </h3>
         
@@ -174,8 +174,8 @@ export const AdjustmentsPanel = ({
           className={cn(
             "px-4 py-2 rounded-lg font-body text-sm font-medium transition-all",
             hasChanges
-              ? "bg-peach/30 border-2 border-gold text-charcoal hover:bg-peach/50 shadow-sm"
-              : "bg-gray-100 border-2 border-gray-200 text-gray-400 cursor-not-allowed"
+              ? "bg-blush-100/50 border-2 border-serelune-300 text-serelune-700 hover:bg-blush-100/70 shadow-soft"
+              : "bg-serelune-50/30 border-2 border-serelune-200/50 text-serelune-400 cursor-not-allowed"
           )}
         >
           Reset
@@ -186,7 +186,7 @@ export const AdjustmentsPanel = ({
       <div className="space-y-6">
         {/* Basic Adjustments */}
         <div className="space-y-4">
-          <h4 className="font-body font-medium text-charcoal/80 text-sm uppercase tracking-wide">
+          <h4 className="font-body font-medium text-serelune-600/80 text-sm uppercase tracking-wide">
             Basic
           </h4>
           
@@ -220,7 +220,7 @@ export const AdjustmentsPanel = ({
 
         {/* Advanced Effects */}
         <div className="space-y-4">
-          <h4 className="font-body font-medium text-charcoal/80 text-sm uppercase tracking-wide">
+          <h4 className="font-body font-medium text-serelune-600/80 text-sm uppercase tracking-wide">
             Effects
           </h4>
 
@@ -267,15 +267,15 @@ export const AdjustmentsPanel = ({
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-gold/10 border border-gold/30 rounded-lg p-3"
+          className="bg-serelune-100/30 border border-serelune-300/50 rounded-lg p-3"
         >
           <div className="flex items-center space-x-2">
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="w-2 h-2 bg-gold rounded-full"
+              className="w-2 h-2 bg-serelune-500 rounded-full"
             />
-            <span className="font-body text-charcoal/80 text-sm">
+            <span className="font-body text-serelune-700/90 text-sm">
               Live preview active
             </span>
           </div>
@@ -283,11 +283,11 @@ export const AdjustmentsPanel = ({
       )}
 
       {/* Tips */}
-      <div className="bg-cream/50 rounded-lg p-4 border border-gold/20">
-        <h5 className="font-body font-medium text-charcoal text-sm mb-2">
+      <div className="bg-moonlight-50/70 rounded-lg p-4 border border-serelune-200/50 shadow-soft">
+        <h5 className="font-body font-medium text-serelune-700 text-sm mb-2">
           Pro Tips
         </h5>
-        <ul className="text-xs text-charcoal/70 space-y-1 font-body">
+        <ul className="text-xs text-serelune-600/80 space-y-1 font-body">
           <li>• Use Temperature to add warmth (+) or coolness (-)</li>
           <li>• Grain adds vintage film texture</li>
           <li>• Fade creates dreamy, washed-out effects</li>
