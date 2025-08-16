@@ -1387,7 +1387,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-serelune-900/80 backdrop-blur-xl z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-gradient-to-br from-pearl-900/90 via-moonlight-900/85 to-serelune-900/90 backdrop-blur-xl z-50 flex items-center justify-center p-2 sm:p-4"
             onClick={() => setShowGallery(false)}
           >
             <motion.div
@@ -1395,19 +1395,19 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="max-w-4xl w-full bg-white/90 backdrop-blur-xl rounded-3xl border border-serelune-200/50 overflow-hidden"
+              className="w-full h-full sm:h-auto sm:max-w-4xl sm:w-full bg-gradient-to-br from-pearl-50/95 to-serelune-50/95 backdrop-blur-xl rounded-none sm:rounded-3xl border-0 sm:border border-pearl-200/50 overflow-hidden flex flex-col"
             >
               {/* Gallery Header */}
-              <div className="p-6 border-b border-serelune-200/30 flex justify-between items-center">
+              <div className="p-3 sm:p-6 border-b border-pearl-200/30 flex justify-between items-center flex-shrink-0">
                 <div>
-                  <h3 className="text-moonlight-800 font-title text-xl font-bold">Gallery ({capturedImages.length})</h3>
-                  <p className="text-moonlight-600 text-sm mt-1">
+                  <h3 className="text-moonlight-800 font-title text-lg sm:text-xl font-bold">Gallery ({capturedImages.length})</h3>
+                  <p className="text-moonlight-600 text-xs sm:text-sm mt-1">
                     Recent captures • {capturedImages.length > 0 ? 
                       capturedImages[selectedImageIndex].timestamp.toLocaleDateString() : ''
                     }
                   </p>
                 </div>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 sm:space-x-3">
                   {/* Clear All Button */}
                   {capturedImages.length > 1 && (
                     <motion.button
@@ -1417,12 +1417,12 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         setCapturedImages([]);
                         setShowGallery(false);
                       }}
-                      className="flex items-center space-x-2 px-3 py-2 bg-red-500/20 border border-red-400/50 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all"
+                      className="flex items-center space-x-2 px-2 sm:px-3 py-2 bg-blush-500/20 border border-blush-400/50 text-blush-600 rounded-lg text-xs sm:text-sm hover:bg-blush-500/30 transition-all"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
-                      <span>Clear All</span>
+                      <span className="hidden sm:inline">Clear All</span>
                     </motion.button>
                   )}
                   {/* Close Button */}
@@ -1430,9 +1430,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setShowGallery(false)}
-                    className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all"
+                    className="p-2 bg-pearl-200/30 rounded-lg hover:bg-pearl-200/50 transition-all"
                   >
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-moonlight-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </motion.button>
@@ -1440,8 +1440,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               </div>
 
               {/* Main Image Display */}
-              <div className="p-6">
-                <div className="relative aspect-video bg-black rounded-2xl overflow-hidden mb-4">
+              <div className="flex-1 flex flex-col p-3 sm:p-6 overflow-hidden">
+                <div className="relative bg-black rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4 flex-1 min-h-0">
                   <img
                     src={capturedImages[selectedImageIndex].dataUrl}
                     alt={`Captured image ${selectedImageIndex + 1}`}
@@ -1449,15 +1449,15 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   />
                   
                   {/* Image Info Overlay */}
-                  <div className="absolute top-4 left-4 space-y-2">
-                    <div className="px-3 py-1 bg-black/70 rounded-full border border-white/20">
-                      <span className="text-white text-sm font-mono">
+                  <div className="absolute top-2 sm:top-4 left-2 sm:left-4 space-y-1 sm:space-y-2">
+                    <div className="px-2 sm:px-3 py-1 bg-black/70 rounded-full border border-white/20">
+                      <span className="text-white text-xs sm:text-sm font-mono">
                         {capturedImages[selectedImageIndex].timestamp.toLocaleString()}
                       </span>
                     </div>
                     {capturedImages[selectedImageIndex].filter && (
-                      <div className="px-3 py-1 bg-amber-500/20 border border-amber-400/30 rounded-full">
-                        <span className="text-amber-400 text-sm font-medium">
+                      <div className="px-2 sm:px-3 py-1 bg-serelune-500/20 border border-serelune-400/30 rounded-full">
+                        <span className="text-serelune-600 text-xs sm:text-sm font-medium">
                           {capturedImages[selectedImageIndex].filter}
                         </span>
                       </div>
@@ -1473,9 +1473,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         onClick={() => setSelectedImageIndex(prev => 
                           prev > 0 ? prev - 1 : capturedImages.length - 1
                         )}
-                        className="absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/50 rounded-full border border-white/20 text-white hover:bg-black/70 transition-all"
+                        className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 p-2 sm:p-3 bg-black/50 rounded-full border border-white/20 text-white hover:bg-black/70 transition-all"
                       >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                       </motion.button>
@@ -1486,9 +1486,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         onClick={() => setSelectedImageIndex(prev => 
                           prev < capturedImages.length - 1 ? prev + 1 : 0
                         )}
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/50 rounded-full border border-white/20 text-white hover:bg-black/70 transition-all"
+                        className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 p-2 sm:p-3 bg-black/50 rounded-full border border-white/20 text-white hover:bg-black/70 transition-all"
                       >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </motion.button>
@@ -1496,8 +1496,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   )}
                   
                   {/* Image Counter */}
-                  <div className="absolute top-4 right-4 px-3 py-1 bg-black/50 rounded-full border border-white/20">
-                    <span className="text-white text-sm font-mono">
+                  <div className="absolute top-2 sm:top-4 right-2 sm:right-4 px-2 sm:px-3 py-1 bg-black/50 rounded-full border border-white/20">
+                    <span className="text-white text-xs sm:text-sm font-mono">
                       {selectedImageIndex + 1} / {capturedImages.length}
                     </span>
                   </div>
@@ -1505,7 +1505,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
 
                 {/* Thumbnail Strip */}
                 {capturedImages.length > 1 && (
-                  <div className="flex space-x-3 overflow-x-auto pb-2">
+                  <div className="flex space-x-2 sm:space-x-3 overflow-x-auto pb-2 flex-shrink-0">
                     {capturedImages.map((image, index) => (
                       <motion.button
                         key={image.id}
@@ -1513,10 +1513,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setSelectedImageIndex(index)}
                         className={cn(
-                          "relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0",
+                          "relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0",
                           selectedImageIndex === index 
-                            ? "border-electric-400 shadow-glow" 
-                            : "border-white/20 hover:border-white/40"
+                            ? "border-serelune-400 shadow-glow" 
+                            : "border-pearl-200/40 hover:border-pearl-200/60"
                         )}
                       >
                         <img
@@ -1525,11 +1525,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           className="w-full h-full object-cover"
                         />
                         {selectedImageIndex === index && (
-                          <div className="absolute inset-0 bg-electric-400/20"></div>
+                          <div className="absolute inset-0 bg-serelune-400/20"></div>
                         )}
                         {/* Filter indicator */}
                         {image.filter && (
-                          <div className="absolute bottom-1 left-1 w-2 h-2 bg-amber-400 rounded-full"></div>
+                          <div className="absolute bottom-1 left-1 w-2 h-2 bg-serelune-400 rounded-full"></div>
                         )}
                         {/* Time indicator */}
                         <div className="absolute bottom-0 right-0 px-1 bg-black/70 text-white text-xs">
@@ -1541,7 +1541,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex justify-center space-x-4 mt-6">
+                <div className="flex justify-center space-x-3 sm:space-x-4 mt-4 sm:mt-6 flex-shrink-0">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -1551,12 +1551,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       const filterSuffix = selectedImage.filter ? `-${selectedImage.filter.replace(/\s+/g, '-').toLowerCase()}` : '';
                       downloadImage(selectedImage.dataUrl, `blue-cam-${timestamp}${filterSuffix}.jpg`);
                     }}
-                    className="flex items-center space-x-2 px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium shadow-soft hover:bg-emerald-600 transition-all"
+                    className="p-3 sm:p-4 bg-blush-500/90 text-white rounded-xl shadow-blush hover:bg-blush-600 transition-all"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span>Download</span>
                   </motion.button>
                   
                   <motion.button
@@ -1568,12 +1567,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         onPageChange('editor');
                       }
                     }}
-                    className="flex items-center space-x-2 px-6 py-3 bg-serelune-500 text-white rounded-xl font-medium shadow-glow hover:bg-serelune-600 transition-all"
+                    className="p-3 sm:p-4 bg-serelune-500/90 text-white rounded-xl shadow-glow hover:bg-serelune-600 transition-all"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
-                    <span>Edit</span>
                   </motion.button>
                   
                   <motion.button
@@ -1586,12 +1584,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         setShowGallery(false);
                       }
                     }}
-                    className="flex items-center space-x-2 px-6 py-3 bg-rose-500 text-white rounded-xl font-medium shadow-blush hover:bg-rose-600 transition-all"
+                    className="p-3 sm:p-4 bg-rose-500/90 text-white rounded-xl shadow-blush hover:bg-rose-600 transition-all"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
-                    <span>Delete</span>
                   </motion.button>
                 </div>
               </div>
