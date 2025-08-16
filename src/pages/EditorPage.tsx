@@ -515,9 +515,11 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
             )}>
               {selectedImage ? (
                 <div className={cn(
-                  "relative min-h-[400px] flex items-center justify-center",
-                  // Mobile: Responsive aspect ratio
-                  "aspect-[4/3] lg:aspect-auto lg:min-h-[500px]"
+                  "relative flex items-center justify-center",
+                  // Shorter image display area - reduced height
+                  "h-[300px] lg:h-[400px]",
+                  // Larger display when frame is active
+                  currentFrame && currentFrame !== 'none' ? "lg:h-[500px]" : ""
                 )}>
                   {processedImage && selectedImage !== processedImage ? (
                     <div className="w-full h-full">
@@ -532,7 +534,7 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                       {currentFrame && currentFrame !== 'none' ? (
                         currentFrame === 'photobooth' ? (
                           frameData?.images && frameData.images.length > 0 ? (
-                            <div className="w-full max-w-xs mx-auto">
+                            <div className="w-full max-w-sm mx-auto">
                               <FrameRenderer 
                                 frameId={currentFrame}
                                 image={selectedImage}
@@ -541,15 +543,15 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                               />
                             </div>
                           ) : (
-                            <div className="text-center p-8">
-                              <div className="text-6xl mb-4">📸</div>
-                              <h3 className="font-title text-xl text-serelune-700 mb-2">
+                            <div className="text-center p-6">
+                              <div className="text-4xl mb-3">📸</div>
+                              <h3 className="font-title text-lg text-serelune-700 mb-2">
                                 Photo Booth Strip
                               </h3>
-                              <p className="font-body text-serelune-600/80 mb-4">
+                              <p className="font-body text-serelune-600/80 mb-3 text-sm">
                                 Upload up to 4 photos to create your photo booth strip
                               </p>
-                              <p className="font-body text-sm text-serelune-500/70">
+                              <p className="font-body text-xs text-serelune-500/70">
                                 Use the Frames panel to add photos
                               </p>
                             </div>
@@ -560,7 +562,7 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                               frameId={currentFrame}
                               image={selectedImage}
                               frameData={frameData}
-                              className="max-w-[90%] max-h-[90%] w-auto h-auto"
+                              className="max-w-[85%] max-h-[85%] w-auto h-auto"
                             />
                           </div>
                         )
@@ -568,7 +570,7 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                         <img 
                           src={selectedImage} 
                           alt="Selected" 
-                          className="max-w-full max-h-full object-contain"
+                          className="max-w-[90%] max-h-[90%] object-contain"
                         />
                       )}
                     </div>
@@ -618,8 +620,9 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                 <div 
                   {...getRootProps()}
                   className={cn(
-                    "aspect-video flex items-center justify-center border-2 border-dashed",
-                    "cursor-pointer transition-colors p-8",
+                    // Shorter upload area
+                    "h-[300px] flex items-center justify-center border-2 border-dashed",
+                    "cursor-pointer transition-colors p-6",
                     isDragActive 
                       ? "border-serelune-400 bg-serelune-50/50" 
                       : "border-serelune-200 hover:border-serelune-400 hover:bg-serelune-50/30"
@@ -627,14 +630,14 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                 >
                   <input {...getInputProps()} />
                   <div className="text-center">
-                    <div className="text-6xl mb-4">📸</div>
-                    <h3 className="font-title text-xl text-serelune-700 mb-2">
+                    <div className="text-5xl mb-3">📸</div>
+                    <h3 className="font-title text-lg text-serelune-700 mb-2">
                       {isDragActive ? 'Drop your photo here' : 'Upload a photo to edit'}
                     </h3>
-                    <p className="font-body text-serelune-600/80">
+                    <p className="font-body text-serelune-600/80 text-sm">
                       Drag and drop an image file, or click to browse
                     </p>
-                    <p className="font-body text-sm text-serelune-500/70 mt-2">
+                    <p className="font-body text-xs text-serelune-500/70 mt-2">
                       Supports: PNG, JPG, JPEG, GIF, WebP
                     </p>
                   </div>
@@ -644,9 +647,9 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
 
             {/* Image Info */}
             {selectedImage && (
-              <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-lg p-4">
-                <h4 className="font-title font-medium text-charcoal mb-2">Image Information</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm font-body text-charcoal/70">
+              <div className="mt-3 bg-white/70 backdrop-blur-sm rounded-lg p-3">
+                <h4 className="font-title font-medium text-charcoal mb-2 text-sm">Image Information</h4>
+                <div className="grid grid-cols-2 gap-3 text-xs font-body text-charcoal/70">
                   <div>Status: {processedImage !== selectedImage ? 'Edited' : 'Original'}</div>
                   <div>Format: {selectedImage.startsWith('data:image/png') ? 'PNG' : 'JPEG'}</div>
                 </div>

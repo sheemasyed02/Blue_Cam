@@ -31,6 +31,12 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   const [activeFilter, setActiveFilter] = useState<string>('');
   const [filterNotification, setFilterNotification] = useState<string | null>(null);
   
+  // Frames state
+  const [showFrames, setShowFrames] = useState(false);
+  const [activeFrame, setActiveFrame] = useState<string>('');
+  const [frameData, setFrameData] = useState<any>(null);
+  const [frameNotification, setFrameNotification] = useState<string | null>(null);
+  
   // Camera editing controls
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
@@ -56,6 +62,58 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   // Camera preview for filter thumbnails
   const [cameraPreview, setCameraPreview] = useState<string | null>(null);
 
+  // Frame styles for camera
+  const frameStyles = [
+    {
+      id: 'none',
+      name: 'No Frame',
+      description: 'Original image without frame',
+      category: 'basic'
+    },
+    {
+      id: 'classic',
+      name: 'Classic White',
+      description: 'Elegant white matted frame',
+      category: 'classic'
+    },
+    {
+      id: 'polaroid',
+      name: 'Polaroid Instant',
+      description: 'Authentic instant photo look',
+      category: 'vintage'
+    },
+    {
+      id: 'filmstrip',
+      name: 'Film Strip 35mm',
+      description: 'Professional film perforations',
+      category: 'vintage'
+    },
+    {
+      id: 'aesthetic',
+      name: 'Modern Minimal',
+      description: 'Clean contemporary design',
+      category: 'modern'
+    },
+    {
+      id: 'vintage',
+      name: 'Vintage Wood',
+      description: 'Rich wooden frame with details',
+      category: 'vintage'
+    },
+    {
+      id: 'golden',
+      name: 'Ornate Gold',
+      description: 'Luxurious golden frame',
+      category: 'classic'
+    },
+    {
+      id: 'scrapbook',
+      name: 'Scrapbook Memory',
+      description: 'Decorative scrapbook style',
+      category: 'decorative'
+    }
+  ];
+
   const videoConstraints = {
     width: 1920,
     height: 1080,
@@ -75,11 +133,22 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   // Update preview when filters panel opens
   const handleFiltersToggle = useCallback(() => {
     if (!showFilters) {
-      // Opening filters - capture preview
+      // Opening filters - capture preview and close frames
       capturePreview();
+      setShowFrames(false);
     }
     setShowFilters(!showFilters);
   }, [showFilters, capturePreview]);
+
+  // Update preview when frames panel opens
+  const handleFramesToggle = useCallback(() => {
+    if (!showFrames) {
+      // Opening frames - capture preview and close filters
+      capturePreview();
+      setShowFilters(false);
+    }
+    setShowFrames(!showFrames);
+  }, [showFrames, capturePreview]);
 
   const capture = useCallback(() => {
     if (webcamRef.current && filmCount > 0) {
@@ -310,6 +379,15 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         <div className="px-3 py-1 bg-serelune-500/20 border border-serelune-400/30 rounded-full">
                           <span className="text-serelune-700 text-xs font-medium">
                             {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filter Active'}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Active Frame Indicator */}
+                      {activeFrame && activeFrame !== 'none' && (
+                        <div className="px-3 py-1 bg-blush-500/20 border border-blush-400/30 rounded-full">
+                          <span className="text-blush-700 text-xs font-medium">
+                            {frameStyles.find(f => f.id === activeFrame)?.name || 'Frame Active'}
                           </span>
                         </div>
                       )}
@@ -633,6 +711,127 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             )}
           </AnimatePresence>
           
+          {/* Mobile Frames Panel - Only visible on mobile when showFrames is true */}
+          <AnimatePresence>
+            {showFrames && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="lg:hidden overflow-hidden bg-white/20 backdrop-blur-sm border-t border-serelune-200/30"
+              >
+                <div className="p-4">
+                  {/* Mobile Frame Header */}
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-moonlight-800 font-title text-lg font-bold">Frames</h3>
+                    <button
+                      onClick={() => setShowFrames(false)}
+                      className="p-2 bg-blush-500/20 rounded-lg hover:bg-blush-500/30 transition-all"
+                    >
+                      <svg className="w-4 h-4 text-moonlight-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Active Frame Display */}
+                  {activeFrame && activeFrame !== 'none' && (
+                    <div className="mb-3 p-2 bg-blush-500/20 border border-blush-400/30 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-blush-500 rounded-full animate-pulse"></div>
+                        <span className="text-blush-700 text-sm font-medium">
+                          {frameStyles.find(f => f.id === activeFrame)?.name || 'Frame Active'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Scrollable Frame Grid */}
+                  <div className="overflow-x-auto">
+                    <div className="flex space-x-3 pb-2">
+                      {/* No Frame Option */}
+                      <div className="flex-shrink-0 w-20">
+                        <button
+                          onClick={() => {
+                            setActiveFrame('none');
+                            setFrameData(null);
+                            setFrameNotification('No Frame');
+                            setTimeout(() => setFrameNotification(null), 2000);
+                          }}
+                          className={cn(
+                            "w-full flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
+                            (!activeFrame || activeFrame === 'none') 
+                              ? "bg-blush-500/20 border-2 border-blush-400" 
+                              : "bg-white/30 border-2 border-transparent hover:border-blush-300"
+                          )}
+                        >
+                          <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 flex items-center justify-center">
+                            {cameraPreview ? (
+                              <img 
+                                src={cameraPreview} 
+                                alt="No frame preview"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <svg className="w-8 h-8 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            )}
+                          </div>
+                          <span className={cn(
+                            "text-xs font-medium text-center w-full truncate",
+                            (!activeFrame || activeFrame === 'none') ? "text-blush-700" : "text-moonlight-600"
+                          )}>No Frame</span>
+                        </button>
+                      </div>
+
+                      {/* Frame Options */}
+                      {frameStyles.filter(frame => frame.id !== 'none').map((frame) => (
+                        <div key={frame.id} className="flex-shrink-0 w-20">
+                          <button
+                            onClick={() => {
+                              setActiveFrame(frame.id);
+                              setFrameData(null);
+                              setFrameNotification(frame.name);
+                              setTimeout(() => setFrameNotification(null), 2000);
+                            }}
+                            className={cn(
+                              "w-full flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
+                              activeFrame === frame.id 
+                                ? "bg-blush-500/20 border-2 border-blush-400" 
+                                : "bg-white/30 border-2 border-transparent hover:border-blush-300"
+                            )}
+                          >
+                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 relative p-2">
+                              {cameraPreview ? (
+                                <div className="w-full h-full relative">
+                                  <img 
+                                    src={cameraPreview} 
+                                    alt={`${frame.name} preview`}
+                                    className="w-full h-full object-cover rounded-sm"
+                                  />
+                                  {/* Frame preview overlay */}
+                                  <div className="absolute inset-0 border-2 border-white/80 rounded-sm shadow-sm"></div>
+                                </div>
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-blush-200 to-serelune-200 rounded-sm border-2 border-white/80 shadow-sm"></div>
+                              )}
+                            </div>
+                            <span className={cn(
+                              "text-xs font-medium text-center w-full truncate",
+                              activeFrame === frame.id ? "text-blush-700" : "text-moonlight-600"
+                            )}>{frame.name}</span>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
           {/* Modern Control Dock - Responsive */}
           <div className={cn(
             "relative z-30 bg-gradient-to-t from-white/30 to-transparent backdrop-blur-sm",
@@ -803,6 +1002,32 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     </svg>
                     {activeFilter && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-serelune-500 rounded-full shadow-glow animate-sparkle"></div>
+                    )}
+                  </motion.button>
+                  
+                  {/* Frames Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleFramesToggle}
+                    className={cn(
+                      "rounded-2xl backdrop-blur-sm border-2 flex items-center justify-center transition-all",
+                      // Mobile: Smaller size
+                      "w-12 h-12 lg:w-16 lg:h-16",
+                      showFrames 
+                        ? "bg-blush-500/20 border-blush-400/50 text-blush-600 shadow-glow" 
+                        : "bg-white/30 border-serelune-200/50 text-moonlight-700"
+                    )}
+                  >
+                    <svg className={cn(
+                      // Mobile: Smaller icon
+                      "w-6 h-6 lg:w-8 lg:h-8"
+                    )} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {activeFrame && activeFrame !== 'none' && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-blush-500 rounded-full shadow-glow animate-sparkle"></div>
                     )}
                   </motion.button>
                 </div>
@@ -1342,6 +1567,257 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
           </motion.div>
         )}
       </AnimatePresence>
+
+        {/* Desktop Sidebar - Only visible on large screens */}
+        <AnimatePresence>
+          {(showFilters || showFrames) && (
+            <motion.div
+              initial={{ x: 300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 300, opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 w-80 max-h-[80vh] bg-white/30 backdrop-blur-md border border-serelune-200/50 rounded-2xl shadow-2xl z-40"
+            >
+              <div className="w-full flex flex-col">
+                {/* Desktop Panel Header */}
+                <div className="flex items-center justify-between p-6 border-b border-serelune-200/30">
+                  <div className="flex space-x-4">
+                    <button
+                      onClick={() => setShowFilters(!showFilters)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                        showFilters 
+                          ? "bg-serelune-500/20 text-serelune-700 border border-serelune-400/30" 
+                          : "text-moonlight-600 hover:text-moonlight-800 hover:bg-white/20"
+                      )}
+                    >
+                      Filters
+                    </button>
+                    <button
+                      onClick={() => setShowFrames(!showFrames)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                        showFrames 
+                          ? "bg-blush-500/20 text-blush-700 border border-blush-400/30" 
+                          : "text-moonlight-600 hover:text-moonlight-800 hover:bg-white/20"
+                      )}
+                    >
+                      Frames
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowFilters(false);
+                      setShowFrames(false);
+                    }}
+                    className="p-2 bg-pearl-500/20 rounded-lg hover:bg-pearl-500/30 transition-all"
+                  >
+                    <svg className="w-4 h-4 text-moonlight-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Panel Content */}
+                <div className="flex-1 overflow-hidden">
+                  {/* Filters Panel Content */}
+                  {showFilters && (
+                    <div className="p-6 h-full overflow-y-auto">
+                      <h3 className="text-moonlight-800 font-title text-xl font-bold mb-4">Filters</h3>
+                      
+                      {/* Active Filter Display */}
+                      {activeFilter && (
+                        <div className="mb-4 p-3 bg-serelune-500/20 border border-serelune-400/30 rounded-lg">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-serelune-500 rounded-full animate-pulse"></div>
+                            <span className="text-serelune-700 text-sm font-medium">
+                              {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filter Active'}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Filter Grid */}
+                      <div className="grid grid-cols-3 gap-3">
+                        {/* Original/No Filter */}
+                        <button
+                          onClick={() => {
+                            setActiveFilter('');
+                            setFilterNotification('Original');
+                            setTimeout(() => setFilterNotification(null), 2000);
+                          }}
+                          className={cn(
+                            "flex flex-col items-center space-y-2 p-3 rounded-lg transition-all",
+                            !activeFilter 
+                              ? "bg-serelune-500/20 border-2 border-serelune-400" 
+                              : "bg-white/30 border-2 border-transparent hover:border-serelune-300"
+                          )}
+                        >
+                          <div className="w-20 h-20 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 flex items-center justify-center">
+                            {cameraPreview ? (
+                              <img 
+                                src={cameraPreview} 
+                                alt="Original preview"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <svg className="w-8 h-8 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            )}
+                          </div>
+                          <span className={cn(
+                            "text-xs font-medium text-center w-full truncate",
+                            !activeFilter ? "text-serelune-700" : "text-moonlight-600"
+                          )}>Original</span>
+                        </button>
+
+                        {/* Filter Options */}
+                        {vintageFilters.map((filter) => (
+                          <button
+                            key={filter.id}
+                            onClick={() => {
+                              setActiveFilter(filter.cssFilter);
+                              setFilterNotification(filter.name);
+                              setTimeout(() => setFilterNotification(null), 2000);
+                            }}
+                            className={cn(
+                              "flex flex-col items-center space-y-2 p-3 rounded-lg transition-all",
+                              activeFilter === filter.cssFilter 
+                                ? "bg-serelune-500/20 border-2 border-serelune-400" 
+                                : "bg-white/30 border-2 border-transparent hover:border-serelune-300"
+                            )}
+                          >
+                            <div className="w-20 h-20 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 relative">
+                              {cameraPreview ? (
+                                <img 
+                                  src={cameraPreview} 
+                                  alt={`${filter.name} preview`}
+                                  className="w-full h-full object-cover"
+                                  style={{ filter: filter.cssFilter }}
+                                />
+                              ) : (
+                                <div 
+                                  className="w-full h-full bg-gradient-to-br from-serelune-200 to-blush-200"
+                                  style={{ filter: filter.cssFilter }}
+                                ></div>
+                              )}
+                            </div>
+                            <span className={cn(
+                              "text-xs font-medium text-center w-full truncate",
+                              activeFilter === filter.cssFilter ? "text-serelune-700" : "text-moonlight-600"
+                            )}>{filter.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Frames Panel Content */}
+                  {showFrames && (
+                    <div className="p-6 h-full overflow-y-auto">
+                      <h3 className="text-moonlight-800 font-title text-xl font-bold mb-4">Frames</h3>
+                      
+                      {/* Active Frame Display */}
+                      {activeFrame && activeFrame !== 'none' && (
+                        <div className="mb-4 p-3 bg-blush-500/20 border border-blush-400/30 rounded-lg">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-blush-500 rounded-full animate-pulse"></div>
+                            <span className="text-blush-700 text-sm font-medium">
+                              {frameStyles.find(f => f.id === activeFrame)?.name || 'Frame Active'}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Frame Grid - Single column layout */}
+                      <div className="grid grid-cols-1 gap-3">
+                        {/* No Frame Option */}
+                        <button
+                          onClick={() => {
+                            setActiveFrame('none');
+                            setFrameData(null);
+                            setFrameNotification('No Frame');
+                            setTimeout(() => setFrameNotification(null), 2000);
+                          }}
+                          className={cn(
+                            "flex items-center space-x-3 p-3 rounded-lg transition-all",
+                            (!activeFrame || activeFrame === 'none') 
+                              ? "bg-blush-500/20 border-2 border-blush-400" 
+                              : "bg-white/30 border-2 border-transparent hover:border-blush-300"
+                          )}
+                        >
+                          <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 flex items-center justify-center flex-shrink-0">
+                            {cameraPreview ? (
+                              <img 
+                                src={cameraPreview} 
+                                alt="No frame preview"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <svg className="w-6 h-6 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="flex-1 text-left">
+                            <span className={cn(
+                              "text-sm font-medium block",
+                              (!activeFrame || activeFrame === 'none') ? "text-blush-700" : "text-moonlight-600"
+                            )}>No Frame</span>
+                            <span className="text-xs text-moonlight-500">Original image</span>
+                          </div>
+                        </button>
+
+                        {/* Frame Options */}
+                        {frameStyles.filter(frame => frame.id !== 'none').map((frame) => (
+                          <button
+                            key={frame.id}
+                            onClick={() => {
+                              setActiveFrame(frame.id);
+                              setFrameData(null);
+                              setFrameNotification(frame.name);
+                              setTimeout(() => setFrameNotification(null), 2000);
+                            }}
+                            className={cn(
+                              "flex items-center space-x-3 p-3 rounded-lg transition-all",
+                              activeFrame === frame.id 
+                                ? "bg-blush-500/20 border-2 border-blush-400" 
+                                : "bg-white/30 border-2 border-transparent hover:border-blush-300"
+                            )}
+                          >
+                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 relative p-2 flex-shrink-0">
+                              {cameraPreview ? (
+                                <div className="w-full h-full relative">
+                                  <img 
+                                    src={cameraPreview} 
+                                    alt={`${frame.name} preview`}
+                                    className="w-full h-full object-cover rounded-sm"
+                                  />
+                                  {/* Simple frame preview overlay */}
+                                  <div className="absolute inset-0 border border-white/60 rounded-sm"></div>
+                                </div>
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-blush-200 to-serelune-200 rounded-sm border border-white/60"></div>
+                              )}
+                            </div>
+                            <div className="flex-1 text-left">
+                              <span className={cn(
+                                "text-sm font-medium block",
+                                activeFrame === frame.id ? "text-blush-700" : "text-moonlight-600"
+                              )}>{frame.name}</span>
+                              <span className="text-xs text-moonlight-500">{frame.description}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       {/* Gallery Modal */}
       <AnimatePresence>

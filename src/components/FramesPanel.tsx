@@ -30,106 +30,106 @@ export const FramesPanel = ({ selectedImage, onFrameApply, activeFrame }: Frames
     {
       id: 'classic',
       name: 'Classic White',
-      description: 'Traditional white photo frame with matting',
+      description: 'Elegant white matted frame with depth',
       category: 'classic',
       style: {
-        padding: '20px',
-        background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
-        border: '1px solid #e0e0e0',
-        boxShadow: 'inset 0 0 0 8px #ffffff, inset 0 0 0 9px #d0d0d0, 0 5px 15px rgba(0,0,0,0.2)',
+        padding: '25px',
+        background: '#ffffff',
+        border: '8px solid #ffffff',
+        boxShadow: 'inset 0 0 0 1px #e8e8e8, 0 4px 20px rgba(0,0,0,0.15)',
         borderRadius: '2px'
       }
     },
     {
       id: 'polaroid',
       name: 'Polaroid Instant',
-      description: 'Authentic instant camera photo look',
+      description: 'Authentic instant photo with signature look',
       category: 'vintage',
       style: {
-        padding: '15px 15px 60px 15px',
+        padding: '20px 20px 80px 20px',
         background: '#ffffff',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
-        transform: 'rotate(-1.2deg)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+        transform: 'rotate(-2deg)',
         borderRadius: '3px'
       }
     },
     {
       id: 'filmstrip',
       name: 'Film Strip 35mm',
-      description: 'Professional film with authentic perforations',
+      description: 'Professional film with realistic perforations',
       category: 'vintage',
       style: {
-        padding: '20px 40px',
+        padding: '25px 50px',
         background: '#1a1a1a',
-        border: '2px solid #0a0a0a',
-        boxShadow: '0 6px 25px rgba(0,0,0,0.5)',
-        position: 'relative' as const
+        border: '3px solid #0d0d0d',
+        boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
+        borderRadius: '2px'
       }
     },
     {
       id: 'photobooth',
       name: 'Photo Booth Strip',
-      description: 'Classic 4-photo booth strip layout',
+      description: 'Classic 4-photo booth strip with perforations',
       category: 'special',
       requiresMultiple: true,
       style: {
-        border: '12px solid #ffffff',
-        borderTop: '30px solid #ffffff',
-        borderBottom: '30px solid #ffffff',
-        boxShadow: 'inset 0 0 0 2px #000000, 0 6px 25px rgba(0,0,0,0.3)',
+        border: '15px solid #ffffff',
+        borderTop: '40px solid #ffffff',
+        borderBottom: '40px solid #ffffff',
+        boxShadow: 'inset 0 0 0 3px #000000, 0 8px 32px rgba(0,0,0,0.4)',
         background: '#ffffff'
       }
     },
     {
       id: 'aesthetic',
       name: 'Modern Minimal',
-      description: 'Clean contemporary frame design',
+      description: 'Clean contemporary design with subtle accents',
       category: 'modern',
       style: {
-        padding: '25px',
-        background: 'linear-gradient(135deg, #fafafa, #f5f5f5)',
-        borderRadius: '12px',
-        boxShadow: '0 12px 40px rgba(0,0,0,0.1)',
-        border: '1px solid rgba(255,255,255,0.8)'
+        padding: '30px',
+        background: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+        borderRadius: '16px',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.08)',
+        border: '1px solid rgba(255,255,255,0.9)'
       }
     },
     {
       id: 'vintage',
       name: 'Vintage Wood',
-      description: 'Rich wooden frame with corner details',
+      description: 'Rich wooden frame with ornate corner details',
       category: 'vintage',
       style: {
-        padding: '30px',
-        background: 'linear-gradient(45deg, #8B4513, #A0522D, #8B4513)',
-        borderRadius: '8px',
-        boxShadow: 'inset 0 0 0 4px #654321, 0 8px 25px rgba(0,0,0,0.4)',
-        border: '2px solid #654321'
+        padding: '35px',
+        background: 'linear-gradient(45deg, #8B4513, #A0522D, #CD853F)',
+        borderRadius: '12px',
+        boxShadow: 'inset 0 0 0 3px #654321, 0 12px 40px rgba(0,0,0,0.4)',
+        border: '3px solid #5d4037'
       }
     },
     {
       id: 'golden',
       name: 'Ornate Gold',
-      description: 'Luxurious golden frame with decorative elements',
+      description: 'Luxurious golden frame with decorative gems',
       category: 'classic',
       style: {
-        padding: '25px',
-        background: 'linear-gradient(45deg, #DAA520, #FFD700, #DAA520)',
-        borderRadius: '12px',
-        boxShadow: 'inset 0 0 0 3px #FFD700, inset 0 0 0 6px #B8860B, 0 10px 35px rgba(0,0,0,0.3)',
-        border: '2px solid #B8860B'
+        padding: '30px',
+        background: 'linear-gradient(45deg, #B8860B, #DAA520, #FFD700)',
+        borderRadius: '15px',
+        boxShadow: 'inset 0 0 0 2px #FFD700, 0 15px 50px rgba(0,0,0,0.3)',
+        border: '4px solid #8B7355'
       }
     },
     {
       id: 'scrapbook',
       name: 'Scrapbook Memory',
-      description: 'Decorative scrapbook style with stickers',
+      description: 'Decorative scrapbook with colorful stickers',
       category: 'decorative',
       style: {
-        padding: '20px',
-        background: 'linear-gradient(135deg, #faf0e6, #f5deb3)',
-        borderRadius: '8px',
-        boxShadow: 'inset 0 0 0 3px #d4af37, 0 8px 30px rgba(0,0,0,0.2)',
-        border: '1px solid #d4af37'
+        padding: '25px',
+        background: 'linear-gradient(135deg, #faf0e6, #f5deb3, #ffe4b5)',
+        borderRadius: '10px',
+        boxShadow: 'inset 0 0 0 2px #d4af37, 0 10px 35px rgba(0,0,0,0.2)',
+        border: '2px solid #cd853f'
       }
     }
   ];
@@ -275,16 +275,14 @@ export const FramesPanel = ({ selectedImage, onFrameApply, activeFrame }: Frames
 
     return (
       <div 
-        className="w-12 h-12 bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100 rounded-sm"
+        className="w-full h-full bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100 rounded-sm border border-serelune-200/50"
         style={frame.style}
       />
     );
   };
 
-  const categories = ['basic', 'classic', 'vintage', 'modern', 'special', 'decorative'];
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-title font-semibold text-moonlight-800 text-lg">Photo Frames</h3>
         {isCapturingPhotobooth && (
@@ -295,7 +293,109 @@ export const FramesPanel = ({ selectedImage, onFrameApply, activeFrame }: Frames
         )}
       </div>
 
-      {/* Photobooth Progress */}
+      {/* Scrollable Frame Selection */}
+      <div className="space-y-4">
+        {/* Basic Frames - Horizontal Scroll */}
+        <div>
+          <h4 className="text-sm font-medium text-moonlight-600 mb-3 border-b border-serelune-200/30 pb-1">
+            Basic & Classic Frames
+          </h4>
+          <div className="flex space-x-3 overflow-x-auto pb-2">
+            {frameStyles.filter(frame => ['basic', 'classic'].includes(frame.category)).map((frame) => (
+              <motion.button
+                key={frame.id}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => applyFrame(frame.id)}
+                disabled={!selectedImage || (isCapturingPhotobooth && frame.id !== 'photobooth')}
+                className={cn(
+                  "flex-shrink-0 w-20 flex flex-col items-center space-y-2 p-3 rounded-lg transition-all",
+                  activeFrame === frame.id 
+                    ? "bg-serelune-500/20 border-2 border-serelune-400" 
+                    : "bg-white/30 border-2 border-transparent hover:border-serelune-300",
+                  (!selectedImage || (isCapturingPhotobooth && frame.id !== 'photobooth')) && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                <div className="w-14 h-14 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 relative">
+                  {getFramePreview(frame)}
+                </div>
+                <span className={cn(
+                  "text-xs font-medium text-center w-full truncate",
+                  activeFrame === frame.id ? "text-serelune-700" : "text-moonlight-600"
+                )}>{frame.name}</span>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+
+        {/* Vintage Frames - Horizontal Scroll */}
+        <div>
+          <h4 className="text-sm font-medium text-moonlight-600 mb-3 border-b border-serelune-200/30 pb-1">
+            Vintage & Retro Frames
+          </h4>
+          <div className="flex space-x-3 overflow-x-auto pb-2">
+            {frameStyles.filter(frame => frame.category === 'vintage').map((frame) => (
+              <motion.button
+                key={frame.id}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => applyFrame(frame.id)}
+                disabled={!selectedImage || (isCapturingPhotobooth && frame.id !== 'photobooth')}
+                className={cn(
+                  "flex-shrink-0 w-20 flex flex-col items-center space-y-2 p-3 rounded-lg transition-all",
+                  activeFrame === frame.id 
+                    ? "bg-serelune-500/20 border-2 border-serelune-400" 
+                    : "bg-white/30 border-2 border-transparent hover:border-serelune-300",
+                  (!selectedImage || (isCapturingPhotobooth && frame.id !== 'photobooth')) && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                <div className="w-14 h-14 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 relative">
+                  {getFramePreview(frame)}
+                </div>
+                <span className={cn(
+                  "text-xs font-medium text-center w-full truncate",
+                  activeFrame === frame.id ? "text-serelune-700" : "text-moonlight-600"
+                )}>{frame.name}</span>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+
+        {/* Modern & Decorative Frames - Horizontal Scroll */}
+        <div>
+          <h4 className="text-sm font-medium text-moonlight-600 mb-3 border-b border-serelune-200/30 pb-1">
+            Modern & Decorative Frames
+          </h4>
+          <div className="flex space-x-3 overflow-x-auto pb-2">
+            {frameStyles.filter(frame => ['modern', 'decorative'].includes(frame.category)).map((frame) => (
+              <motion.button
+                key={frame.id}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => applyFrame(frame.id)}
+                disabled={!selectedImage || (isCapturingPhotobooth && frame.id !== 'photobooth')}
+                className={cn(
+                  "flex-shrink-0 w-20 flex flex-col items-center space-y-2 p-3 rounded-lg transition-all",
+                  activeFrame === frame.id 
+                    ? "bg-serelune-500/20 border-2 border-serelune-400" 
+                    : "bg-white/30 border-2 border-transparent hover:border-serelune-300",
+                  (!selectedImage || (isCapturingPhotobooth && frame.id !== 'photobooth')) && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                <div className="w-14 h-14 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 relative">
+                  {getFramePreview(frame)}
+                </div>
+                <span className={cn(
+                  "text-xs font-medium text-center w-full truncate",
+                  activeFrame === frame.id ? "text-serelune-700" : "text-moonlight-600"
+                )}>{frame.name}</span>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Special Photobooth Section */}
       {frameStyles.find(f => f.id === 'photobooth') && (isCapturingPhotobooth || photoboothImages.length > 0 || activeFrame === 'photobooth') && (
         <div className="p-4 bg-white/80 rounded-lg border border-serelune-200/50">
           <div className="flex items-center justify-between mb-3">
@@ -345,6 +445,7 @@ export const FramesPanel = ({ selectedImage, onFrameApply, activeFrame }: Frames
                                    flex items-center justify-center text-xs hover:bg-rose-600 transition-colors
                                    opacity-0 group-hover:opacity-100"
                         >
+                          ×
                         </button>
                       </>
                     ) : (
@@ -395,67 +496,6 @@ export const FramesPanel = ({ selectedImage, onFrameApply, activeFrame }: Frames
           )}
         </div>
       )}
-
-      {/* Frame Categories */}
-      {categories.map(category => {
-        const categoryFrames = frameStyles.filter(frame => frame.category === category);
-        if (categoryFrames.length === 0) return null;
-
-        return (
-          <div key={category} className="space-y-3">
-            <h4 className="text-sm font-medium text-moonlight-600 capitalize border-b border-serelune-200/30 pb-1">
-              {category === 'basic' ? 'Basic' : 
-               category === 'classic' ? 'Classic' :
-               category === 'vintage' ? 'Vintage' :
-               category === 'modern' ? 'Modern' :
-               category === 'special' ? 'Special Effects' :
-               'Decorative'} Frames
-            </h4>
-            
-            <div className="grid grid-cols-1 gap-3">
-              {categoryFrames.map((frame) => (
-                <motion.button
-                  key={frame.id}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => applyFrame(frame.id)}
-                  disabled={!selectedImage || (isCapturingPhotobooth && frame.id !== 'photobooth')}
-                  className={cn(
-                    "p-4 bg-white rounded-lg border-2 transition-all text-left shadow-soft hover:shadow-glow",
-                    activeFrame === frame.id 
-                      ? "border-serelune-400 bg-serelune-50" 
-                      : "border-transparent hover:border-serelune-400",
-                    (!selectedImage || (isCapturingPhotobooth && frame.id !== 'photobooth')) && "opacity-50 cursor-not-allowed"
-                  )}
-                >
-                  <div className="flex items-center space-x-3">
-                    {/* Frame Preview */}
-                    <div className="flex-shrink-0">
-                      {getFramePreview(frame)}
-                    </div>
-                    
-                    {/* Frame Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="font-body font-medium text-serelune-700">{frame.name}</div>
-                      <div className="text-xs text-serelune-500/70 mt-1">{frame.description}</div>
-                      {frame.requiresMultiple && (
-                        <div className="text-xs text-blush-600 mt-1 font-medium">
-                          Requires 4 photos
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Active Indicator */}
-                    {activeFrame === frame.id && (
-                      <div className="flex-shrink-0 w-2 h-2 bg-serelune-500 rounded-full animate-pulse"></div>
-                    )}
-                  </div>
-                </motion.button>
-              ))}
-            </div>
-          </div>
-        );
-      })}
     </div>
   );
 };
