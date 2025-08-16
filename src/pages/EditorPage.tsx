@@ -533,7 +533,7 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
       
       {/* Header */}
       <header className={cn(
-        "relative z-20 bg-white/20 backdrop-blur-xl border-b border-serelune-200/30",
+        "relative z-20 bg-white/10 backdrop-blur-2xl border-b border-white/20 shadow-xl",
         // Mobile: Smaller padding
         "p-3 lg:p-6"
       )}>
@@ -586,7 +586,7 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
             "order-2 lg:order-1"
           )}>
             {/* Vertical Tabs - Mobile Horizontal */}
-            <div className="bg-white/40 backdrop-blur-sm rounded-lg p-1 mb-4 lg:mb-6 border border-serelune-200/50 shadow-soft">
+            <div className="bg-white/10 backdrop-blur-2xl rounded-lg p-1 mb-4 lg:mb-6 border border-white/20 shadow-2xl">
               <div className={cn(
                 "flex gap-1",
                 // Mobile: Horizontal scroll, Desktop: Vertical stack
@@ -621,7 +621,7 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
-                className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-serelune-200/50 shadow-soft"
+                className="bg-white/10 backdrop-blur-2xl rounded-lg p-6 border border-white/20 shadow-2xl"
               >
                 {renderTabContent()}
               </motion.div>
@@ -635,7 +635,7 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
             "order-1 lg:order-2"
           )}>
             <div className={cn(
-              "bg-white rounded-lg shadow-lg overflow-hidden relative",
+              "bg-white/10 backdrop-blur-2xl rounded-lg shadow-2xl overflow-hidden relative border border-white/20",
               // Mobile: Smaller border radius
               "rounded-lg lg:rounded-xl"
             )}>

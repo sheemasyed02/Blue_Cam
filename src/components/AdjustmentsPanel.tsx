@@ -283,7 +283,7 @@ export const AdjustmentsPanel = ({ selectedImage, onAdjustmentsApply, className 
                   "flex flex-col items-center justify-center p-3 rounded-lg transition-all text-center min-h-[50px]",
                   activeCategory === category.id
                     ? "bg-serelune-500/20 border-2 border-serelune-400"
-                    : "bg-white/30 border-2 border-transparent hover:border-serelune-300"
+                    : "bg-white/10 border-2 border-transparent hover:border-serelune-300 backdrop-blur-sm"
                 )}
               >
                 <span className={cn(
@@ -303,7 +303,7 @@ export const AdjustmentsPanel = ({ selectedImage, onAdjustmentsApply, className 
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="bg-white/90 backdrop-blur-sm border border-serelune-200/50 rounded-lg p-4 shadow-soft"
+                className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-lg p-4 shadow-2xl"
               >
                 {(() => {
                   const adjustment = adjustmentCategories
@@ -401,7 +401,7 @@ export const AdjustmentsPanel = ({ selectedImage, onAdjustmentsApply, className 
                       ? "bg-serelune-500/20 border-2 border-serelune-400"
                       : adjustments[adjustment.id as keyof ImageAdjustments] !== adjustment.defaultValue
                       ? "bg-blush-500/20 border-2 border-blush-400"
-                      : "bg-white/30 border-2 border-transparent hover:border-serelune-300"
+                      : "bg-white/10 border-2 border-transparent hover:border-serelune-300 backdrop-blur-sm"
                   )}
                 >
                   <span className={cn(

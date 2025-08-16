@@ -226,7 +226,7 @@ export const FiltersPanel = ({
             transition={{ duration: 0.3 }}
             className="mt-4 px-4"
           >
-            <div className="bg-white/60 backdrop-blur-sm rounded-lg p-3 border border-serelune-200/50 shadow-soft">
+            <div className="bg-white/10 backdrop-blur-2xl rounded-lg p-3 border border-white/20 shadow-2xl">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="font-body font-medium text-serelune-700">

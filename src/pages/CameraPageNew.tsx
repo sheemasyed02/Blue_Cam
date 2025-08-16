@@ -1031,8 +1031,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       // Mobile: Smaller icon
                       "w-6 h-6 lg:w-8 lg:h-8"
                     )} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                      {/* Flower-like 3 circles design */}
+                      <circle cx="12" cy="8" r="3" strokeWidth={2} fill="none" />
+                      <circle cx="8" cy="16" r="3" strokeWidth={2} fill="none" />
+                      <circle cx="16" cy="16" r="3" strokeWidth={2} fill="none" />
                     </svg>
                     {activeFilter && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-serelune-500 rounded-full shadow-glow animate-sparkle"></div>
@@ -1402,14 +1404,14 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 20 }}
             className={cn(
-              "fixed top-0 right-0 h-full bg-white/90 backdrop-blur-xl border-l border-serelune-200/50 z-50 flex flex-col",
+              "fixed top-0 right-0 h-full bg-white/10 backdrop-blur-2xl border-l border-white/20 z-50 flex flex-col shadow-2xl",
               // Only show on desktop, hide on mobile
               "hidden lg:flex lg:w-80"
             )}
           >
             {/* Header - Responsive */}
             <div className={cn(
-              "border-b border-serelune-200/30",
+              "border-b border-white/20 bg-white/5 backdrop-blur-sm",
               // Mobile: Smaller padding
               "p-4 lg:p-6"
             )}>
@@ -1423,7 +1425,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setShowFilters(false)}
-                  className="p-2 bg-serelune-500/20 rounded-lg hover:bg-serelune-500/30 transition-all"
+                  className="p-2 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all border border-white/20"
                 >
                   <svg className="w-5 h-5 text-moonlight-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1433,7 +1435,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               
               {/* Active Filter Display */}
               {activeFilter && (
-                <div className="mt-4 p-3 bg-serelune-500/20 border border-serelune-400/30 rounded-lg">
+                <div className="mt-4 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
                     <span className="text-amber-400 text-sm font-medium">
@@ -1457,10 +1459,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     setTimeout(() => setFilterNotification(null), 2000);
                   }}
                   className={cn(
-                    "w-full p-4 rounded-xl border-2 text-left transition-all",
+                    "w-full p-4 rounded-xl border-2 text-left transition-all backdrop-blur-sm",
                     !activeFilter
-                      ? "bg-serelune-500/20 border-serelune-400/50 text-serelune-700"
-                      : "bg-white/10 border-white/20 text-moonlight-800 hover:bg-white/20 hover:text-serelune-700"
+                      ? "bg-white/20 border-white/30 text-serelune-700 shadow-lg"
+                      : "bg-white/5 border-white/10 text-moonlight-800 hover:bg-white/15 hover:text-serelune-700"
                   )}
                 >
                   <div className="flex items-center space-x-3">
@@ -1488,10 +1490,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       setTimeout(() => setFilterNotification(null), 2000);
                     }}
                     className={cn(
-                      "w-full p-4 rounded-xl border-2 text-left transition-all",
+                      "w-full p-4 rounded-xl border-2 text-left transition-all backdrop-blur-sm",
                       activeFilter === filter.cssFilter
-                        ? "bg-serelune-500/20 border-serelune-400/50 text-serelune-700"
-                        : "bg-white/10 border-white/20 text-moonlight-800 hover:bg-white/20 hover:text-serelune-700"
+                        ? "bg-white/20 border-white/30 text-serelune-700 shadow-lg"
+                        : "bg-white/5 border-white/10 text-moonlight-800 hover:bg-white/15 hover:text-serelune-700"
                     )}
                   >
                     <div className="flex items-center space-x-3">
@@ -1623,7 +1625,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       
                       {/* Active Filter Display */}
                       {activeFilter && (
-                        <div className="mb-4 p-3 bg-serelune-500/20 border border-serelune-400/30 rounded-lg">
+                        <div className="mb-4 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
                           <div className="flex items-center space-x-2">
                             <div className="w-2 h-2 bg-serelune-500 rounded-full animate-pulse"></div>
                             <span className="text-serelune-700 text-sm font-medium">
@@ -1946,7 +1948,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-gradient-to-br from-pearl-50/95 to-serelune-50/95 backdrop-blur-xl rounded-3xl border border-pearl-200/50 p-6 max-w-md w-full"
+              className="bg-white/10 backdrop-blur-2xl rounded-3xl border border-white/20 p-6 max-w-md w-full shadow-2xl"
             >
               <h3 className="text-moonlight-800 font-title text-xl font-bold mb-4">Photobooth Settings</h3>
               
@@ -1961,10 +1963,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         key={num}
                         onClick={() => setPhotoboothSettings(prev => ({ ...prev, photoCount: num }))}
                         className={cn(
-                          "w-10 h-10 rounded-lg font-bold transition-all",
+                          "w-10 h-10 rounded-lg font-bold transition-all backdrop-blur-sm",
                           photoboothSettings.photoCount === num
                             ? "bg-serelune-500 text-white shadow-glow"
-                            : "bg-white/70 text-moonlight-600 hover:bg-serelune-100"
+                            : "bg-white/20 text-moonlight-600 hover:bg-white/30 border border-white/30"
                         )}
                       >
                         {num}
@@ -1983,10 +1985,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         key={seconds}
                         onClick={() => setPhotoboothSettings(prev => ({ ...prev, timerSeconds: seconds }))}
                         className={cn(
-                          "px-3 py-2 rounded-lg font-medium transition-all",
+                          "px-3 py-2 rounded-lg font-medium transition-all backdrop-blur-sm",
                           photoboothSettings.timerSeconds === seconds
                             ? "bg-serelune-500 text-white shadow-glow"
-                            : "bg-white/70 text-moonlight-600 hover:bg-serelune-100"
+                            : "bg-white/20 text-moonlight-600 hover:bg-white/30 border border-white/30"
                         )}
                       >
                         {seconds}s
@@ -1999,7 +2001,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               <div className="flex space-x-3 mt-6">
                 <button
                   onClick={() => setShowPhotoboothSettings(false)}
-                  className="flex-1 py-2 px-4 bg-white/70 text-moonlight-700 rounded-lg font-medium hover:bg-white/90 transition-all"
+                  className="flex-1 py-2 px-4 bg-white/20 backdrop-blur-sm text-moonlight-700 rounded-lg font-medium hover:bg-white/30 transition-all border border-white/30"
                 >
                   Cancel
                 </button>
@@ -2033,7 +2035,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-gradient-to-br from-pearl-50/95 to-serelune-50/95 backdrop-blur-xl rounded-3xl border border-pearl-200/50 p-6 max-w-md w-full"
+              className="bg-white/10 backdrop-blur-2xl rounded-3xl border border-white/20 p-6 max-w-md w-full shadow-2xl"
             >
               <h3 className="text-moonlight-800 font-title text-xl font-bold mb-4 text-center">Photobooth Strip Ready!</h3>
               
@@ -2059,7 +2061,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               <div className="flex space-x-3">
                 <button
                   onClick={resetPhotobooth}
-                  className="flex-1 py-2 px-4 bg-white/70 text-moonlight-700 rounded-lg font-medium hover:bg-white/90 transition-all"
+                  className="flex-1 py-2 px-4 bg-white/20 backdrop-blur-sm text-moonlight-700 rounded-lg font-medium hover:bg-white/30 transition-all border border-white/30"
                 >
                   Reset
                 </button>
