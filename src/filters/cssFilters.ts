@@ -12,8 +12,8 @@ export const vintageFilters: FilterEffect[] = [
   {
     name: 'Blue Jeans',
     id: 'blue-jeans',
-    cssFilter: 'hue-rotate(200deg) saturate(80%) contrast(110%) brightness(95%) sepia(20%)',
-    description: 'Cool faded blues with dark vignette'
+    cssFilter: 'brightness(92%) contrast(82%) saturate(10%) hue-rotate(200deg) sepia(25%) blur(0.3px)',
+    description: 'Dreamy Lana Del Rey aesthetic - moody, desaturated with vintage grain'
   },
   {
     name: 'Born to Die',
@@ -116,6 +116,12 @@ export const vintageFilters: FilterEffect[] = [
     id: 'salvatore',
     cssFilter: 'sepia(50%) hue-rotate(25deg) saturate(110%) brightness(108%) contrast(95%)',
     description: 'Retro Italian warm fade'
+  },
+  {
+    name: 'Video Games',
+    id: 'video-games',
+    cssFilter: 'brightness(88%) contrast(78%) saturate(8%) hue-rotate(198deg) sepia(35%) blur(0.5px) grayscale(20%)',
+    description: 'Ultra-dreamy cinematic haze with heavy desaturation and vintage grain'
   }
 ];
 
@@ -124,15 +130,8 @@ export const advancedFilters: FilterEffect[] = [
   {
     name: 'Blue Jeans (Advanced)',
     id: 'blue-jeans-advanced',
-    cssFilter: `
-      contrast(110%) 
-      brightness(95%) 
-      saturate(80%) 
-      hue-rotate(200deg) 
-      sepia(20%)
-      drop-shadow(0 0 20px rgba(0, 40, 80, 0.3))
-    `.replace(/\s+/g, ' ').trim(),
-    description: 'Cool faded blues with vignette effect'
+    cssFilter: 'brightness(90%) contrast(80%) saturate(5%) hue-rotate(195deg) sepia(30%) blur(0.4px) grayscale(15%)',
+    description: 'Ultra-dreamy Lana aesthetic with heavy desaturation and grain'
   },
   {
     name: 'West Coast (Advanced)',
