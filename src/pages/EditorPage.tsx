@@ -399,22 +399,38 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
         </div>
       </header>
 
-      {/* Main Content - Mobile First Responsive */}
+      {/* Main Content - Enhanced Mobile Layout */}
       <div className="relative z-10 max-w-7xl mx-auto p-3 md:p-4 lg:p-6">
-        <div className="flex flex-col xl:flex-row gap-4 lg:gap-6">
+        <div className={cn(
+          "flex gap-4 lg:gap-6",
+          // Mobile: Stack vertically, Desktop: Side by side
+          "flex-col lg:flex-row"
+        )}>
           
-          {/* Mobile: Image Preview First, Desktop: Controls First */}
-          <div className="order-2 xl:order-1 xl:w-80">
-            {/* Horizontal Tabs on Mobile, Vertical on Desktop */}
+          {/* Left Column - Tabs and Controls */}
+          <div className={cn(
+            // Mobile: Full width, Desktop: Fixed width
+            "w-full lg:w-80",
+            // Mobile: Order after image preview, Desktop: Normal order
+            "order-2 lg:order-1"
+          )}>
+            {/* Vertical Tabs - Mobile Horizontal */}
             <div className="bg-white/40 backdrop-blur-sm rounded-lg p-1 mb-4 lg:mb-6 border border-serelune-200/50 shadow-soft">
-              <div className="flex xl:flex-col gap-1 overflow-x-auto xl:overflow-visible">
+              <div className={cn(
+                "flex gap-1",
+                // Mobile: Horizontal scroll, Desktop: Vertical stack
+                "overflow-x-auto lg:flex-col lg:overflow-x-visible"
+              )}>
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      "flex-shrink-0 xl:flex-1 xl:w-full py-2 lg:py-3 px-3 lg:px-4 rounded-md font-body font-medium transition-all text-sm lg:text-base",
-                      "text-moonlight-700 whitespace-nowrap xl:whitespace-normal",
+                      "py-3 px-4 rounded-md font-body font-medium transition-all text-moonlight-700",
+                      // Mobile: Prevent shrinking, Desktop: Full width
+                      "flex-shrink-0 lg:flex-shrink lg:w-full",
+                      // Mobile: Smaller padding
+                      "py-2 px-3 lg:py-3 lg:px-4",
                       activeTab === tab.id
                         ? "bg-serelune-500 text-white border-2 border-serelune-400 shadow-glow"
                         : "hover:bg-serelune-100/50"
@@ -426,7 +442,7 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
               </div>
             </div>
 
-            {/* Tab Content - Responsive */}
+            {/* Tab Content */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
@@ -434,19 +450,30 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
-                className="bg-white/50 backdrop-blur-sm rounded-lg p-4 lg:p-6 border border-serelune-200/50 shadow-soft"
+                className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-serelune-200/50 shadow-soft"
               >
                 {renderTabContent()}
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* Image Preview Section - Mobile: First, Desktop: Second */}
-          <div className="flex-1 order-1 xl:order-2">
-            <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 lg:p-6 border border-serelune-200/50 shadow-soft">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          {/* Right Column - Preview - Mobile First */}
+          <div className={cn(
+            "flex-1",
+            // Mobile: First position, Desktop: Second position  
+            "order-1 lg:order-2"
+          )}>
+            <div className={cn(
+              "bg-white rounded-lg shadow-lg overflow-hidden",
+              // Mobile: Smaller border radius
+              "rounded-lg lg:rounded-xl"
+            )}>
               {selectedImage ? (
-                <div className="aspect-video relative">
+                <div className={cn(
+                  "relative",
+                  // Mobile: Responsive aspect ratio
+                  "aspect-[4/3] lg:aspect-video"
+                )}>
                   {processedImage && selectedImage !== processedImage ? (
                     <BeforeAfterSlider 
                       beforeImage={selectedImage}
@@ -504,14 +531,13 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
             {/* Image Info */}
             {selectedImage && (
               <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-lg p-4">
-                <h4 className="font-title font-medium text-serelune-700 mb-2">Image Information</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 lg:gap-4 text-sm font-body text-serelune-600/80">
+                <h4 className="font-title font-medium text-charcoal mb-2">Image Information</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm font-body text-charcoal/70">
                   <div>Status: {processedImage !== selectedImage ? 'Edited' : 'Original'}</div>
                   <div>Format: {selectedImage.startsWith('data:image/png') ? 'PNG' : 'JPEG'}</div>
                 </div>
               </div>
             )}
-            </div>
           </div>
         </div>
       </div>
