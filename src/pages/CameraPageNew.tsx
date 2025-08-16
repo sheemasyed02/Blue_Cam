@@ -71,6 +71,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
 
   // Video recording state
   const [isRecording, setIsRecording] = useState(false);
+  const [capturedVideo, setCapturedVideo] = useState<string | null>(null); // Similar to capturedImage
   const [recordedVideos, setRecordedVideos] = useState<Array<{
     id: string;
     blob: Blob;
@@ -78,6 +79,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
     timestamp: Date;
     filter?: string;
     facingMode: 'user' | 'environment';
+    thumbnail?: string; // Add thumbnail for preview
   }>>([]);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -350,6 +352,37 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
     setFilmCount(prev => prev + 1);
   };
 
+  // Video functions similar to photo functions
+  const saveVideo = () => {
+    if (capturedVideo && recordedVideos.length > 0) {
+      const latestVideo = recordedVideos[recordedVideos.length - 1];
+      const link = document.createElement('a');
+      link.download = `serelune-video-${Date.now()}.webm`;
+      link.href = latestVideo.url;
+      link.click();
+    }
+  };
+
+  const retakeVideo = () => {
+    if (capturedVideo) {
+      // Remove the latest video from recorded videos
+      setRecordedVideos(prev => prev.slice(0, -1));
+      setCapturedVideo(null);
+    }
+  };
+
+  const deleteVideo = (videoId: string) => {
+    setRecordedVideos(prev => {
+      const updated = prev.filter(video => video.id !== videoId);
+      // Clean up object URL to prevent memory leaks
+      const videoToDelete = prev.find(video => video.id !== videoId);
+      if (videoToDelete) {
+        URL.revokeObjectURL(videoToDelete.url);
+      }
+      return updated;
+    });
+  };
+
   // Video recording functions
   const startVideoRecording = useCallback(async () => {
     if (!webcamRef.current?.stream) return;
@@ -371,16 +404,23 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: 'video/webm' });
         const url = URL.createObjectURL(blob);
+        
+        // Create thumbnail from current camera feed
+        const thumbnail = webcamRef.current?.getScreenshot() || '';
+        
         const videoRecord = {
           id: Date.now().toString(),
           blob,
           url,
           timestamp: new Date(),
           filter: activeVideoFilter !== 'none' ? activeVideoFilter : undefined,
-          facingMode
+          facingMode,
+          thumbnail
         };
         
         setRecordedVideos(prev => [...prev, videoRecord]);
+        // Show video preview similar to photo capture
+        setCapturedVideo(url);
       };
 
       setMediaRecorder(recorder);
@@ -728,6 +768,52 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </motion.button>
+                      </div>
+                    </motion.div>
+                  ) : capturedVideo ? (
+                    // Captured Video Display
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 1.05 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="relative w-full h-full"
+                    >
+                      <video 
+                        src={capturedVideo} 
+                        className="w-full h-full object-cover rounded-3xl"
+                        controls
+                        autoPlay
+                        muted
+                        style={{ 
+                          filter: generateFilterString(),
+                          boxShadow: vignette > 0 ? `inset 0 0 ${vignette * 2}px rgba(0,0,0,${vignette / 100})` : 'none'
+                        }}
+                      />
+                      
+                      {/* Video Actions */}
+                      <div className="absolute bottom-6 right-6 flex space-x-3">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={retakeVideo}
+                          className="p-4 bg-red-400/90 text-white rounded-xl backdrop-blur-sm shadow-soft border border-red-300/50"
+                        >
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                        </motion.button>
+                        
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={saveVideo}
+                          className="p-4 bg-red-500/90 text-white rounded-xl backdrop-blur-sm shadow-glow border border-red-400/50"
+                        >
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                         </motion.button>
                       </div>
@@ -1151,46 +1237,105 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         }
                       }}
                       className={cn(
-                        "relative rounded-2xl overflow-hidden border-2 border-purple-400/60 shadow-lg shadow-purple-500/30 bg-gradient-to-br from-purple-100/40 to-purple-200/40 backdrop-blur-sm",
+                        "relative rounded-2xl overflow-hidden border-2 shadow-lg bg-gradient-to-br backdrop-blur-sm",
+                        currentMode === 'photo' 
+                          ? "border-purple-400/60 shadow-purple-500/30 from-purple-100/40 to-purple-200/40"
+                          : "border-red-400/60 shadow-red-500/30 from-red-100/40 to-red-200/40",
                         // Mobile: Bigger size to match other icons
                         "w-14 h-14 lg:w-18 lg:h-18"
                       )}
-                      title={`View Gallery (${capturedImages.length} photos)`}
+                      title={currentMode === 'photo' 
+                        ? `View Gallery (${capturedImages.length} photos)` 
+                        : `View Videos (${recordedVideos.length} videos)`
+                      }
                     >
-                      <img 
-                        src={capturedImages[0].dataUrl} 
-                        alt="Recent capture"
-                        className="w-full h-full object-cover"
-                      />
-                      {/* Gallery indicator badge */}
-                      <div className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-gradient-to-r from-serelune-500 to-blush-500 rounded-full flex items-center justify-center shadow-glow">
-                        <span className="text-white text-xs font-bold px-1">{capturedImages.length}</span>
-                      </div>
-                      {/* Gallery icon overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-serelune-600/50 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      {/* Recent timestamp */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-serelune-800/70 text-white text-xs px-1 py-0.5 text-center">
-                        {capturedImages[0].timestamp.toLocaleTimeString([], { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </div>
+                      {currentMode === 'photo' ? (
+                        <>
+                          <img 
+                            src={capturedImages[0].dataUrl} 
+                            alt="Recent capture"
+                            className="w-full h-full object-cover"
+                          />
+                          {/* Photo Gallery indicator badge */}
+                          <div className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-gradient-to-r from-serelune-500 to-blush-500 rounded-full flex items-center justify-center shadow-glow">
+                            <span className="text-white text-xs font-bold px-1">{capturedImages.length}</span>
+                          </div>
+                          {/* Photo Gallery icon overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-serelune-600/50 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          {/* Photo Recent timestamp */}
+                          <div className="absolute bottom-0 left-0 right-0 bg-serelune-800/70 text-white text-xs px-1 py-0.5 text-center">
+                            {capturedImages[0].timestamp.toLocaleTimeString([], { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          {recordedVideos[0]?.thumbnail ? (
+                            <img 
+                              src={recordedVideos[0].thumbnail} 
+                              alt="Recent video"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-red-500/20 flex items-center justify-center">
+                              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                      d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                          )}
+                          {/* Video Gallery indicator badge */}
+                          <div className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-glow">
+                            <span className="text-white text-xs font-bold px-1">{recordedVideos.length}</span>
+                          </div>
+                          {/* Video Gallery icon overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-red-600/50 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          {/* Video Recent timestamp */}
+                          <div className="absolute bottom-0 left-0 right-0 bg-red-800/70 text-white text-xs px-1 py-0.5 text-center">
+                            {recordedVideos[0].timestamp.toLocaleTimeString([], { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
+                          </div>
+                        </>
+                      )}
                     </motion.button>
                   ) : (
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="w-14 h-14 lg:w-18 lg:h-18 bg-white/30 backdrop-blur-sm rounded-2xl border-2 border-serelune-200/50 flex flex-col items-center justify-center hover:bg-white/40 transition-all"
-                      title="No photos captured yet"
+                      className={cn(
+                        "bg-gradient-to-br backdrop-blur-sm rounded-2xl border-2 flex flex-col items-center justify-center hover:bg-white/40 transition-all",
+                        "w-14 h-14 lg:w-18 lg:h-18",
+                        currentMode === 'photo' 
+                          ? "bg-white/30 border-serelune-200/50"
+                          : "bg-red-50/30 border-red-200/50"
+                      )}
+                      title={currentMode === 'photo' ? "No photos captured yet" : "No videos recorded yet"}
                     >
-                      <svg className="w-6 h-6 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <svg className={cn(
+                        "w-6 h-6",
+                        currentMode === 'photo' ? "text-moonlight-600" : "text-red-600"
+                      )} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {currentMode === 'photo' ? (
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        ) : (
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        )}
                       </svg>
                     </motion.button>
                   )}
@@ -1244,7 +1389,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   "order-2 sm:order-none"
                 )}>
                   
-                  {/* Main Capture/Record Button - Enhanced Size */}
+                  {/* Main Capture/Record Button - Enhanced Professional Design */}
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -1254,77 +1399,68 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   >
                     <motion.div
                       className={cn(
-                        "rounded-2xl border-2 shadow-glow p-1",
+                        "rounded-full border-4 shadow-xl transition-all duration-300",
                         currentMode === 'video' 
                           ? isRecording 
-                            ? "border-red-600 bg-red-600" 
-                            : "border-red-400 bg-black"
-                          : "border-serelune-400 bg-black",
+                            ? "border-red-400 bg-gradient-to-br from-red-500 to-red-600 shadow-red-500/50" 
+                            : "border-red-300 bg-gradient-to-br from-red-500 to-red-600 shadow-red-500/40"
+                          : "border-gray-300 bg-gradient-to-br from-white to-gray-100 shadow-gray-400/50",
                         // Enhanced size for better prominence
-                        "w-20 h-16 lg:w-24 lg:h-20"
+                        "w-20 h-20 lg:w-24 lg:h-24"
                       )}
                       animate={
                         // Only animate for photo capture, not video recording to keep camera steady
                         currentMode === 'photo' && isCapturing 
                           ? { scale: [1, 1.1, 1] } 
+                          : isRecording
+                          ? { scale: [1, 1.02, 1] }
                           : {}
                       }
                       transition={{ 
-                        duration: 0.3, 
-                        repeat: (currentMode === 'photo' && isCapturing) ? Infinity : 0 
+                        duration: currentMode === 'video' && isRecording ? 1 : 0.3, 
+                        repeat: (currentMode === 'photo' && isCapturing) || (currentMode === 'video' && isRecording) ? Infinity : 0 
                       }}
                     >
-                      {/* First inner layer */}
+                      {/* Professional Button Content */}
                       <div className={cn(
-                        "w-full h-full rounded-xl p-1",
-                        currentMode === 'video' && isRecording ? "bg-red-700" : "bg-gray-900"
+                        "w-full h-full rounded-full flex items-center justify-center relative",
+                        currentMode === 'video' 
+                          ? isRecording 
+                            ? "bg-white" 
+                            : "bg-white"
+                          : "bg-white"
                       )}>
-                        {/* Second inner layer */}
-                        <div className={cn(
-                          "w-full h-full rounded-lg p-1",
-                          currentMode === 'video' && isRecording ? "bg-red-800" : "bg-gray-800"
-                        )}>
-                          {/* Third inner layer */}
-                          <div className={cn(
-                            "w-full h-full rounded-lg bg-gradient-to-br flex items-center justify-center",
-                            currentMode === 'video' && isRecording 
-                              ? "from-red-700 to-red-900" 
-                              : "from-gray-700 to-black"
-                          )}>
-                            {currentMode === 'video' ? (
-                              <>
-                                {/* Recording timer - Better positioned */}
-                                {isRecording && (
-                                  <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
-                                    <div className="bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-mono shadow-lg">
-                                      {formatRecordingTime(recordingTime)}
-                                    </div>
-                                  </div>
-                                )}
-                                {/* Recording indicator */}
-                                {isRecording ? (
-                                  <motion.div
-                                    className="w-6 h-6 bg-white rounded"
-                                    animate={{ opacity: [1, 0.5, 1] }}
-                                    transition={{ duration: 1, repeat: Infinity }}
-                                  />
-                                ) : (
-                                  <div className="w-8 h-8 bg-red-500 rounded-full"></div>
-                                )}
-                              </>
-                            ) : (
-                              <>
-                                {(isCapturing) && (
-                                  <motion.div
-                                    className="w-10 h-3 rounded-full bg-gray-600"
-                                    animate={{ opacity: [0.5, 1, 0.5] }}
-                                    transition={{ duration: 0.5, repeat: Infinity }}
-                                  />
-                                )}
-                              </>
+                        {currentMode === 'video' ? (
+                          <>
+                            {/* Recording timer - Better positioned */}
+                            {isRecording && (
+                              <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
+                                <div className="bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-mono shadow-lg">
+                                  {formatRecordingTime(recordingTime)}
+                                </div>
+                              </div>
                             )}
-                          </div>
-                        </div>
+                            {/* Professional Video Recording Indicator */}
+                            {isRecording ? (
+                              <motion.div
+                                className="w-8 h-8 bg-red-600 rounded-md shadow-inner"
+                                animate={{ opacity: [1, 0.7, 1] }}
+                                transition={{ duration: 1, repeat: Infinity }}
+                              />
+                            ) : (
+                              <div className="w-6 h-6 bg-red-600 rounded-full shadow-inner"></div>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            {/* Professional Photo Capture Circle */}
+                            <div className={cn(
+                              "rounded-full bg-white transform transition-all duration-300",
+                              isCapturing ? "w-8 h-8 scale-75" : "w-12 h-12 scale-90",
+                              "shadow-inner border border-gray-200"
+                            )} />
+                          </>
+                        )}
                       </div>
                     </motion.div>
                   </motion.button>
