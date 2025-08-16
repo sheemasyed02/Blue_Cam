@@ -1,8 +1,8 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn, saveFramedImage, savePhotobooth } from '../utils';
-import { Navigation, FiltersPanel, FramesPanel, FrameRenderer, AdjustmentsPanel, ExportPanel, type ImageAdjustments } from '../components';
+import { cn } from '../utils';
+import { Navigation, FiltersPanel, AdjustmentsPanel, ExportPanel, type ImageAdjustments } from '../components';
 
 interface EditorPageProps {
   className?: string;
@@ -10,7 +10,7 @@ interface EditorPageProps {
   initialImage?: string;
 }
 
-type TabType = 'presets' | 'adjustments' | 'frames' | 'export';
+type TabType = 'presets' | 'adjustments' | 'export';
 
 interface BeforeAfterSliderProps {
   beforeImage: string;
@@ -102,10 +102,7 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
   const [selectedImage, setSelectedImage] = useState<string | null>(initialImage || null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [currentFilter, setCurrentFilter] = useState<string>('');
-  const [currentFrame, setCurrentFrame] = useState<string>('');
-  const [frameData, setFrameData] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const frameRef = useRef<HTMLDivElement>(null);
   const [currentAdjustments, setCurrentAdjustments] = useState<ImageAdjustments>({
     // Basic Adjustments
     brightness: 0,
@@ -161,7 +158,6 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
   const tabs = [
     { id: 'presets' as const, label: 'Presets' },
     { id: 'adjustments' as const, label: 'Adjustments' },
-    { id: 'frames' as const, label: 'Frames' },
     { id: 'export' as const, label: 'Export' }
   ];
 
@@ -312,46 +308,27 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
     multiple: false
   });
 
-  const applyFrame = useCallback((frameId: string, frameData?: any) => {
-    if (!selectedImage) return;
-    
-    setCurrentFrame(frameId);
-    setFrameData(frameData);
-    
-    // For simple frames, just update the current frame
-    // For complex frames like photobooth, the FramesPanel handles the logic
-    setProcessedImage(selectedImage);
-  }, [selectedImage]);
-
   const handleSaveImage = useCallback(async () => {
     if (!selectedImage) return;
     
     setIsSaving(true);
     
     try {
-      if (currentFrame === 'photobooth' && frameData?.images) {
-        // Save photobooth strip
-        await savePhotobooth(frameData.images, 'serelune-photobooth');
-      } else if (frameRef.current) {
-        // Save regular framed image
-        const frameName = currentFrame === 'none' || !currentFrame ? 'original' : currentFrame;
-        await saveFramedImage(frameRef.current, `serelune-${frameName}`);
-      } else {
-        // Fallback: save original image
-        const link = document.createElement('a');
-        link.href = selectedImage;
-        link.download = `serelune-photo-${new Date().toISOString().split('T')[0]}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+      // Save the processed image or original
+      const imageToSave = processedImage || selectedImage;
+      const link = document.createElement('a');
+      link.href = imageToSave;
+      link.download = `serelune-photo-${new Date().toISOString().split('T')[0]}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (error) {
       console.error('Error saving image:', error);
       alert('Failed to save image. Please try again.');
     } finally {
       setIsSaving(false);
     }
-  }, [selectedImage, currentFrame, frameData]);
+  }, [selectedImage, processedImage]);
 
   const applyPreset = useCallback((filter: string) => {
     if (!selectedImage) return;
@@ -500,15 +477,6 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
           />
         );
 
-      case 'frames':
-        return (
-          <FramesPanel
-            selectedImage={selectedImage}
-            onFrameApply={applyFrame}
-            activeFrame={currentFrame}
-          />
-        );
-
       case 'export':
         return (
           <ExportPanel
@@ -642,10 +610,8 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
               {selectedImage ? (
                 <div className={cn(
                   "relative flex items-center justify-center",
-                  // Shorter image display area - reduced height
-                  "h-[300px] lg:h-[400px]",
-                  // Larger display when frame is active
-                  currentFrame && currentFrame !== 'none' ? "lg:h-[500px]" : ""
+                  // Standard image display area
+                  "h-[300px] lg:h-[400px]"
                 )}>
                   {processedImage && selectedImage !== processedImage ? (
                     <div className="w-full h-full">
@@ -656,49 +622,12 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                       />
                     </div>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center p-4" ref={frameRef}>
-                      {currentFrame && currentFrame !== 'none' ? (
-                        currentFrame === 'photobooth' ? (
-                          frameData?.images && frameData.images.length > 0 ? (
-                            <div className="w-full max-w-sm mx-auto">
-                              <FrameRenderer 
-                                frameId={currentFrame}
-                                image={selectedImage}
-                                frameData={frameData}
-                                className="w-full"
-                              />
-                            </div>
-                          ) : (
-                            <div className="text-center p-6">
-                              <div className="text-4xl mb-3">📸</div>
-                              <h3 className="font-title text-lg text-serelune-700 mb-2">
-                                Photo Booth Strip
-                              </h3>
-                              <p className="font-body text-serelune-600/80 mb-3 text-sm">
-                                Upload up to 4 photos to create your photo booth strip
-                              </p>
-                              <p className="font-body text-xs text-serelune-500/70">
-                                Use the Frames panel to add photos
-                              </p>
-                            </div>
-                          )
-                        ) : (
-                          <div className="max-w-full max-h-full flex items-center justify-center">
-                            <FrameRenderer 
-                              frameId={currentFrame}
-                              image={selectedImage}
-                              frameData={frameData}
-                              className="max-w-[85%] max-h-[85%] w-auto h-auto"
-                            />
-                          </div>
-                        )
-                      ) : (
-                        <img 
-                          src={selectedImage} 
-                          alt="Selected" 
-                          className="max-w-[90%] max-h-[90%] object-contain"
-                        />
-                      )}
+                    <div className="w-full h-full flex items-center justify-center p-4">
+                      <img 
+                        src={selectedImage} 
+                        alt="Selected" 
+                        className="max-w-[90%] max-h-[90%] object-contain"
+                      />
                     </div>
                   )}
                   

@@ -129,11 +129,17 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   useEffect(() => {
     let timer: number;
     
-    if (isPhotoboothActive && countdown > 0) {
+    if (isPhotoboothActive && countdown > 1) {
+      timer = setTimeout(() => {
+        setCountdown(prev => prev - 1);
+      }, 1000);
+    } else if (isPhotoboothActive && countdown === 1) {
+      // Show "Hehe" for a moment, then continue countdown
       timer = setTimeout(() => {
         setCountdown(prev => prev - 1);
       }, 1000);
     } else if (isPhotoboothActive && countdown === 0) {
+      // Capture photo immediately
       capturePhotoboothPhoto();
     }
     
@@ -150,11 +156,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
     
     if (!ctx) return;
 
-    // Calculate dimensions for photobooth strip
-    const stripWidth = 300;
-    const photoHeight = 200;
-    const padding = 20;
-    const headerHeight = 60;
+    // Calculate dimensions for photobooth strip - increased for better quality
+    const stripWidth = 600; // Doubled from 300
+    const photoHeight = 400; // Doubled from 200
+    const padding = 40; // Doubled from 20
+    const headerHeight = 120; // Doubled from 60
     
     canvas.width = stripWidth;
     canvas.height = headerHeight + (photoHeight * photoboothImages.length) + (padding * (photoboothImages.length + 1));
@@ -168,12 +174,12 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
     ctx.fillRect(0, 0, canvas.width, headerHeight);
     
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 18px Arial';
+    ctx.font = 'bold 36px Arial'; // Increased from 18px
     ctx.textAlign = 'center';
-    ctx.fillText('Have a good dayyy! ✨', canvas.width / 2, 35);
+    ctx.fillText('Have a good dayyy! ✨', canvas.width / 2, 70); // Adjusted position
     
-    ctx.font = '12px Arial';
-    ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, 50);
+    ctx.font = '24px Arial'; // Increased from 12px
+    ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, 100); // Adjusted position
     
     // Load and draw each photo
     let loadedCount = 0;
@@ -186,16 +192,16 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
           
           // Draw photo border
           ctx.fillStyle = '#f3f4f6';
-          ctx.fillRect(padding - 5, y - 5, photoWidth + 10, photoHeight + 10);
+          ctx.fillRect(padding - 10, y - 10, photoWidth + 20, photoHeight + 20); // Increased border from 5px to 10px
           
           // Draw photo
           ctx.drawImage(img, padding, y, photoWidth, photoHeight);
           
           // Photo number
           ctx.fillStyle = '#6b7280';
-          ctx.font = 'bold 14px Arial';
+          ctx.font = 'bold 28px Arial'; // Increased from 14px
           ctx.textAlign = 'right';
-          ctx.fillText(`${index + 1}`, stripWidth - padding - 10, y + 20);
+          ctx.fillText(`${index + 1}`, stripWidth - padding - 20, y + 40); // Adjusted position
           
           loadedCount++;
           if (loadedCount === photoboothImages.length) {
@@ -225,8 +231,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   }, []);
 
   const videoConstraints = {
-    width: 1920,
-    height: 1080,
+    width: { ideal: 1920, max: 1920 },
+    height: { ideal: 1080, max: 1080 },
     facingMode: facingMode
   };
 
@@ -651,35 +657,16 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           initial={{ opacity: 0, scale: 0.5 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 1.5 }}
-                          className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                          className="absolute inset-0 flex items-center justify-center"
                         >
                           <motion.div
                             key={countdown}
                             initial={{ scale: 0.5, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 1.5, opacity: 0 }}
-                            className="text-white text-6xl lg:text-8xl font-bold font-mono text-center"
+                            className="text-white text-6xl lg:text-8xl font-bold font-mono text-center drop-shadow-2xl"
                           >
                             {countdown === 1 ? 'SMILE! 😊' : countdown}
-                          </motion.div>
-                        </motion.div>
-                      )}
-                      
-                      {/* Photo Capture Flash */}
-                      {countdown === 0 && isPhotoboothActive && (
-                        <motion.div 
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: [0, 1, 0] }}
-                          transition={{ duration: 0.3 }}
-                          className="absolute inset-0 flex items-center justify-center bg-white/90"
-                        >
-                          <motion.div
-                            initial={{ scale: 0.5, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 1.5, opacity: 0 }}
-                            className="text-serelune-600 text-4xl lg:text-6xl font-bold font-mono"
-                          >
-                            CLICK! 📸
                           </motion.div>
                         </motion.div>
                       )}
@@ -730,125 +717,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             </motion.div>
           </div>
           
-          {/* Mobile Filters Panel - Only visible on mobile when showFilters is true */}
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="lg:hidden overflow-hidden bg-white/20 backdrop-blur-sm border-t border-serelune-200/30"
-              >
-                <div className="p-4">
-                  {/* Mobile Filter Header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-moonlight-800 font-title text-lg font-bold">Filters</h3>
-                    <button
-                      onClick={() => setShowFilters(false)}
-                      className="p-2 bg-serelune-500/20 rounded-lg hover:bg-serelune-500/30 transition-all"
-                    >
-                      <svg className="w-4 h-4 text-moonlight-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* Active Filter Display */}
-                  {activeFilter && (
-                    <div className="mb-3 p-2 bg-serelune-500/20 border border-serelune-400/30 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-serelune-500 rounded-full animate-pulse"></div>
-                        <span className="text-serelune-700 text-sm font-medium">
-                          {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filter Active'}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Scrollable Filter Grid */}
-                  <div className="overflow-x-auto">
-                    <div className="flex space-x-3 pb-2">
-                      {/* Original/No Filter */}
-                      <div className="flex-shrink-0 w-20">
-                        <button
-                          onClick={() => {
-                            setActiveFilter('');
-                            setFilterNotification('Original');
-                            setTimeout(() => setFilterNotification(null), 2000);
-                          }}
-                          className={cn(
-                            "w-full flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
-                            !activeFilter 
-                              ? "bg-serelune-500/20 border-2 border-serelune-400" 
-                              : "bg-white/30 border-2 border-transparent hover:border-serelune-300"
-                          )}
-                        >
-                          <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 flex items-center justify-center">
-                            {cameraPreview ? (
-                              <img 
-                                src={cameraPreview} 
-                                alt="Original preview"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <svg className="w-8 h-8 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            )}
-                          </div>
-                          <span className={cn(
-                            "text-xs font-medium text-center w-full truncate",
-                            !activeFilter ? "text-serelune-700" : "text-moonlight-600"
-                          )}>Original</span>
-                        </button>
-                      </div>
-
-                      {/* Filter Options */}
-                      {vintageFilters.map((filter) => (
-                        <div key={filter.id} className="flex-shrink-0 w-20">
-                          <button
-                            onClick={() => {
-                              setActiveFilter(filter.cssFilter);
-                              setFilterNotification(filter.name);
-                              setTimeout(() => setFilterNotification(null), 2000);
-                            }}
-                            className={cn(
-                              "w-full flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
-                              activeFilter === filter.cssFilter 
-                                ? "bg-serelune-500/20 border-2 border-serelune-400" 
-                                : "bg-white/30 border-2 border-transparent hover:border-serelune-300"
-                            )}
-                          >
-                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 relative">
-                              {cameraPreview ? (
-                                <img 
-                                  src={cameraPreview} 
-                                  alt={`${filter.name} preview`}
-                                  className="w-full h-full object-cover"
-                                  style={{ filter: filter.cssFilter }}
-                                />
-                              ) : (
-                                <div 
-                                  className="w-full h-full bg-gradient-to-br from-serelune-200 to-blush-200"
-                                  style={{ filter: filter.cssFilter }}
-                                ></div>
-                              )}
-                            </div>
-                            <span className={cn(
-                              "text-xs font-medium text-center w-full truncate",
-                              activeFilter === filter.cssFilter ? "text-serelune-700" : "text-moonlight-600"
-                            )}>{filter.name}</span>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          
           {/* REMOVED: Mobile Frames Panel */}
           {/* Modern Control Dock - Responsive */}
           <div className={cn(
@@ -860,11 +728,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
           )}>
             <div className="max-w-4xl mx-auto">
               
-              {/* Main Controls Row - Centered with 2px gaps */}
+              {/* Main Controls Row - Centered with improved spacing */}
               <div className="flex items-center justify-center">
                 
-                {/* Gallery, Photobooth, Capture & Filters - All with 2px gaps */}
-                <div className="flex items-center gap-0.5">
+                {/* Gallery, Photobooth, Capture & Filters - All with better spacing */}
+                <div className="flex items-center gap-3">
                   {/* Gallery Button */}
                   {capturedImages.length > 0 ? (
                     <motion.button
@@ -875,9 +743,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         setShowGallery(true);
                       }}
                       className={cn(
-                        "relative rounded-2xl overflow-hidden border-2 border-serelune-300/50 shadow-soft bg-gradient-to-br from-serelune-100/40 to-blush-100/40 backdrop-blur-sm",
-                        // Mobile: Smaller size
-                        "w-12 h-12 lg:w-16 lg:h-16"
+                        "relative rounded-2xl overflow-hidden border-2 border-purple-400/60 shadow-lg shadow-purple-500/30 bg-gradient-to-br from-purple-100/40 to-purple-200/40 backdrop-blur-sm",
+                        // Mobile: Bigger size to match other icons
+                        "w-14 h-14 lg:w-18 lg:h-18"
                       )}
                       title={`View Gallery (${capturedImages.length} photos)`}
                     >
@@ -909,7 +777,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="w-12 h-12 lg:w-16 lg:h-16 bg-white/30 backdrop-blur-sm rounded-2xl border-2 border-serelune-200/50 flex flex-col items-center justify-center hover:bg-white/40 transition-all"
+                      className="w-14 h-14 lg:w-18 lg:h-18 bg-white/30 backdrop-blur-sm rounded-2xl border-2 border-serelune-200/50 flex flex-col items-center justify-center hover:bg-white/40 transition-all"
                       title="No photos captured yet"
                     >
                       <svg className="w-6 h-6 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -933,18 +801,30 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         "rounded-2xl border-2 bg-gradient-to-br shadow-glow p-1",
                         isPhotoboothActive 
                           ? "border-serelune-400 from-serelune-500 to-blush-500" 
-                          : "border-moonlight-400 from-moonlight-400 to-serelune-400",
-                        // Mobile: Slightly smaller
-                        "w-12 h-12 lg:w-16 lg:h-16"
+                          : "border-moonlight-400/70 from-moonlight-300/20 to-serelune-300/20",
+                        // Mobile: Match other icons size
+                        "w-14 h-14 lg:w-18 lg:h-18"
                       )}
                       animate={isPhotoboothActive ? { scale: [1, 1.1, 1] } : {}}
                       transition={{ duration: 0.3, repeat: isPhotoboothActive ? Infinity : 0 }}
                     >
-                      <div className="w-full h-full rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                        </svg>
+                      <div className="w-full h-full rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
+                        {/* Photobooth strip icon with camera */}
+                        <div className="relative w-8 h-8 lg:w-10 lg:h-10">
+                          {/* Photo strip background */}
+                          <div className="w-full h-full bg-white/90 rounded-md border border-white/40 shadow-sm">
+                            {/* Three photo frames in strip */}
+                            <div className="flex flex-col h-full p-0.5 gap-0.5">
+                              <div className="flex-1 bg-purple-400/30 rounded-sm"></div>
+                              <div className="flex-1 bg-purple-400/30 rounded-sm"></div>
+                              <div className="flex-1 bg-purple-400/30 rounded-sm"></div>
+                            </div>
+                          </div>
+                          {/* Small camera icon overlay */}
+                          <div className="absolute -top-1 -right-1 w-3 h-3 lg:w-4 lg:h-4 bg-purple-500 rounded-full flex items-center justify-center border border-white/60">
+                            <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-white rounded-full"></div>
+                          </div>
+                        </div>
                       </div>
                     </motion.div>
                   </motion.button>
@@ -985,31 +865,31 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     </motion.div>
                   </motion.button>
 
-                  {/* Filters Button - Now next to capture with 2px gap */}
+                  {/* Filters Button - Now next to capture with 4px gap */}
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleFiltersToggle}
                     className={cn(
                       "rounded-2xl backdrop-blur-sm border-2 flex items-center justify-center transition-all",
-                      // Mobile: Smaller size
-                      "w-12 h-12 lg:w-16 lg:h-16",
+                      // Mobile: Match other icons size
+                      "w-14 h-14 lg:w-18 lg:h-18",
                       showFilters 
-                        ? "bg-serelune-500/20 border-serelune-400/50 text-serelune-600 shadow-glow" 
-                        : "bg-white/30 border-serelune-200/50 text-moonlight-700"
+                        ? "bg-purple-500/15 border-purple-400/60 text-purple-600 shadow-glow shadow-purple-300/50" 
+                        : "bg-white/30 border-purple-300/40 text-purple-500 hover:border-purple-400/60 hover:bg-purple-50/20"
                     )}
                   >
                     <svg className={cn(
-                      // Mobile: Bigger circles to fit the icon box better
-                      "w-8 h-8 lg:w-11 lg:h-11"
+                      // Proper size for the bigger button
+                      "w-8 h-8 lg:w-10 lg:h-10"
                     )} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      {/* 3 interlocking circles design - bigger radius */}
-                      <circle cx="12" cy="8" r="5" strokeWidth={2} fill="none" />
-                      <circle cx="8" cy="16" r="5" strokeWidth={2} fill="none" />
-                      <circle cx="16" cy="16" r="5" strokeWidth={2} fill="none" />
+                      {/* 3 interlocking circles design - thinner stroke and better positioning */}
+                      <circle cx="12" cy="8" r="4.5" strokeWidth={1.5} fill="none" />
+                      <circle cx="8" cy="15" r="4.5" strokeWidth={1.5} fill="none" />
+                      <circle cx="16" cy="15" r="4.5" strokeWidth={1.5} fill="none" />
                     </svg>
                     {activeFilter && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-serelune-500 rounded-full shadow-glow animate-sparkle"></div>
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-purple-500 rounded-full shadow-glow animate-sparkle"></div>
                     )}
                   </motion.button>
                 </div>
@@ -1521,7 +1401,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setShowFilters(false)}
-                  className="flex-1 py-3 px-4 bg-white/10 border border-white/20 text-white rounded-lg text-sm font-medium hover:bg-white/20 transition-all"
+                  className="flex-1 py-3 px-4 bg-green-500/20 border border-green-400/50 text-green-400 rounded-lg text-sm font-medium hover:bg-green-500/30 transition-all shadow-lg"
                 >
                   Done
                 </motion.button>
@@ -1549,144 +1429,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
           </motion.div>
         )}
       </AnimatePresence>
-
-        {/* Desktop Sidebar - Only visible on large screens */}
-        <AnimatePresence>
-          {showFilters && (
-            <motion.div
-              initial={{ x: 300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: 300, opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="hidden lg:flex fixed right-6 top-1/2 -translate-y-1/2 w-80 max-h-[80vh] bg-white/30 backdrop-blur-md border border-serelune-200/50 rounded-2xl shadow-2xl z-40"
-            >
-              <div className="w-full flex flex-col">
-                {/* Desktop Panel Header */}
-                <div className="flex items-center justify-between p-6 border-b border-serelune-200/30">
-                  <div className="flex space-x-4">
-                    <button
-                      onClick={() => setShowFilters(!showFilters)}
-                      className={cn(
-                        "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
-                        showFilters 
-                          ? "bg-serelune-500/20 text-serelune-700 border border-serelune-400/30" 
-                          : "text-moonlight-600 hover:text-moonlight-800 hover:bg-white/20"
-                      )}
-                    >
-                      Filters
-                    </button>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setShowFilters(false);
-                    }}
-                    className="p-2 bg-pearl-500/20 rounded-lg hover:bg-pearl-500/30 transition-all"
-                  >
-                    <svg className="w-4 h-4 text-moonlight-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-
-                {/* Panel Content */}
-                <div className="flex-1 overflow-hidden">
-                  {/* Filters Panel Content */}
-                  {showFilters && (
-                    <div className="p-6 h-full overflow-y-auto">
-                      <h3 className="text-moonlight-800 font-title text-xl font-bold mb-4">Filters</h3>
-                      
-                      {/* Active Filter Display */}
-                      {activeFilter && (
-                        <div className="mb-4 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-serelune-500 rounded-full animate-pulse"></div>
-                            <span className="text-serelune-700 text-sm font-medium">
-                              {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filter Active'}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Filter Grid */}
-                      <div className="grid grid-cols-3 gap-3">
-                        {/* Original/No Filter */}
-                        <button
-                          onClick={() => {
-                            setActiveFilter('');
-                            setFilterNotification('Original');
-                            setTimeout(() => setFilterNotification(null), 2000);
-                          }}
-                          className={cn(
-                            "flex flex-col items-center space-y-2 p-3 rounded-lg transition-all",
-                            !activeFilter 
-                              ? "bg-serelune-500/20 border-2 border-serelune-400" 
-                              : "bg-white/30 border-2 border-transparent hover:border-serelune-300"
-                          )}
-                        >
-                          <div className="w-20 h-20 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 flex items-center justify-center">
-                            {cameraPreview ? (
-                              <img 
-                                src={cameraPreview} 
-                                alt="Original preview"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <svg className="w-8 h-8 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            )}
-                          </div>
-                          <span className={cn(
-                            "text-xs font-medium text-center w-full truncate",
-                            !activeFilter ? "text-serelune-700" : "text-moonlight-600"
-                          )}>Original</span>
-                        </button>
-
-                        {/* Filter Options */}
-                        {vintageFilters.map((filter) => (
-                          <button
-                            key={filter.id}
-                            onClick={() => {
-                              setActiveFilter(filter.cssFilter);
-                              setFilterNotification(filter.name);
-                              setTimeout(() => setFilterNotification(null), 2000);
-                            }}
-                            className={cn(
-                              "flex flex-col items-center space-y-2 p-3 rounded-lg transition-all",
-                              activeFilter === filter.cssFilter 
-                                ? "bg-serelune-500/20 border-2 border-serelune-400" 
-                                : "bg-white/30 border-2 border-transparent hover:border-serelune-300"
-                            )}
-                          >
-                            <div className="w-20 h-20 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 relative">
-                              {cameraPreview ? (
-                                <img 
-                                  src={cameraPreview} 
-                                  alt={`${filter.name} preview`}
-                                  className="w-full h-full object-cover"
-                                  style={{ filter: filter.cssFilter }}
-                                />
-                              ) : (
-                                <div 
-                                  className="w-full h-full bg-gradient-to-br from-serelune-200 to-blush-200"
-                                  style={{ filter: filter.cssFilter }}
-                                ></div>
-                              )}
-                            </div>
-                            <span className={cn(
-                              "text-xs font-medium text-center w-full truncate",
-                              activeFilter === filter.cssFilter ? "text-serelune-700" : "text-moonlight-600"
-                            )}>{filter.name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
       {/* Gallery Modal */}
       <AnimatePresence>
@@ -1749,7 +1491,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
 
               {/* Main Image Display */}
               <div className="flex-1 flex flex-col p-3 sm:p-6 overflow-hidden">
-                <div className="relative bg-black rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4 flex-1 min-h-0">
+                <div className="relative bg-black rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4 flex-1 min-h-0 border-2 border-purple-400/50 shadow-lg shadow-purple-500/20">
                   <img
                     src={capturedImages[selectedImageIndex].dataUrl}
                     alt={`Captured image ${selectedImageIndex + 1}`}
@@ -1821,10 +1563,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setSelectedImageIndex(index)}
                         className={cn(
-                          "relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0",
+                          "relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 shadow-md",
                           selectedImageIndex === index 
-                            ? "border-serelune-400 shadow-glow" 
-                            : "border-pearl-200/40 hover:border-pearl-200/60"
+                            ? "border-purple-400 shadow-lg shadow-purple-400/30" 
+                            : "border-purple-300/50 hover:border-purple-400/70 hover:shadow-lg hover:shadow-purple-300/20"
                         )}
                       >
                         <img
@@ -1833,11 +1575,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           className="w-full h-full object-cover"
                         />
                         {selectedImageIndex === index && (
-                          <div className="absolute inset-0 bg-serelune-400/20"></div>
+                          <div className="absolute inset-0 bg-purple-400/20"></div>
                         )}
                         {/* Filter indicator */}
                         {image.filter && (
-                          <div className="absolute bottom-1 left-1 w-2 h-2 bg-serelune-400 rounded-full"></div>
+                          <div className="absolute bottom-1 left-1 w-2 h-2 bg-purple-400 rounded-full border border-white/50"></div>
                         )}
                         {/* Time indicator */}
                         <div className="absolute bottom-0 right-0 px-1 bg-black/70 text-white text-xs">
@@ -2012,10 +1754,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               <h3 className="text-moonlight-800 font-title text-xl font-bold mb-4 text-center">Photobooth Strip Ready!</h3>
               
               <div className="mb-6 flex justify-center">
-                <div className="bg-white rounded-2xl p-4 shadow-soft">
-                  <div className="w-64 h-80 bg-white rounded-lg overflow-hidden relative">
+                <div className="bg-white rounded-2xl p-4 shadow-lg border-2 border-purple-400/50">
+                  <div className="w-64 h-80 bg-white rounded-lg overflow-hidden relative border border-purple-300/40">
                     {photoboothImages.map((img, index) => (
-                      <div key={index} className="w-full h-20 border-b border-gray-200 last:border-b-0">
+                      <div key={index} className="w-full h-20 border-b border-purple-200/60 last:border-b-0">
                         <img 
                           src={img} 
                           alt={`Photo ${index + 1}`}
@@ -2023,7 +1765,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         />
                       </div>
                     ))}
-                    <div className="absolute bottom-2 left-2 text-xs font-bold text-gray-600">
+                    <div className="absolute bottom-2 left-2 text-xs font-bold text-purple-600 bg-white/80 px-2 py-1 rounded">
                       SERELUNE
                     </div>
                   </div>
