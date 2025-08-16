@@ -399,22 +399,22 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className="relative z-10 max-w-7xl mx-auto p-4 md:p-6">
-        <div className="flex flex-col lg:flex-row gap-6">
+      {/* Main Content - Mobile First Responsive */}
+      <div className="relative z-10 max-w-7xl mx-auto p-3 md:p-4 lg:p-6">
+        <div className="flex flex-col xl:flex-row gap-4 lg:gap-6">
           
-          {/* Left Column - Tabs and Controls */}
-          <div className="lg:w-80 order-1 lg:order-none">
-            {/* Vertical Tabs */}
-            <div className="bg-white/40 backdrop-blur-sm rounded-lg p-1 mb-6 border border-serelune-200/50 shadow-soft">
-              <div className="flex lg:flex-col gap-1">
+          {/* Mobile: Image Preview First, Desktop: Controls First */}
+          <div className="order-2 xl:order-1 xl:w-80">
+            {/* Horizontal Tabs on Mobile, Vertical on Desktop */}
+            <div className="bg-white/40 backdrop-blur-sm rounded-lg p-1 mb-4 lg:mb-6 border border-serelune-200/50 shadow-soft">
+              <div className="flex xl:flex-col gap-1 overflow-x-auto xl:overflow-visible">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      "flex-1 lg:w-full py-3 px-4 rounded-md font-body font-medium transition-all",
-                      "text-moonlight-700",
+                      "flex-shrink-0 xl:flex-1 xl:w-full py-2 lg:py-3 px-3 lg:px-4 rounded-md font-body font-medium transition-all text-sm lg:text-base",
+                      "text-moonlight-700 whitespace-nowrap xl:whitespace-normal",
                       activeTab === tab.id
                         ? "bg-serelune-500 text-white border-2 border-serelune-400 shadow-glow"
                         : "hover:bg-serelune-100/50"
@@ -426,7 +426,7 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
               </div>
             </div>
 
-            {/* Tab Content */}
+            {/* Tab Content - Responsive */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
@@ -434,15 +434,16 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
-                className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-serelune-200/50 shadow-soft"
+                className="bg-white/50 backdrop-blur-sm rounded-lg p-4 lg:p-6 border border-serelune-200/50 shadow-soft"
               >
                 {renderTabContent()}
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* Right Column - Preview */}
-          <div className="flex-1 order-none lg:order-1">
+          {/* Image Preview Section - Mobile: First, Desktop: Second */}
+          <div className="flex-1 order-1 xl:order-2">
+            <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 lg:p-6 border border-serelune-200/50 shadow-soft">
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               {selectedImage ? (
                 <div className="aspect-video relative">
@@ -503,13 +504,14 @@ export const EditorPage = ({ className, onPageChange }: EditorPageProps) => {
             {/* Image Info */}
             {selectedImage && (
               <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-lg p-4">
-                <h4 className="font-title font-medium text-charcoal mb-2">Image Information</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm font-body text-charcoal/70">
+                <h4 className="font-title font-medium text-serelune-700 mb-2">Image Information</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 lg:gap-4 text-sm font-body text-serelune-600/80">
                   <div>Status: {processedImage !== selectedImage ? 'Edited' : 'Original'}</div>
                   <div>Format: {selectedImage.startsWith('data:image/png') ? 'PNG' : 'JPEG'}</div>
                 </div>
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>
