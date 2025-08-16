@@ -18,8 +18,13 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   const [isCapturing, setIsCapturing] = useState(false);
   const [filmCount, setFilmCount] = useState(24);
   
-  // Gallery state for captured images
-  const [capturedImages, setCapturedImages] = useState<string[]>([]);
+  // Gallery state for captured images with metadata
+  const [capturedImages, setCapturedImages] = useState<Array<{
+    id: string;
+    dataUrl: string;
+    timestamp: Date;
+    filter?: string;
+  }>>([]);
   
   // Filters state
   const [showFilters, setShowFilters] = useState(false);
@@ -43,6 +48,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   
   // Reset notification
   const [resetNotification, setResetNotification] = useState(false);
+  
+  // Gallery modal state
+  const [showGallery, setShowGallery] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const videoConstraints = {
     width: 1920,
@@ -57,6 +66,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
       const imageSrc = webcamRef.current.getScreenshot();
       
       if (imageSrc) {
+        const timestamp = new Date();
+        const imageId = `img-${timestamp.getTime()}`;
+        
         if (activeFilter) {
           const img = new Image();
           img.onload = () => {
@@ -80,13 +92,23 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               
               const filteredImageSrc = canvas.toDataURL('image/jpeg', 0.9);
               setCapturedImage(filteredImageSrc);
-              setCapturedImages(prev => [filteredImageSrc, ...prev]);
+              setCapturedImages(prev => [{
+                id: imageId,
+                dataUrl: filteredImageSrc,
+                timestamp,
+                filter: vintageFilters.find(f => f.cssFilter === activeFilter)?.name
+              }, ...prev]);
             }
           };
           img.src = imageSrc;
         } else {
           setCapturedImage(imageSrc);
-          setCapturedImages(prev => [imageSrc, ...prev]);
+          setCapturedImages(prev => [{
+            id: imageId,
+            dataUrl: imageSrc,
+            timestamp,
+            filter: undefined
+          }, ...prev]);
         }
       }
       
@@ -480,28 +502,49 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-white/20 shadow-glow"
+                      onClick={() => {
+                        setSelectedImageIndex(0);
+                        setShowGallery(true);
+                      }}
+                      className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-white/20 shadow-glow bg-gradient-to-br from-electric-600/20 to-amber-600/20 backdrop-blur-sm"
+                      title={`View Gallery (${capturedImages.length} photos)`}
                     >
                       <img 
-                        src={capturedImages[0]} 
+                        src={capturedImages[0].dataUrl} 
                         alt="Recent capture"
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute top-1 right-1 w-3 h-3 bg-amber-400 rounded-full shadow-glow"></div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity">
-                        <div className="absolute bottom-1 left-1 text-white text-xs font-bold">{capturedImages.length}</div>
+                      {/* Gallery indicator badge */}
+                      <div className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-gradient-to-r from-electric-500 to-amber-500 rounded-full flex items-center justify-center shadow-glow">
+                        <span className="text-white text-xs font-bold px-1">{capturedImages.length}</span>
+                      </div>
+                      {/* Gallery icon overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      {/* Recent timestamp */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs px-1 py-0.5 text-center">
+                        {capturedImages[0].timestamp.toLocaleTimeString([], { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
                       </div>
                     </motion.button>
                   ) : (
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl border-2 border-white/20 flex items-center justify-center"
+                      className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl border-2 border-white/20 flex flex-col items-center justify-center hover:bg-white/20 transition-all"
+                      title="No photos captured yet"
                     >
-                      <svg className="w-8 h-8 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                               d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
+                      <span className="text-xs text-white/60 mt-1">Gallery</span>
                     </motion.button>
                   )}
                 </div>
@@ -533,26 +576,49 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   </motion.div>
                 </motion.button>
                 
-                {/* Right: Filters */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowFilters(!showFilters)}
-                  className={cn(
-                    "w-16 h-16 rounded-2xl backdrop-blur-sm border-2 flex items-center justify-center transition-all",
-                    showFilters 
-                      ? "bg-amber-500/20 border-amber-400/50 text-amber-400" 
-                      : "bg-white/10 border-white/20 text-white"
+                {/* Right: Filters & Gallery Button */}
+                <div className="flex items-center space-x-3">
+                  {/* Quick Gallery Access */}
+                  {capturedImages.length > 0 && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setSelectedImageIndex(0);
+                        setShowGallery(true);
+                      }}
+                      className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-electric-600/20 to-amber-600/20 border border-electric-400/30 text-electric-400 rounded-xl backdrop-blur-sm hover:from-electric-600/30 hover:to-amber-600/30 transition-all"
+                      title="View all captured photos"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-sm font-medium">{capturedImages.length}</span>
+                    </motion.button>
                   )}
-                >
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                  </svg>
-                  {activeFilter && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full shadow-glow"></div>
-                  )}
-                </motion.button>
+                  
+                  {/* Filters Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={cn(
+                      "w-16 h-16 rounded-2xl backdrop-blur-sm border-2 flex items-center justify-center transition-all",
+                      showFilters 
+                        ? "bg-amber-500/20 border-amber-400/50 text-amber-400" 
+                        : "bg-white/10 border-white/20 text-white"
+                    )}
+                  >
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                    {activeFilter && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full shadow-glow"></div>
+                    )}
+                  </motion.button>
+                </div>
               </div>
               
               {/* Quick Settings Strip */}
@@ -1065,6 +1131,226 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                 {filterNotification} Applied
               </span>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Gallery Modal */}
+      <AnimatePresence>
+        {showGallery && capturedImages.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4"
+            onClick={() => setShowGallery(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="max-w-4xl w-full bg-black/80 backdrop-blur-xl rounded-3xl border border-white/20 overflow-hidden"
+            >
+              {/* Gallery Header */}
+              <div className="p-6 border-b border-white/10 flex justify-between items-center">
+                <div>
+                  <h3 className="text-white font-title text-xl font-bold">Gallery ({capturedImages.length})</h3>
+                  <p className="text-white/60 text-sm mt-1">
+                    Recent captures • {capturedImages.length > 0 ? 
+                      capturedImages[selectedImageIndex].timestamp.toLocaleDateString() : ''
+                    }
+                  </p>
+                </div>
+                <div className="flex items-center space-x-3">
+                  {/* Clear All Button */}
+                  {capturedImages.length > 1 && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setCapturedImages([]);
+                        setShowGallery(false);
+                      }}
+                      className="flex items-center space-x-2 px-3 py-2 bg-red-500/20 border border-red-400/50 text-red-400 rounded-lg text-sm hover:bg-red-500/30 transition-all"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      <span>Clear All</span>
+                    </motion.button>
+                  )}
+                  {/* Close Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setShowGallery(false)}
+                    className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all"
+                  >
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </motion.button>
+                </div>
+              </div>
+
+              {/* Main Image Display */}
+              <div className="p-6">
+                <div className="relative aspect-video bg-black rounded-2xl overflow-hidden mb-4">
+                  <img
+                    src={capturedImages[selectedImageIndex].dataUrl}
+                    alt={`Captured image ${selectedImageIndex + 1}`}
+                    className="w-full h-full object-contain"
+                  />
+                  
+                  {/* Image Info Overlay */}
+                  <div className="absolute top-4 left-4 space-y-2">
+                    <div className="px-3 py-1 bg-black/70 rounded-full border border-white/20">
+                      <span className="text-white text-sm font-mono">
+                        {capturedImages[selectedImageIndex].timestamp.toLocaleString()}
+                      </span>
+                    </div>
+                    {capturedImages[selectedImageIndex].filter && (
+                      <div className="px-3 py-1 bg-amber-500/20 border border-amber-400/30 rounded-full">
+                        <span className="text-amber-400 text-sm font-medium">
+                          {capturedImages[selectedImageIndex].filter}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Navigation Arrows */}
+                  {capturedImages.length > 1 && (
+                    <>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setSelectedImageIndex(prev => 
+                          prev > 0 ? prev - 1 : capturedImages.length - 1
+                        )}
+                        className="absolute left-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/50 rounded-full border border-white/20 text-white hover:bg-black/70 transition-all"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </motion.button>
+                      
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => setSelectedImageIndex(prev => 
+                          prev < capturedImages.length - 1 ? prev + 1 : 0
+                        )}
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 p-3 bg-black/50 rounded-full border border-white/20 text-white hover:bg-black/70 transition-all"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </motion.button>
+                    </>
+                  )}
+                  
+                  {/* Image Counter */}
+                  <div className="absolute top-4 right-4 px-3 py-1 bg-black/50 rounded-full border border-white/20">
+                    <span className="text-white text-sm font-mono">
+                      {selectedImageIndex + 1} / {capturedImages.length}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Thumbnail Strip */}
+                {capturedImages.length > 1 && (
+                  <div className="flex space-x-3 overflow-x-auto pb-2">
+                    {capturedImages.map((image, index) => (
+                      <motion.button
+                        key={image.id}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setSelectedImageIndex(index)}
+                        className={cn(
+                          "relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0",
+                          selectedImageIndex === index 
+                            ? "border-electric-400 shadow-glow" 
+                            : "border-white/20 hover:border-white/40"
+                        )}
+                      >
+                        <img
+                          src={image.dataUrl}
+                          alt={`Thumbnail ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        {selectedImageIndex === index && (
+                          <div className="absolute inset-0 bg-electric-400/20"></div>
+                        )}
+                        {/* Filter indicator */}
+                        {image.filter && (
+                          <div className="absolute bottom-1 left-1 w-2 h-2 bg-amber-400 rounded-full"></div>
+                        )}
+                        {/* Time indicator */}
+                        <div className="absolute bottom-0 right-0 px-1 bg-black/70 text-white text-xs">
+                          {image.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </motion.button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex justify-center space-x-4 mt-6">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      const selectedImage = capturedImages[selectedImageIndex];
+                      const timestamp = selectedImage.timestamp.toISOString().replace(/[:.]/g, '-');
+                      const filterSuffix = selectedImage.filter ? `-${selectedImage.filter.replace(/\s+/g, '-').toLowerCase()}` : '';
+                      downloadImage(selectedImage.dataUrl, `blue-cam-${timestamp}${filterSuffix}.jpg`);
+                    }}
+                    className="flex items-center space-x-2 px-6 py-3 bg-emerald-600 text-white rounded-xl font-medium shadow-glow hover:bg-emerald-700 transition-all"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Download</span>
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setShowGallery(false);
+                      if (onPageChange) {
+                        onPageChange('editor');
+                      }
+                    }}
+                    className="flex items-center space-x-2 px-6 py-3 bg-electric-600 text-white rounded-xl font-medium shadow-glow hover:bg-electric-700 transition-all"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <span>Edit</span>
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setCapturedImages(prev => prev.filter((_, index) => index !== selectedImageIndex));
+                      setSelectedImageIndex(prev => Math.min(prev, capturedImages.length - 2));
+                      if (capturedImages.length <= 1) {
+                        setShowGallery(false);
+                      }
+                    }}
+                    className="flex items-center space-x-2 px-6 py-3 bg-red-600 text-white rounded-xl font-medium shadow-glow hover:bg-red-700 transition-all"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span>Delete</span>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
