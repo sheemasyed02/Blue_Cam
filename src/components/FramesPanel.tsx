@@ -30,106 +30,106 @@ export const FramesPanel = ({ selectedImage, onFrameApply, activeFrame }: Frames
     {
       id: 'classic',
       name: 'Classic White',
-      description: 'Traditional white photo frame',
+      description: 'Traditional white photo frame with matting',
       category: 'classic',
       style: {
-        border: '20px solid #ffffff',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(0,0,0,0.1)',
-        background: '#ffffff'
+        padding: '20px',
+        background: 'linear-gradient(145deg, #ffffff, #f0f0f0)',
+        border: '1px solid #e0e0e0',
+        boxShadow: 'inset 0 0 0 8px #ffffff, inset 0 0 0 9px #d0d0d0, 0 5px 15px rgba(0,0,0,0.2)',
+        borderRadius: '2px'
       }
     },
     {
       id: 'polaroid',
       name: 'Polaroid Instant',
-      description: 'Authentic instant camera look',
+      description: 'Authentic instant camera photo look',
       category: 'vintage',
       style: {
-        border: '20px solid #ffffff',
-        borderBottom: '80px solid #ffffff',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
-        transform: 'rotate(-1.5deg)',
+        padding: '15px 15px 60px 15px',
         background: '#ffffff',
-        position: 'relative' as const
+        boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+        transform: 'rotate(-1.2deg)',
+        borderRadius: '3px'
       }
     },
     {
       id: 'filmstrip',
       name: 'Film Strip 35mm',
-      description: 'Professional film with perforations',
+      description: 'Professional film with authentic perforations',
       category: 'vintage',
       style: {
-        border: '20px solid #1a1a1a',
-        borderLeft: '50px solid #1a1a1a',
-        borderRight: '50px solid #1a1a1a',
-        boxShadow: '0 6px 25px rgba(0,0,0,0.4)',
+        padding: '20px 40px',
         background: '#1a1a1a',
+        border: '2px solid #0a0a0a',
+        boxShadow: '0 6px 25px rgba(0,0,0,0.5)',
         position: 'relative' as const
       }
     },
     {
       id: 'photobooth',
       name: 'Photo Booth Strip',
-      description: 'Classic 4-photo booth strip',
+      description: 'Classic 4-photo booth strip layout',
       category: 'special',
       requiresMultiple: true,
       style: {
-        border: '15px solid #ffffff',
-        borderTop: '40px solid #ffffff',
-        borderBottom: '40px solid #ffffff',
-        boxShadow: 'inset 0 0 0 3px #000000, 0 8px 30px rgba(0,0,0,0.3)',
-        background: '#ffffff',
-        position: 'relative' as const
+        border: '12px solid #ffffff',
+        borderTop: '30px solid #ffffff',
+        borderBottom: '30px solid #ffffff',
+        boxShadow: 'inset 0 0 0 2px #000000, 0 6px 25px rgba(0,0,0,0.3)',
+        background: '#ffffff'
       }
     },
     {
       id: 'aesthetic',
-      name: 'Aesthetic Minimal',
-      description: 'Clean Pinterest-style frame',
+      name: 'Modern Minimal',
+      description: 'Clean contemporary frame design',
       category: 'modern',
       style: {
-        border: '30px solid #f8f9fa',
+        padding: '25px',
+        background: 'linear-gradient(135deg, #fafafa, #f5f5f5)',
         borderRadius: '12px',
-        boxShadow: '0 12px 40px rgba(0,0,0,0.08)',
-        background: '#f8f9fa'
+        boxShadow: '0 12px 40px rgba(0,0,0,0.1)',
+        border: '1px solid rgba(255,255,255,0.8)'
       }
     },
     {
       id: 'vintage',
       name: 'Vintage Wood',
-      description: 'Aged wooden frame effect',
+      description: 'Rich wooden frame with corner details',
       category: 'vintage',
       style: {
-        border: '25px solid #8B4513',
-        borderRadius: '4px',
-        boxShadow: 'inset 0 0 0 2px #654321, 0 8px 25px rgba(0,0,0,0.3)',
-        background: 'linear-gradient(45deg, #8B4513, #A0522D)',
-        position: 'relative' as const
+        padding: '30px',
+        background: 'linear-gradient(45deg, #8B4513, #A0522D, #8B4513)',
+        borderRadius: '8px',
+        boxShadow: 'inset 0 0 0 4px #654321, 0 8px 25px rgba(0,0,0,0.4)',
+        border: '2px solid #654321'
       }
     },
     {
       id: 'golden',
       name: 'Ornate Gold',
-      description: 'Luxurious golden frame',
+      description: 'Luxurious golden frame with decorative elements',
       category: 'classic',
       style: {
-        border: '30px solid #DAA520',
-        borderRadius: '8px',
-        boxShadow: 'inset 0 0 0 3px #FFD700, inset 0 0 0 6px #B8860B, 0 10px 35px rgba(0,0,0,0.25)',
+        padding: '25px',
         background: 'linear-gradient(45deg, #DAA520, #FFD700, #DAA520)',
-        position: 'relative' as const
+        borderRadius: '12px',
+        boxShadow: 'inset 0 0 0 3px #FFD700, inset 0 0 0 6px #B8860B, 0 10px 35px rgba(0,0,0,0.3)',
+        border: '2px solid #B8860B'
       }
     },
     {
       id: 'scrapbook',
       name: 'Scrapbook Memory',
-      description: 'Decorative scrapbook style',
+      description: 'Decorative scrapbook style with stickers',
       category: 'decorative',
       style: {
-        border: '25px solid #faf0e6',
-        borderRadius: '8px',
-        boxShadow: 'inset 0 0 0 4px #d4af37, 0 8px 30px rgba(0,0,0,0.2)',
+        padding: '20px',
         background: 'linear-gradient(135deg, #faf0e6, #f5deb3)',
-        position: 'relative' as const
+        borderRadius: '8px',
+        boxShadow: 'inset 0 0 0 3px #d4af37, 0 8px 30px rgba(0,0,0,0.2)',
+        border: '1px solid #d4af37'
       }
     }
   ];

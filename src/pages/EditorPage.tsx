@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../utils';
+import { cn, saveFramedImage, savePhotobooth } from '../utils';
 import { Navigation, FiltersPanel, FramesPanel, FrameRenderer, AdjustmentsPanel, ExportPanel, type ImageAdjustments } from '../components';
 
 interface EditorPageProps {
@@ -104,6 +104,8 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
   const [currentFilter, setCurrentFilter] = useState<string>('');
   const [currentFrame, setCurrentFrame] = useState<string>('');
   const [frameData, setFrameData] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const frameRef = useRef<HTMLDivElement>(null);
   const [currentAdjustments, setCurrentAdjustments] = useState<ImageAdjustments>({
     brightness: 100,
     contrast: 100,
@@ -194,6 +196,36 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
     // For complex frames like photobooth, the FramesPanel handles the logic
     setProcessedImage(selectedImage);
   }, [selectedImage]);
+
+  const handleSaveImage = useCallback(async () => {
+    if (!selectedImage) return;
+    
+    setIsSaving(true);
+    
+    try {
+      if (currentFrame === 'photobooth' && frameData?.images) {
+        // Save photobooth strip
+        await savePhotobooth(frameData.images, 'serelune-photobooth');
+      } else if (frameRef.current) {
+        // Save regular framed image
+        const frameName = currentFrame === 'none' || !currentFrame ? 'original' : currentFrame;
+        await saveFramedImage(frameRef.current, `serelune-${frameName}`);
+      } else {
+        // Fallback: save original image
+        const link = document.createElement('a');
+        link.href = selectedImage;
+        link.download = `serelune-photo-${new Date().toISOString().split('T')[0]}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error('Error saving image:', error);
+      alert('Failed to save image. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [selectedImage, currentFrame, frameData]);
 
   const applyPreset = useCallback((filter: string) => {
     if (!selectedImage) return;
@@ -477,15 +509,15 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
             "order-1 lg:order-2"
           )}>
             <div className={cn(
-              "bg-white rounded-lg shadow-lg overflow-hidden",
+              "bg-white rounded-lg shadow-lg overflow-hidden relative",
               // Mobile: Smaller border radius
               "rounded-lg lg:rounded-xl"
             )}>
               {selectedImage ? (
                 <div className={cn(
-                  "relative",
+                  "relative min-h-[400px] flex items-center justify-center",
                   // Mobile: Responsive aspect ratio
-                  "aspect-[4/3] lg:aspect-video"
+                  "aspect-[4/3] lg:aspect-auto lg:min-h-[500px]"
                 )}>
                   {processedImage && selectedImage !== processedImage ? (
                     <div className="w-full h-full">
@@ -496,7 +528,7 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                       />
                     </div>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center p-4">
+                    <div className="w-full h-full flex items-center justify-center p-4" ref={frameRef}>
                       {currentFrame && currentFrame !== 'none' ? (
                         currentFrame === 'photobooth' ? (
                           frameData?.images && frameData.images.length > 0 ? (
@@ -523,12 +555,14 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                             </div>
                           )
                         ) : (
-                          <FrameRenderer 
-                            frameId={currentFrame}
-                            image={selectedImage}
-                            frameData={frameData}
-                            className="max-w-full max-h-full"
-                          />
+                          <div className="max-w-full max-h-full flex items-center justify-center">
+                            <FrameRenderer 
+                              frameId={currentFrame}
+                              image={selectedImage}
+                              frameData={frameData}
+                              className="max-w-[90%] max-h-[90%] w-auto h-auto"
+                            />
+                          </div>
                         )
                       ) : (
                         <img 
@@ -540,6 +574,35 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                     </div>
                   )}
                   
+                  {/* Save Button */}
+                  {selectedImage && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleSaveImage}
+                      disabled={isSaving}
+                      className={cn(
+                        "absolute top-4 left-4 px-4 py-2 rounded-lg font-body font-medium transition-all shadow-lg",
+                        "text-white backdrop-blur-sm",
+                        isSaving 
+                          ? "bg-gray-500 cursor-not-allowed" 
+                          : "bg-serelune-500 hover:bg-serelune-600"
+                      )}
+                    >
+                      {isSaving ? (
+                        <div className="flex items-center space-x-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Saving...</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <span>💾</span>
+                          <span>Save Image</span>
+                        </div>
+                      )}
+                    </motion.button>
+                  )}
+
                   {/* Change Image Button */}
                   <motion.button
                     whileHover={{ scale: 1.05 }}
