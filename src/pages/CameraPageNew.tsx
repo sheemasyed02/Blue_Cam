@@ -52,12 +52,34 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   // Gallery modal state
   const [showGallery, setShowGallery] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  
+  // Camera preview for filter thumbnails
+  const [cameraPreview, setCameraPreview] = useState<string | null>(null);
 
   const videoConstraints = {
     width: 1920,
     height: 1080,
     facingMode: facingMode
   };
+
+  // Capture current camera view for filter previews
+  const capturePreview = useCallback(() => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      setCameraPreview(imageSrc);
+      return imageSrc;
+    }
+    return null;
+  }, []);
+
+  // Update preview when filters panel opens
+  const handleFiltersToggle = useCallback(() => {
+    if (!showFilters) {
+      // Opening filters - capture preview
+      capturePreview();
+    }
+    setShowFilters(!showFilters);
+  }, [showFilters, capturePreview]);
 
   const capture = useCallback(() => {
     if (webcamRef.current && filmCount > 0) {
@@ -569,7 +591,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   <div className="overflow-x-auto">
                     <div className="flex space-x-3 pb-2">
                       {/* Original/No Filter */}
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 w-20">
                         <button
                           onClick={() => {
                             setActiveFilter('');
@@ -577,19 +599,27 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                             setTimeout(() => setFilterNotification(null), 2000);
                           }}
                           className={cn(
-                            "flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
+                            "w-full flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
                             !activeFilter 
                               ? "bg-serelune-500/20 border-2 border-serelune-400" 
                               : "bg-white/30 border-2 border-transparent hover:border-serelune-300"
                           )}
                         >
                           <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 flex items-center justify-center">
-                            <svg className="w-8 h-8 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            {cameraPreview ? (
+                              <img 
+                                src={cameraPreview} 
+                                alt="Original preview"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <svg className="w-8 h-8 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            )}
                           </div>
                           <span className={cn(
-                            "text-xs font-medium text-center",
+                            "text-xs font-medium text-center w-full truncate",
                             !activeFilter ? "text-serelune-700" : "text-moonlight-600"
                           )}>Original</span>
                         </button>
@@ -597,7 +627,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
 
                       {/* Filter Options */}
                       {vintageFilters.map((filter) => (
-                        <div key={filter.id} className="flex-shrink-0">
+                        <div key={filter.id} className="flex-shrink-0 w-20">
                           <button
                             onClick={() => {
                               setActiveFilter(filter.cssFilter);
@@ -605,21 +635,29 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                               setTimeout(() => setFilterNotification(null), 2000);
                             }}
                             className={cn(
-                              "flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
+                              "w-full flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
                               activeFilter === filter.cssFilter 
                                 ? "bg-serelune-500/20 border-2 border-serelune-400" 
                                 : "bg-white/30 border-2 border-transparent hover:border-serelune-300"
                             )}
                           >
                             <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 relative">
-                              {/* Filter preview placeholder */}
-                              <div 
-                                className="w-full h-full bg-gradient-to-br from-serelune-200 to-blush-200"
-                                style={{ filter: filter.cssFilter }}
-                              ></div>
+                              {cameraPreview ? (
+                                <img 
+                                  src={cameraPreview} 
+                                  alt={`${filter.name} preview`}
+                                  className="w-full h-full object-cover"
+                                  style={{ filter: filter.cssFilter }}
+                                />
+                              ) : (
+                                <div 
+                                  className="w-full h-full bg-gradient-to-br from-serelune-200 to-blush-200"
+                                  style={{ filter: filter.cssFilter }}
+                                ></div>
+                              )}
                             </div>
                             <span className={cn(
-                              "text-xs font-medium text-center",
+                              "text-xs font-medium text-center w-full truncate",
                               activeFilter === filter.cssFilter ? "text-serelune-700" : "text-moonlight-600"
                             )}>{filter.name}</span>
                           </button>
@@ -783,7 +821,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowFilters(!showFilters)}
+                    onClick={handleFiltersToggle}
                     className={cn(
                       "rounded-2xl backdrop-blur-sm border-2 flex items-center justify-center transition-all",
                       // Mobile: Smaller size
@@ -1225,8 +1263,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   className={cn(
                     "w-full p-4 rounded-xl border-2 text-left transition-all",
                     !activeFilter
-                      ? "bg-electric-500/20 border-electric-400/50 text-electric-400"
-                      : "bg-white/10 border-white/20 text-white hover:bg-white/20"
+                      ? "bg-serelune-500/20 border-serelune-400/50 text-serelune-700"
+                      : "bg-white/10 border-white/20 text-moonlight-800 hover:bg-white/20 hover:text-serelune-700"
                   )}
                 >
                   <div className="flex items-center space-x-3">
@@ -1256,17 +1294,26 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     className={cn(
                       "w-full p-4 rounded-xl border-2 text-left transition-all",
                       activeFilter === filter.cssFilter
-                        ? "bg-amber-500/20 border-amber-400/50 text-amber-400"
-                        : "bg-white/10 border-white/20 text-white hover:bg-white/20"
+                        ? "bg-serelune-500/20 border-serelune-400/50 text-serelune-700"
+                        : "bg-white/10 border-white/20 text-moonlight-800 hover:bg-white/20 hover:text-serelune-700"
                     )}
                   >
                     <div className="flex items-center space-x-3">
                       {/* Filter Preview */}
                       <div className="w-12 h-12 rounded-lg overflow-hidden border border-white/30">
-                        <div 
-                          className="w-full h-full bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100"
-                          style={{ filter: filter.cssFilter }}
-                        />
+                        {cameraPreview ? (
+                          <img 
+                            src={cameraPreview}
+                            alt={`${filter.name} preview`}
+                            className="w-full h-full object-cover"
+                            style={{ filter: filter.cssFilter }}
+                          />
+                        ) : (
+                          <div 
+                            className="w-full h-full bg-gradient-to-br from-blue-200 via-green-100 to-yellow-100"
+                            style={{ filter: filter.cssFilter }}
+                          />
+                        )}
                       </div>
                       
                       {/* Filter Info */}
@@ -1277,7 +1324,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       
                       {/* Active Indicator */}
                       {activeFilter === filter.cssFilter && (
-                        <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-serelune-500 rounded-full animate-pulse"></div>
                       )}
                     </div>
                   </motion.button>
