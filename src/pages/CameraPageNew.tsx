@@ -373,13 +373,17 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
 
   const deleteVideo = (videoId: string) => {
     setRecordedVideos(prev => {
-      const updated = prev.filter(video => video.id !== videoId);
-      // Clean up object URL to prevent memory leaks
-      const videoToDelete = prev.find(video => video.id !== videoId);
+      // Find the video to delete for cleanup
+      const videoToDelete = prev.find(video => video.id === videoId);
       if (videoToDelete) {
+        // Clean up object URLs to prevent memory leaks
         URL.revokeObjectURL(videoToDelete.url);
+        if (videoToDelete.thumbnail) {
+          URL.revokeObjectURL(videoToDelete.thumbnail);
+        }
       }
-      return updated;
+      // Return filtered array without the deleted video
+      return prev.filter(video => video.id !== videoId);
     });
   };
 
@@ -797,11 +801,29 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={retakeVideo}
-                          className="p-4 bg-red-400/90 text-white rounded-xl backdrop-blur-sm shadow-soft border border-red-300/50"
+                          className="p-4 bg-gray-400/90 text-white rounded-xl backdrop-blur-sm shadow-soft border border-gray-300/50"
                         >
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                        </motion.button>
+                        
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => {
+                            if (recordedVideos.length > 0) {
+                              const latestVideoId = recordedVideos[recordedVideos.length - 1].id;
+                              deleteVideo(latestVideoId);
+                              setCapturedVideo(null);
+                            }
+                          }}
+                          className="p-4 bg-red-400/90 text-white rounded-xl backdrop-blur-sm shadow-soft border border-red-300/50"
+                        >
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </motion.button>
                         
@@ -1339,48 +1361,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       </svg>
                     </motion.button>
                   )}
-
-                  {/* Photobooth Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowPhotoboothSettings(true)}
-                    disabled={isCapturing || isPhotoboothActive}
-                    className="relative flex items-center justify-center disabled:opacity-50"
-                    title="Start Photobooth Mode"
-                  >
-                    <motion.div
-                      className={cn(
-                        "rounded-2xl border-2 bg-gradient-to-br shadow-glow p-1",
-                        isPhotoboothActive 
-                          ? "border-serelune-400 from-serelune-500 to-blush-500" 
-                          : "border-moonlight-400/70 from-moonlight-300/20 to-serelune-300/20",
-                        // Mobile: Match other icons size
-                        "w-14 h-14 lg:w-18 lg:h-18"
-                      )}
-                      animate={isPhotoboothActive ? { scale: [1, 1.1, 1] } : {}}
-                      transition={{ duration: 0.3, repeat: isPhotoboothActive ? Infinity : 0 }}
-                    >
-                      <div className="w-full h-full rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
-                        {/* Photobooth strip icon with camera */}
-                        <div className="relative w-8 h-8 lg:w-10 lg:h-10">
-                          {/* Photo strip background */}
-                          <div className="w-full h-full bg-white/90 rounded-md border border-white/40 shadow-sm">
-                            {/* Three photo frames in strip */}
-                            <div className="flex flex-col h-full p-0.5 gap-0.5">
-                              <div className="flex-1 bg-purple-400/30 rounded-sm"></div>
-                              <div className="flex-1 bg-purple-400/30 rounded-sm"></div>
-                              <div className="flex-1 bg-purple-400/30 rounded-sm"></div>
-                            </div>
-                          </div>
-                          {/* Small camera icon overlay */}
-                          <div className="absolute -top-1 -right-1 w-3 h-3 lg:w-4 lg:h-4 bg-purple-500 rounded-full flex items-center justify-center border border-white/60">
-                            <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-white rounded-full"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </motion.button>
                 </div>
                 
                 {/* Center Section - Main Capture Button */}
