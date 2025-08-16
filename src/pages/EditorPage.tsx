@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils';
-import { Navigation, FiltersPanel, AdjustmentsPanel, ExportPanel, type ImageAdjustments } from '../components';
+import { Navigation, FiltersPanel, FramesPanel, FrameRenderer, AdjustmentsPanel, ExportPanel, type ImageAdjustments } from '../components';
 
 interface EditorPageProps {
   className?: string;
@@ -102,6 +102,8 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
   const [selectedImage, setSelectedImage] = useState<string | null>(initialImage || null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [currentFilter, setCurrentFilter] = useState<string>('');
+  const [currentFrame, setCurrentFrame] = useState<string>('');
+  const [frameData, setFrameData] = useState<any>(null);
   const [currentAdjustments, setCurrentAdjustments] = useState<ImageAdjustments>({
     brightness: 100,
     contrast: 100,
@@ -181,6 +183,17 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
     },
     multiple: false
   });
+
+  const applyFrame = useCallback((frameId: string, frameData?: any) => {
+    if (!selectedImage) return;
+    
+    setCurrentFrame(frameId);
+    setFrameData(frameData);
+    
+    // For simple frames, just update the current frame
+    // For complex frames like photobooth, the FramesPanel handles the logic
+    setProcessedImage(selectedImage);
+  }, [selectedImage]);
 
   const applyPreset = useCallback((filter: string) => {
     if (!selectedImage) return;
@@ -331,34 +344,11 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
 
       case 'frames':
         return (
-          <div className="space-y-4">
-            <h3 className="font-title font-semibold text-charcoal text-lg mb-4">Photo Frames</h3>
-            <div className="grid grid-cols-1 gap-3">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                disabled={!selectedImage}
-                className="p-4 bg-white rounded-lg border-2 border-transparent hover:border-serelune-400
-                         disabled:opacity-50 disabled:cursor-not-allowed transition-all
-                         text-left shadow-soft hover:shadow-glow"
-              >
-                <div className="font-body font-medium text-serelune-700">Classic Border</div>
-                <div className="text-xs text-serelune-500/70 mt-1">White vintage frame</div>
-              </motion.button>
-              
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                disabled={!selectedImage}
-                className="p-4 bg-white rounded-lg border-2 border-transparent hover:border-serelune-400
-                         disabled:opacity-50 disabled:cursor-not-allowed transition-all
-                         text-left shadow-soft hover:shadow-glow"
-              >
-                <div className="font-body font-medium text-serelune-700">Film Strip</div>
-                <div className="text-xs text-serelune-500/70 mt-1">Retro film edge effect</div>
-              </motion.button>
-            </div>
-          </div>
+          <FramesPanel
+            selectedImage={selectedImage}
+            onFrameApply={applyFrame}
+            activeFrame={currentFrame}
+          />
         );
 
       case 'export':
@@ -498,17 +488,56 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                   "aspect-[4/3] lg:aspect-video"
                 )}>
                   {processedImage && selectedImage !== processedImage ? (
-                    <BeforeAfterSlider 
-                      beforeImage={selectedImage}
-                      afterImage={processedImage}
-                      className="w-full h-full"
-                    />
+                    <div className="w-full h-full">
+                      <BeforeAfterSlider 
+                        beforeImage={selectedImage}
+                        afterImage={processedImage}
+                        className="w-full h-full"
+                      />
+                    </div>
                   ) : (
-                    <img 
-                      src={selectedImage} 
-                      alt="Selected" 
-                      className="w-full h-full object-cover"
-                    />
+                    <div className="w-full h-full flex items-center justify-center p-4">
+                      {currentFrame && currentFrame !== 'none' ? (
+                        currentFrame === 'photobooth' ? (
+                          frameData?.images && frameData.images.length > 0 ? (
+                            <div className="w-full max-w-xs mx-auto">
+                              <FrameRenderer 
+                                frameId={currentFrame}
+                                image={selectedImage}
+                                frameData={frameData}
+                                className="w-full"
+                              />
+                            </div>
+                          ) : (
+                            <div className="text-center p-8">
+                              <div className="text-6xl mb-4">📸</div>
+                              <h3 className="font-title text-xl text-serelune-700 mb-2">
+                                Photo Booth Strip
+                              </h3>
+                              <p className="font-body text-serelune-600/80 mb-4">
+                                Upload up to 4 photos to create your photo booth strip
+                              </p>
+                              <p className="font-body text-sm text-serelune-500/70">
+                                Use the Frames panel to add photos
+                              </p>
+                            </div>
+                          )
+                        ) : (
+                          <FrameRenderer 
+                            frameId={currentFrame}
+                            image={selectedImage}
+                            frameData={frameData}
+                            className="max-w-full max-h-full"
+                          />
+                        )
+                      ) : (
+                        <img 
+                          src={selectedImage} 
+                          alt="Selected" 
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      )}
+                    </div>
                   )}
                   
                   {/* Change Image Button */}
