@@ -12,104 +12,92 @@ export const vintageFilters: FilterEffect[] = [
   {
     name: 'Blue Jeans',
     id: 'blue-jeans',
-    cssFilter: 'brightness(95%) contrast(80%) saturate(30%) hue-rotate(200deg) sepia(25%) blur(0.4px)',
-    description: 'Vintage glamour smoky romance - almost monochrome with faint silver-blue tones'
+    cssFilter: 'brightness(95%) contrast(135%) saturate(0%) grayscale(100%) sepia(5%) blur(0.3px)',
+    description: 'Cinematic black & white film noir - moody crushed blacks, soft vintage skin, dreamy faded contrast'
   },
   {
     name: 'Born to Die',
     id: 'born-to-die',
-    cssFilter: 'brightness(95%) contrast(85%) saturate(70%) hue-rotate(320deg) sepia(20%) blur(0.35px)',
-    description: 'Pastel faded cinematic romance - muted blue/silver with dreamy film still aesthetic'
+    cssFilter: 'brightness(100%) contrast(125%) saturate(95%) hue-rotate(340deg) sepia(10%) blur(0.4px)',
+    description: 'Cinematic oil painting elegance - creamy skin, bold vintage red lips, muted pastel background with dreamy soft focus'
   },
   {
     name: 'West Coast',
     id: 'west-coast',
-    cssFilter: 'brightness(95%) contrast(120%) saturate(90%) hue-rotate(25deg) sepia(10%) blur(0.25px)',
-    description: 'Rebellious California noir - warm golden haze with deep shadows and gritty film grain'
+    cssFilter: 'brightness(95%) contrast(140%) saturate(0%) grayscale(100%) sepia(5%) blur(0.2px)',
+    description: 'Cinematic B&W film noir - raw vintage 35mm film with crushed blacks, glowing highlights, and gritty texture'
   },
   {
     name: 'Young & Beautiful',
     id: 'young-beautiful',
-    cssFilter: 'brightness(105%) contrast(90%) saturate(80%) hue-rotate(330deg) sepia(15%) blur(0.4px)',
-    description: 'Elegant silvery romantic - pale pastel skin tones with ethereal glow and vintage glamour'
+    cssFilter: 'brightness(105%) contrast(110%) saturate(85%) hue-rotate(340deg) sepia(15%) blur(0.6px)',
+    description: 'Old Hollywood film still - creamy candlelight glow, vintage matte red lips, faded soft focus like 1950s projection'
   },
   {
     name: 'Summertime Sadness',
     id: 'summertime-sadness',
-    cssFilter: 'brightness(95%) contrast(85%) saturate(80%) hue-rotate(25deg) sepia(20%) blur(0.5px)',
-    description: 'Dreamy nostalgic warm tragedy - faded summer film reels with golden haze and soft tragic-romantic glow'
+    cssFilter: 'brightness(102%) contrast(85%) saturate(75%) hue-rotate(20deg) sepia(25%) blur(0.4px)',
+    description: 'Dreamy 1970s film aesthetic - warm golden vintage mood, muted pastels, soft light leak glow with faded matte blacks'
   },
   {
     name: 'Honeymoon',
     id: 'honeymoon',
-    cssFilter: 'brightness(105%) contrast(90%) saturate(75%) hue-rotate(15deg) sepia(15%) blur(0.4px)',
-    description: 'Luxurious vintage cinematic postcard - muted warm tones with 1960s glam filter and pinkish-magenta romance'
-  },
-  {
-    name: 'Ride',
-    id: 'ride',
-    cssFilter: 'brightness(100%) contrast(90%) saturate(85%) hue-rotate(30deg) sepia(10%) blur(0.3px)',
-    description: 'Cinematic Americana - dusty golden deserts, faded vintage road-trip freedom with gritty film grain'
+    cssFilter: 'brightness(105%) contrast(75%) saturate(80%) hue-rotate(10deg) sepia(15%) blur(0.6px)',
+    description: 'VHS dreamy vintage postcard - soft pastel colors, washed-out film grain, faded daylight tape aesthetic'
   },
   {
     name: 'Love',
     id: 'love',
-    cssFilter: 'brightness(110%) contrast(85%) saturate(80%) hue-rotate(330deg) sepia(20%) blur(0.6px)',
-    description: 'Ethereal cosmic dream - soft glowing pastels with outer-space surreal tones and heavenly glow'
-  },
-  {
-    name: 'Doin\' Time',
-    id: 'doin-time',
-    cssFilter: 'brightness(105%) contrast(95%) saturate(85%) hue-rotate(20deg) sepia(20%) blur(0.35px)',
-    description: 'Retro California dream - 90s VHS summer haze with faded beach tones and laid-back vintage feel'
+    cssFilter: 'brightness(115%) contrast(85%) saturate(85%) hue-rotate(340deg) sepia(25%) blur(0.5px)',
+    description: 'Ethereal overexposed glow - warm golden pastels, creamy skin, dreamy faded film with lifted shadows and milky highlights'
   },
   {
     name: 'Cherry',
     id: 'cherry',
-    cssFilter: 'brightness(90%) contrast(115%) saturate(90%) hue-rotate(350deg) sepia(10%) blur(0.3px)',
-    description: 'Intimate raw sultry passion - deep reds, smoky shadows, moody cinematic spotlight with dark glamour'
+    cssFilter: 'brightness(100%) contrast(90%) saturate(0%) grayscale(100%) sepia(10%) blur(0.35px)',
+    description: 'Vintage monochrome film - faded blacks, muted whites, soft glow with authentic 1960s black-and-white TV aesthetic'
   },
   {
     name: 'Venice Bitch',
     id: 'venice-bitch',
-    cssFilter: 'brightness(105%) contrast(85%) saturate(80%) hue-rotate(15deg) sepia(25%) blur(0.5px)',
-    description: 'Psychedelic dreamy Americana - faded film tones with golden haze and surreal washed retro pastels'
+    cssFilter: 'brightness(102%) contrast(85%) saturate(90%) hue-rotate(25deg) sepia(25%) blur(0.5px)',
+    description: 'Warm faded Super-8 film - golden sunset tones, lifted shadows, heavy grain with dreamy home-movie retro feel'
   },
   {
     name: 'Brooklyn Baby',
     id: 'brooklyn-baby',
-    cssFilter: 'brightness(100%) contrast(95%) saturate(85%) hue-rotate(320deg) sepia(15%) blur(0.25px)',
-    description: 'Hip ironic vintage NYC - muted urban tones with playful 70s-retro styling and cool city vibes'
+    cssFilter: 'brightness(110%) contrast(135%) saturate(0%) grayscale(100%) sepia(5%) blur(0.2px)',
+    description: 'Cinematic black & white film - glowing skin, sharp contrast, soft S-curve with vintage grain and dark edges'
   },
   {
     name: 'Shades of Cool',
     id: 'shades-of-cool',
-    cssFilter: 'brightness(95%) contrast(85%) saturate(80%) hue-rotate(180deg) sepia(25%) blur(0.7px)',
-    description: 'Ethereal underwater haze - glowing cyan/teal tones, ghostly softness, surreal dreamy cinematic blur'
+    cssFilter: 'brightness(75%) contrast(125%) saturate(130%) hue-rotate(280deg) sepia(20%) blur(0.4px)',
+    description: 'Dark neon VHS aesthetic - deep shadows, bright cyan/magenta tinting, chromatic aberration glow with dreamy haze'
   },
   {
     name: 'Ultraviolence',
     id: 'ultraviolence',
-    cssFilter: 'brightness(85%) contrast(110%) saturate(70%) hue-rotate(0deg) sepia(20%) blur(0.25px)',
-    description: 'Raw dark vintage noir - faded blacks, muted grays, gritty Americana with moody cinema spotlight'
+    cssFilter: 'brightness(130%) contrast(70%) saturate(80%) hue-rotate(15deg) sepia(30%) blur(0.5px)',
+    description: 'Overexposed dreamy film fade - blown-out highlights, crushed shadows, matte vintage with warm haze and soft focus'
   },
   {
     name: 'Terrence Loves You',
     id: 'terrence-loves-you',
-    cssFilter: 'brightness(95%) contrast(85%) saturate(75%) hue-rotate(210deg) sepia(20%) blur(0.6px)',
-    description: 'Spacey haunting jazz-lounge - muted blues, smoky atmosphere, dreamy mist with cool vintage sadness'
+    cssFilter: 'brightness(97%) contrast(110%) saturate(95%) hue-rotate(45deg) sepia(15%) blur(0.35px)',
+    description: 'Moody cinematic warmth - golden tone, lifted shadows, soft film grain with vintage jazz-lounge atmosphere'
   },
   {
     name: 'Mariners Apartment Complex',
     id: 'mariners-apartment-complex',
-    cssFilter: 'brightness(100%) contrast(90%) saturate(80%) hue-rotate(200deg) sepia(15%) blur(0.4px)',
-    description: 'Moody coastal twilight - soft blues, golden dusk, faded film feel with dreamy ocean melancholy'
+    cssFilter: 'brightness(100%) contrast(85%) saturate(0%) grayscale(100%) sepia(15%) blur(0.5px)',
+    description: 'Film B&W vintage - faded shadows, soft contrast, washed-out 16mm grain with dreamy analog feel'
   },
   {
     name: 'Norman Rockwell',
     id: 'norman-rockwell',
-    cssFilter: 'brightness(110%) contrast(90%) saturate(85%) hue-rotate(320deg) sepia(15%) blur(0.4px)',
-    description: 'Bright ironic Americana - pastel coastal tones, painterly soft edges with romantic dreamy glow'
+    cssFilter: 'brightness(100%) contrast(80%) saturate(85%) hue-rotate(50deg) sepia(15%) blur(0.45px)',
+    description: 'Flat vintage film - muted colors, lifted shadows, creamy warm tint with washed-out 16mm texture and soft grain'
   },
   {
     name: 'Salvatore',
@@ -124,22 +112,34 @@ export const vintageFilters: FilterEffect[] = [
     description: 'Nostalgic vintage home-video aesthetic - muted tones, dreamy faded glow with romantic VHS nostalgia'
   },
   {
-    name: 'Tragic Romance',
-    id: 'tragic-romance',
-    cssFilter: 'brightness(94%) contrast(83%) saturate(68%) hue-rotate(230deg) sepia(22%) blur(0.45px) grayscale(6%) opacity(96%)',
-    description: 'Soft melancholic vintage dream - elegant but haunting like a faded movie poster'
+    name: 'White Mustang',
+    id: 'white-mustang',
+    cssFilter: 'brightness(105%) contrast(70%) saturate(70%) hue-rotate(320deg) sepia(20%) blur(0.6px)',
+    description: 'Pastel film softness - heavily faded blacks, muted greens, pinkish highlights with milky dreamy grain'
   },
   {
-    name: 'Hollywood Noir',
-    id: 'hollywood-noir',
-    cssFilter: 'brightness(85%) contrast(130%) saturate(0%) hue-rotate(340deg) sepia(12%) blur(0.25px) grayscale(95%)',
-    description: 'Raw black & white film with dramatic shadows and rebellious edge'
+    name: 'High by the Beach',
+    id: 'high-by-the-beach',
+    cssFilter: 'brightness(105%) contrast(85%) saturate(90%) hue-rotate(280deg) sepia(15%) blur(0.4px)',
+    description: 'Dreamy pastel retro - cool blue/magenta tint, lifted blacks, soft hazy clarity with enhanced purples and blues'
   },
   {
-    name: 'Golden West',
-    id: 'golden-west',
-    cssFilter: 'brightness(88%) contrast(118%) saturate(25%) hue-rotate(35deg) sepia(40%) blur(0.2px)',
-    description: 'Warm golden-tinted noir with deep shadows and hazy film grain'
+    name: 'National Anthem',
+    id: 'national-anthem',
+    cssFilter: 'brightness(105%) contrast(70%) saturate(90%) hue-rotate(320deg) sepia(25%) blur(0.7px)',
+    description: 'Dreamy Super 8 film reel - overexposed glow, faded blacks, warm magenta tint with heavy vintage grain and soft blur'
+  },
+  {
+    name: 'Art Deco',
+    id: 'art-deco',
+    cssFilter: 'brightness(102%) contrast(110%) saturate(110%) hue-rotate(30deg) sepia(10%) blur(0.3px)',
+    description: 'Cinematic pastel elegance - creamy skin tones, soft peach-pink highlights, vibrant florals with dreamy romantic glow'
+  },
+  {
+    name: 'Motel 6 Acoustic',
+    id: 'motel-6-acoustic',
+    cssFilter: 'brightness(103%) contrast(70%) saturate(90%) hue-rotate(45deg) sepia(30%) blur(0.8px)',
+    description: 'Vintage golden film wash - strong warm yellow shift, faded blacks, heavy haze with Super 8 VHS grain effect'
   }
 ];
 
@@ -148,20 +148,20 @@ export const advancedFilters: FilterEffect[] = [
   {
     name: 'Blue Jeans (Advanced)',
     id: 'blue-jeans-advanced',
-    cssFilter: 'brightness(93%) contrast(75%) saturate(25%) hue-rotate(195deg) sepia(30%) blur(0.5px)',
-    description: 'Ultra-smoky vintage glamour with heavy grain and ethereal mist'
+    cssFilter: 'brightness(92%) contrast(140%) saturate(0%) grayscale(100%) sepia(8%) blur(0.4px)',
+    description: 'Ultra-cinematic black & white film noir with enhanced grain and deeper crushed blacks'
   },
   {
     name: 'West Coast (Advanced)',
     id: 'west-coast-advanced',
-    cssFilter: 'brightness(92%) contrast(125%) saturate(85%) hue-rotate(30deg) sepia(15%) blur(0.3px)',
-    description: 'Ultra-gritty California dream with intense golden haze and raw shadows'
+    cssFilter: 'brightness(92%) contrast(145%) saturate(0%) grayscale(100%) sepia(8%) blur(0.25px)',
+    description: 'Ultra-cinematic B&W film noir with enhanced grain and deeper crushed blacks for raw vintage feel'
   },
   {
     name: 'Born to Die (Advanced)',
     id: 'born-to-die-advanced',
-    cssFilter: 'brightness(93%) contrast(82%) saturate(65%) hue-rotate(315deg) sepia(25%) blur(0.5px)',
-    description: 'Ultra-pastel dreamy romance with heavy film grain and ethereal glow'
+    cssFilter: 'brightness(98%) contrast(130%) saturate(100%) hue-rotate(335deg) sepia(15%) blur(0.5px)',
+    description: 'Ultra-cinematic oil painting with enhanced film grain and deeper vintage color grading'
   }
 ];
 
