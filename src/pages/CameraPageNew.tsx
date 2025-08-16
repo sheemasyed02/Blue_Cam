@@ -560,20 +560,25 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   className="relative flex items-center justify-center disabled:opacity-50"
                 >
                   <motion.div
-                    className="w-20 h-20 rounded-full bg-gradient-to-br from-serelune-500 to-blush-500 p-1 shadow-glow"
+                    className="w-20 h-16 rounded-2xl border-2 border-serelune-400 bg-black shadow-glow p-1"
                     animate={isCapturing ? { scale: [1, 1.1, 1] } : {}}
                     transition={{ duration: 0.3, repeat: isCapturing ? Infinity : 0 }}
                   >
-                    <div className="w-full h-full bg-white rounded-full shadow-inner flex items-center justify-center">
-                      {isCapturing ? (
-                        <motion.div
-                          className="w-6 h-6 bg-blush-500 rounded-sm"
-                          animate={{ scale: [1, 0.8, 1] }}
-                          transition={{ duration: 0.5, repeat: Infinity }}
-                        />
-                      ) : (
-                        <div className="w-6 h-6 bg-gradient-to-br from-serelune-500 to-blush-500 rounded-full"></div>
-                      )}
+                    {/* First inner layer - dark gray */}
+                    <div className="w-full h-full rounded-xl bg-gray-900 p-1">
+                      {/* Second inner layer - darker */}
+                      <div className="w-full h-full rounded-lg bg-gray-800 p-1">
+                        {/* Third inner layer - darkest with subtle gradient */}
+                        <div className="w-full h-full rounded-lg bg-gradient-to-br from-gray-700 to-black flex items-center justify-center">
+                          {isCapturing && (
+                            <motion.div
+                              className="w-8 h-2 rounded-full bg-gray-600"
+                              animate={{ opacity: [0.5, 1, 0.5] }}
+                              transition={{ duration: 0.5, repeat: Infinity }}
+                            />
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </motion.div>
                 </motion.button>
