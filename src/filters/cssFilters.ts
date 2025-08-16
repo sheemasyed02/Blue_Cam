@@ -12,26 +12,26 @@ export const vintageFilters: FilterEffect[] = [
   {
     name: 'Blue Jeans',
     id: 'blue-jeans',
-    cssFilter: 'brightness(92%) contrast(82%) saturate(10%) hue-rotate(200deg) sepia(25%) blur(0.3px)',
-    description: 'Dreamy Lana Del Rey aesthetic - moody, desaturated with vintage grain'
+    cssFilter: 'brightness(95%) contrast(80%) saturate(30%) hue-rotate(200deg) sepia(25%) blur(0.4px)',
+    description: 'Vintage glamour smoky romance - almost monochrome with faint silver-blue tones'
   },
   {
     name: 'Born to Die',
     id: 'born-to-die',
-    cssFilter: 'hue-rotate(220deg) saturate(60%) contrast(140%) brightness(85%) grayscale(10%)',
-    description: 'High contrast muted navy blues'
+    cssFilter: 'brightness(95%) contrast(85%) saturate(70%) hue-rotate(320deg) sepia(20%) blur(0.35px)',
+    description: 'Pastel faded cinematic romance - muted blue/silver with dreamy film still aesthetic'
   },
   {
     name: 'West Coast',
     id: 'west-coast',
-    cssFilter: 'sepia(40%) saturate(130%) brightness(120%) contrast(105%) hue-rotate(15deg)',
-    description: 'Golden sunlight overexposed highlights'
+    cssFilter: 'brightness(95%) contrast(120%) saturate(90%) hue-rotate(25deg) sepia(10%) blur(0.25px)',
+    description: 'Rebellious California noir - warm golden haze with deep shadows and gritty film grain'
   },
   {
     name: 'Young & Beautiful',
     id: 'young-beautiful',
-    cssFilter: 'sepia(25%) saturate(110%) brightness(115%) contrast(95%) blur(0.5px) hue-rotate(30deg)',
-    description: 'Champagne glow with soft blur'
+    cssFilter: 'brightness(105%) contrast(90%) saturate(80%) hue-rotate(330deg) sepia(15%) blur(0.4px)',
+    description: 'Elegant silvery romantic - pale pastel skin tones with ethereal glow and vintage glamour'
   },
   {
     name: 'Summertime Sadness',
@@ -122,6 +122,24 @@ export const vintageFilters: FilterEffect[] = [
     id: 'video-games',
     cssFilter: 'brightness(88%) contrast(78%) saturate(8%) hue-rotate(198deg) sepia(35%) blur(0.5px) grayscale(20%)',
     description: 'Ultra-dreamy cinematic haze with heavy desaturation and vintage grain'
+  },
+  {
+    name: 'Tragic Romance',
+    id: 'tragic-romance',
+    cssFilter: 'brightness(94%) contrast(83%) saturate(68%) hue-rotate(230deg) sepia(22%) blur(0.45px) grayscale(6%) opacity(96%)',
+    description: 'Soft melancholic vintage dream - elegant but haunting like a faded movie poster'
+  },
+  {
+    name: 'Hollywood Noir',
+    id: 'hollywood-noir',
+    cssFilter: 'brightness(85%) contrast(130%) saturate(0%) hue-rotate(340deg) sepia(12%) blur(0.25px) grayscale(95%)',
+    description: 'Raw black & white film with dramatic shadows and rebellious edge'
+  },
+  {
+    name: 'Golden West',
+    id: 'golden-west',
+    cssFilter: 'brightness(88%) contrast(118%) saturate(25%) hue-rotate(35deg) sepia(40%) blur(0.2px)',
+    description: 'Warm golden-tinted noir with deep shadows and hazy film grain'
   }
 ];
 
@@ -130,21 +148,20 @@ export const advancedFilters: FilterEffect[] = [
   {
     name: 'Blue Jeans (Advanced)',
     id: 'blue-jeans-advanced',
-    cssFilter: 'brightness(90%) contrast(80%) saturate(5%) hue-rotate(195deg) sepia(30%) blur(0.4px) grayscale(15%)',
-    description: 'Ultra-dreamy Lana aesthetic with heavy desaturation and grain'
+    cssFilter: 'brightness(93%) contrast(75%) saturate(25%) hue-rotate(195deg) sepia(30%) blur(0.5px)',
+    description: 'Ultra-smoky vintage glamour with heavy grain and ethereal mist'
   },
   {
     name: 'West Coast (Advanced)',
     id: 'west-coast-advanced',
-    cssFilter: `
-      sepia(40%) 
-      saturate(130%) 
-      brightness(125%) 
-      contrast(105%) 
-      hue-rotate(15deg)
-      drop-shadow(0 0 15px rgba(255, 200, 100, 0.4))
-    `.replace(/\s+/g, ' ').trim(),
-    description: 'Golden hour overexposed look'
+    cssFilter: 'brightness(92%) contrast(125%) saturate(85%) hue-rotate(30deg) sepia(15%) blur(0.3px)',
+    description: 'Ultra-gritty California dream with intense golden haze and raw shadows'
+  },
+  {
+    name: 'Born to Die (Advanced)',
+    id: 'born-to-die-advanced',
+    cssFilter: 'brightness(93%) contrast(82%) saturate(65%) hue-rotate(315deg) sepia(25%) blur(0.5px)',
+    description: 'Ultra-pastel dreamy romance with heavy film grain and ethereal glow'
   }
 ];
 
