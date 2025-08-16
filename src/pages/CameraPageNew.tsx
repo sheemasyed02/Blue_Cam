@@ -529,6 +529,109 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             </motion.div>
           </div>
           
+          {/* Mobile Filters Panel - Only visible on mobile when showFilters is true */}
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="lg:hidden overflow-hidden bg-white/20 backdrop-blur-sm border-t border-serelune-200/30"
+              >
+                <div className="p-4">
+                  {/* Mobile Filter Header */}
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-moonlight-800 font-title text-lg font-bold">Filters</h3>
+                    <button
+                      onClick={() => setShowFilters(false)}
+                      className="p-2 bg-serelune-500/20 rounded-lg hover:bg-serelune-500/30 transition-all"
+                    >
+                      <svg className="w-4 h-4 text-moonlight-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Active Filter Display */}
+                  {activeFilter && (
+                    <div className="mb-3 p-2 bg-serelune-500/20 border border-serelune-400/30 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-serelune-500 rounded-full animate-pulse"></div>
+                        <span className="text-serelune-700 text-sm font-medium">
+                          {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filter Active'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Scrollable Filter Grid */}
+                  <div className="overflow-x-auto">
+                    <div className="flex space-x-3 pb-2">
+                      {/* Original/No Filter */}
+                      <div className="flex-shrink-0">
+                        <button
+                          onClick={() => {
+                            setActiveFilter('');
+                            setFilterNotification('Original');
+                            setTimeout(() => setFilterNotification(null), 2000);
+                          }}
+                          className={cn(
+                            "flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
+                            !activeFilter 
+                              ? "bg-serelune-500/20 border-2 border-serelune-400" 
+                              : "bg-white/30 border-2 border-transparent hover:border-serelune-300"
+                          )}
+                        >
+                          <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 flex items-center justify-center">
+                            <svg className="w-8 h-8 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </div>
+                          <span className={cn(
+                            "text-xs font-medium text-center",
+                            !activeFilter ? "text-serelune-700" : "text-moonlight-600"
+                          )}>Original</span>
+                        </button>
+                      </div>
+
+                      {/* Filter Options */}
+                      {vintageFilters.map((filter) => (
+                        <div key={filter.id} className="flex-shrink-0">
+                          <button
+                            onClick={() => {
+                              setActiveFilter(filter.cssFilter);
+                              setFilterNotification(filter.name);
+                              setTimeout(() => setFilterNotification(null), 2000);
+                            }}
+                            className={cn(
+                              "flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
+                              activeFilter === filter.cssFilter 
+                                ? "bg-serelune-500/20 border-2 border-serelune-400" 
+                                : "bg-white/30 border-2 border-transparent hover:border-serelune-300"
+                            )}
+                          >
+                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-serelune-200/50 bg-gradient-to-br from-moonlight-100 to-pearl-100 relative">
+                              {/* Filter preview placeholder */}
+                              <div 
+                                className="w-full h-full bg-gradient-to-br from-serelune-200 to-blush-200"
+                                style={{ filter: filter.cssFilter }}
+                              ></div>
+                            </div>
+                            <span className={cn(
+                              "text-xs font-medium text-center",
+                              activeFilter === filter.cssFilter ? "text-serelune-700" : "text-moonlight-600"
+                            )}>{filter.name}</span>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
           {/* Modern Control Dock - Responsive */}
           <div className={cn(
             "relative z-30 bg-gradient-to-t from-white/30 to-transparent backdrop-blur-sm",
@@ -1066,8 +1169,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             transition={{ type: 'spring', damping: 20 }}
             className={cn(
               "fixed top-0 right-0 h-full bg-white/90 backdrop-blur-xl border-l border-serelune-200/50 z-50 flex flex-col",
-              // Mobile: Full width, Desktop: Fixed width
-              "w-full lg:w-80"
+              // Only show on desktop, hide on mobile
+              "hidden lg:flex lg:w-80"
             )}
           >
             {/* Header - Responsive */}
