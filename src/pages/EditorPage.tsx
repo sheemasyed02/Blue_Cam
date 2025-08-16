@@ -384,19 +384,41 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
       </div>
       
       {/* Header */}
-      <header className="relative z-10 bg-white/20 backdrop-blur-xl border-b border-serelune-200/30 text-moonlight-800 p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl md:text-3xl font-title font-bold">
-              SERELUNE
-            </h1>
+      <header className={cn(
+        "relative z-20 bg-white/20 backdrop-blur-xl border-b border-serelune-200/30",
+        // Mobile: Smaller padding
+        "p-3 lg:p-6"
+      )}>
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className={cn(
+            "flex items-center",
+            // Mobile: Smaller spacing
+            "space-x-2 lg:space-x-4"
+          )}>
+            <div>
+              <h2 className={cn(
+                "text-moonlight-800 font-title font-bold",
+                // Mobile: Smaller title
+                "text-lg lg:text-xl"
+              )}>SERELUNE</h2>
+              <div className={cn(
+                "flex items-center text-moonlight-600",
+                // Mobile: Smaller text and spacing
+                "space-x-2 text-xs lg:space-x-3 lg:text-sm"
+              )}>
+                {/* <span className="text-serelune-600 truncate">
+                  Photo Editor
+                </span> */}
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex items-center space-x-4">
             {onPageChange && (
               <Navigation currentPage="editor" onPageChange={onPageChange} />
             )}
           </div>
-          <p className="text-center mt-1 font-body text-moonlight-600 text-sm md:text-base">
-            Transform your photos with dreamy filters and adjustments
-          </p>
         </div>
       </header>
 
