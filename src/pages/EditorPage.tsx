@@ -388,7 +388,7 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-2xl md:text-3xl font-title font-bold">
-              SERELUNE Editor
+              SERELUNE
             </h1>
             {onPageChange && (
               <Navigation currentPage="editor" onPageChange={onPageChange} />

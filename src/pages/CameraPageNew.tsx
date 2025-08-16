@@ -254,19 +254,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                 // Mobile: Smaller text and spacing
                 "space-x-2 text-xs lg:space-x-3 lg:text-sm"
               )}>
-                <span className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-blush-400 rounded-full animate-pulse"></div>
-                  <span className="hidden sm:inline">Live</span>
-                </span>
-                <span className="hidden sm:inline">•</span>
-                <span className="truncate">{filmCount} shots</span>
                 {activeFilter && (
-                  <>
-                    <span className="hidden lg:inline">•</span>
-                    <span className="text-serelune-600 truncate hidden lg:inline">
-                      {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filtered'}
-                    </span>
-                  </>
+                  <span className="text-serelune-600 truncate">
+                    {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filtered'}
+                  </span>
                 )}
               </div>
             </div>
@@ -335,11 +326,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       <div className="flex items-center space-x-2">
                         <div className="w-3 h-3 bg-blush-500 rounded-full animate-pulse"></div>
                         <span className="text-moonlight-700 text-sm font-mono">REC</span>
-                      </div>
-                      
-                      {/* Film Count */}
-                      <div className="px-2 py-1 bg-white/30 rounded border border-serelune-200/30">
-                        <span className="text-moonlight-700 text-xs font-mono">{filmCount} shots</span>
                       </div>
                       
                       {/* Active Filter Indicator */}
