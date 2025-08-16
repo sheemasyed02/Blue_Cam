@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils';
-import { Navigation, VideoFiltersPanel } from '../components';
+import { Navigation } from '../components';
 import { downloadImage } from '../utils/imageUtils';
 import { vintageFilters } from '../filters/cssFilters';
 import { videoFilters } from '../filters/videoFilters';
@@ -409,6 +409,9 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
         clearInterval(recordingInterval);
         setRecordingInterval(null);
       }
+      
+      // Ensure camera feed returns by clearing any captured image state
+      setCapturedImage(null);
     }
   }, [mediaRecorder, isRecording, recordingInterval]);
 
@@ -733,21 +736,43 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     // Live Camera Feed
                     <div 
                       className="relative w-full h-full cursor-pointer rounded-3xl overflow-hidden"
-                      onClick={capture}
-                      title="Tap to capture photo"
+                      onClick={currentMode === 'photo' ? capture : undefined}
+                      title={currentMode === 'photo' ? "Tap to capture photo" : "Video mode active"}
                     >
-                      <Webcam
-                        ref={webcamRef}
-                        audio={false}
-                        screenshotFormat="image/jpeg"
-                        videoConstraints={videoConstraints}
-                        className="w-full h-full object-cover"
-                        style={{ 
-                          filter: generateFilterString(),
-                          boxShadow: vignette > 0 ? `inset 0 0 ${vignette * 2}px rgba(0,0,0,${vignette / 100})` : 'none'
-                        }}
-                        mirrored={facingMode === 'user'}
-                      />
+                      {/* Stable Webcam Container - Prevents dancing during recording */}
+                      <div className="absolute inset-0 w-full h-full">
+                        <Webcam
+                          ref={webcamRef}
+                          audio={currentMode === 'video'} // Enable audio for video recording
+                          screenshotFormat="image/jpeg"
+                          videoConstraints={videoConstraints}
+                          className="w-full h-full object-cover"
+                          style={{ 
+                            filter: generateFilterString(),
+                            boxShadow: vignette > 0 ? `inset 0 0 ${vignette * 2}px rgba(0,0,0,${vignette / 100})` : 'none',
+                            // Prevent any transforms that could cause dancing
+                            transform: 'none'
+                          }}
+                          mirrored={facingMode === 'user'}
+                        />
+                      </div>
+                      
+                      {/* Video Recording Status Overlay */}
+                      {currentMode === 'video' && isRecording && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="absolute top-4 left-4 bg-red-600/90 backdrop-blur-sm text-white px-3 py-2 rounded-lg flex items-center gap-2 shadow-lg"
+                        >
+                          <motion.div
+                            className="w-3 h-3 bg-white rounded-full"
+                            animate={{ opacity: [1, 0.3, 1] }}
+                            transition={{ duration: 1, repeat: Infinity }}
+                          />
+                          <span className="text-sm font-medium">Recording</span>
+                          <span className="text-sm font-mono">{formatRecordingTime(recordingTime)}</span>
+                        </motion.div>
+                      )}
                       
                       {/* Photobooth Countdown Overlay */}
                       {countdown > 0 && (
@@ -1039,7 +1064,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
           </AnimatePresence>
           
           {/* REMOVED: Mobile Frames Panel */}
-          {/* Modern Control Dock - Responsive */}
+          {/* Modern Control Dock - Responsive with improved layout */}
           <div className={cn(
             "relative z-30 bg-gradient-to-t from-white/30 to-transparent backdrop-blur-sm",
             // Mobile: Fixed bottom with padding for safe area
@@ -1047,13 +1072,22 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             // Mobile: Full width bottom controls
             "lg:relative"
           )}>
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
               
-              {/* Main Controls Row - Centered with improved spacing */}
-              <div className="flex items-center justify-center">
+              {/* Controls Layout - Better organized for mobile and desktop */}
+              <div className={cn(
+                "flex items-center justify-center gap-4",
+                // Mobile: Stack vertically for better touch targets
+                "flex-col sm:flex-row",
+                // Desktop: Spread across available space
+                "lg:justify-between lg:flex-row"
+              )}>
                 
-                {/* Gallery, Photobooth, Capture & Filters - All with better spacing */}
-                <div className="flex items-center gap-3">
+                {/* Top Row on Mobile / Left Side on Desktop - Mode Toggle & Gallery */}
+                <div className={cn(
+                  "flex items-center gap-4",
+                  "order-1 sm:order-none"
+                )}>
                   
                   {/* Mode Toggle - Photo/Video */}
                   <div className="flex bg-white/20 backdrop-blur-sm rounded-xl p-1 border border-serelune-200/30">
@@ -1061,7 +1095,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => setCurrentMode('photo')}
+                      onClick={() => {
+                        setCurrentMode('photo');
+                        setCapturedImage(null); // Ensure camera feed is visible
+                        setShowVideoFilters(false); // Close video filters if open
+                      }}
                       className={cn(
                         "px-3 py-2 rounded-lg text-sm font-medium transition-all",
                         currentMode === 'photo' 
@@ -1080,7 +1118,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => setCurrentMode('video')}
+                      onClick={() => {
+                        setCurrentMode('video');
+                        setCapturedImage(null); // Ensure camera feed is visible
+                        setShowFilters(false); // Close photo filters if open
+                      }}
                       className={cn(
                         "px-3 py-2 rounded-lg text-sm font-medium transition-all",
                         currentMode === 'video' 
@@ -1194,8 +1236,15 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       </div>
                     </motion.div>
                   </motion.button>
-
-                  {/* Capture/Record Button */}
+                </div>
+                
+                {/* Center Section - Main Capture Button */}
+                <div className={cn(
+                  "flex items-center justify-center",
+                  "order-2 sm:order-none"
+                )}>
+                  
+                  {/* Main Capture/Record Button - Enhanced Size */}
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -1211,11 +1260,19 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                             ? "border-red-600 bg-red-600" 
                             : "border-red-400 bg-black"
                           : "border-serelune-400 bg-black",
-                        // Mobile: Slightly smaller
-                        "w-16 h-12 lg:w-20 lg:h-16"
+                        // Enhanced size for better prominence
+                        "w-20 h-16 lg:w-24 lg:h-20"
                       )}
-                      animate={isCapturing || isRecording ? { scale: [1, 1.1, 1] } : {}}
-                      transition={{ duration: 0.3, repeat: (isCapturing || isRecording) ? Infinity : 0 }}
+                      animate={
+                        // Only animate for photo capture, not video recording to keep camera steady
+                        currentMode === 'photo' && isCapturing 
+                          ? { scale: [1, 1.1, 1] } 
+                          : {}
+                      }
+                      transition={{ 
+                        duration: 0.3, 
+                        repeat: (currentMode === 'photo' && isCapturing) ? Infinity : 0 
+                      }}
                     >
                       {/* First inner layer */}
                       <div className={cn(
@@ -1236,10 +1293,10 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           )}>
                             {currentMode === 'video' ? (
                               <>
-                                {/* Recording timer */}
+                                {/* Recording timer - Better positioned */}
                                 {isRecording && (
-                                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
-                                    <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-mono">
+                                  <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
+                                    <div className="bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-mono shadow-lg">
                                       {formatRecordingTime(recordingTime)}
                                     </div>
                                   </div>
@@ -1247,19 +1304,19 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                                 {/* Recording indicator */}
                                 {isRecording ? (
                                   <motion.div
-                                    className="w-4 h-4 bg-white rounded-sm"
+                                    className="w-6 h-6 bg-white rounded"
                                     animate={{ opacity: [1, 0.5, 1] }}
                                     transition={{ duration: 1, repeat: Infinity }}
                                   />
                                 ) : (
-                                  <div className="w-6 h-6 bg-red-500 rounded-full"></div>
+                                  <div className="w-8 h-8 bg-red-500 rounded-full"></div>
                                 )}
                               </>
                             ) : (
                               <>
                                 {(isCapturing) && (
                                   <motion.div
-                                    className="w-8 h-2 rounded-full bg-gray-600"
+                                    className="w-10 h-3 rounded-full bg-gray-600"
                                     animate={{ opacity: [0.5, 1, 0.5] }}
                                     transition={{ duration: 0.5, repeat: Infinity }}
                                   />
@@ -1271,6 +1328,52 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       </div>
                     </motion.div>
                   </motion.button>
+                </div>
+                
+                {/* Right Section - Secondary Controls */}
+                <div className={cn(
+                  "flex items-center gap-4",
+                  "order-3 sm:order-none"
+                )}>
+                  
+                  {/* Photobooth Button - Only for photo mode */}
+                  {currentMode === 'photo' && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setShowPhotoboothSettings(true)}
+                      disabled={isCapturing || isPhotoboothActive}
+                      className="relative flex items-center justify-center disabled:opacity-50"
+                      title="Start Photobooth Mode"
+                    >
+                      <motion.div
+                        className={cn(
+                          "rounded-2xl border-2 bg-gradient-to-br shadow-glow p-1",
+                          "from-purple-500/20 to-purple-600/30 border-purple-400/60",
+                          "w-14 h-14 lg:w-16 lg:h-16"
+                        )}
+                      >
+                        <div className="w-full h-full rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
+                          {/* Photobooth strip icon with camera */}
+                          <div className="relative w-8 h-8 lg:w-9 lg:h-9">
+                            {/* Photo strip background */}
+                            <div className="w-full h-full bg-white/90 rounded-md border border-white/40 shadow-sm">
+                              {/* Three photo frames in strip */}
+                              <div className="flex flex-col h-full p-0.5 gap-0.5">
+                                <div className="flex-1 bg-purple-400/30 rounded-sm"></div>
+                                <div className="flex-1 bg-purple-400/30 rounded-sm"></div>
+                                <div className="flex-1 bg-purple-400/30 rounded-sm"></div>
+                              </div>
+                            </div>
+                            {/* Small camera icon overlay */}
+                            <div className="absolute -top-1 -right-1 w-3 h-3 lg:w-4 lg:h-4 bg-purple-500 rounded-full flex items-center justify-center border border-white/60">
+                              <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-white rounded-full"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </motion.button>
+                  )}
 
                   {/* Filters Button - Handles both photo and video filters */}
                   <motion.button
@@ -1279,18 +1382,14 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     onClick={currentMode === 'video' ? handleVideoFiltersToggle : handleFiltersToggle}
                     className={cn(
                       "rounded-2xl backdrop-blur-sm border-2 flex items-center justify-center transition-all",
-                      // Mobile: Match other icons size
-                      "w-14 h-14 lg:w-18 lg:h-18",
+                      "w-14 h-14 lg:w-16 lg:h-16",
                       (showFilters || showVideoFilters)
                         ? "bg-purple-500/15 border-purple-400/60 text-purple-600 shadow-glow shadow-purple-300/50" 
                         : "bg-white/30 border-purple-300/40 text-purple-500 hover:border-purple-400/60 hover:bg-purple-50/20"
                     )}
                   >
-                    <svg className={cn(
-                      // Proper size for the bigger button
-                      "w-8 h-8 lg:w-10 lg:h-10"
-                    )} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      {/* 3 interlocking circles design - thinner stroke and better positioning */}
+                    <svg className="w-7 h-7 lg:w-8 lg:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {/* 3 interlocking circles design */}
                       <circle cx="12" cy="8" r="4.5" strokeWidth={1.5} fill="none" />
                       <circle cx="8" cy="15" r="4.5" strokeWidth={1.5} fill="none" />
                       <circle cx="16" cy="15" r="4.5" strokeWidth={1.5} fill="none" />
