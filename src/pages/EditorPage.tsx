@@ -596,7 +596,6 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
                         </div>
                       ) : (
                         <div className="flex items-center space-x-2">
-                          <span>💾</span>
                           <span>Save Image</span>
                         </div>
                       )}

@@ -136,7 +136,7 @@ export const FrameRenderer = ({ frameId, image, frameData, className }: FrameRen
             month: '2-digit', 
             day: '2-digit', 
             year: 'numeric' 
-          })} • SERELUNE STUDIO
+          })} • SERELUNE 
         </div>
         
         {/* Decorative perforations */}

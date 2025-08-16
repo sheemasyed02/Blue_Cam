@@ -345,7 +345,6 @@ export const FramesPanel = ({ selectedImage, onFrameApply, activeFrame }: Frames
                                    flex items-center justify-center text-xs hover:bg-rose-600 transition-colors
                                    opacity-0 group-hover:opacity-100"
                         >
-                          ×
                         </button>
                       </>
                     ) : (
