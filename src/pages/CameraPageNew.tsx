@@ -2,9 +2,10 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils';
-import { Navigation } from '../components';
+import { Navigation, VideoFiltersPanel } from '../components';
 import { downloadImage } from '../utils/imageUtils';
 import { vintageFilters } from '../filters/cssFilters';
+import { videoFilters } from '../filters/videoFilters';
 
 interface CameraPageProps {
   className?: string;
@@ -67,6 +68,26 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   
   // Camera preview for filter thumbnails
   const [cameraPreview, setCameraPreview] = useState<string | null>(null);
+
+  // Video recording state
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordedVideos, setRecordedVideos] = useState<Array<{
+    id: string;
+    blob: Blob;
+    url: string;
+    timestamp: Date;
+    filter?: string;
+    facingMode: 'user' | 'environment';
+  }>>([]);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [recordingInterval, setRecordingInterval] = useState<number | null>(null);
+  
+  // Video filters state (separate from photo filters)
+  const [showVideoFilters, setShowVideoFilters] = useState(false);
+  const [activeVideoFilter, setActiveVideoFilter] = useState<string>('none');
+  const [currentMode, setCurrentMode] = useState<'photo' | 'video'>('photo');
+  const [showVideoGallery, setShowVideoGallery] = useState(false);
 
   // Photobooth functions
   const startPhotobooth = useCallback(() => {
@@ -329,6 +350,78 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
     setFilmCount(prev => prev + 1);
   };
 
+  // Video recording functions
+  const startVideoRecording = useCallback(async () => {
+    if (!webcamRef.current?.stream) return;
+
+    try {
+      const stream = webcamRef.current.stream;
+      const recorder = new MediaRecorder(stream, {
+        mimeType: 'video/webm;codecs=vp9',
+      });
+
+      const chunks: BlobPart[] = [];
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const videoRecord = {
+          id: Date.now().toString(),
+          blob,
+          url,
+          timestamp: new Date(),
+          filter: activeVideoFilter !== 'none' ? activeVideoFilter : undefined,
+          facingMode
+        };
+        
+        setRecordedVideos(prev => [...prev, videoRecord]);
+      };
+
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      setRecordingTime(0);
+      
+      // Start recording timer
+      const timer = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+      setRecordingInterval(timer);
+
+      recorder.start();
+    } catch (error) {
+      console.error('Error starting video recording:', error);
+    }
+  }, [activeVideoFilter, facingMode]);
+
+  const stopVideoRecording = useCallback(() => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+      setMediaRecorder(null);
+      
+      if (recordingInterval) {
+        clearInterval(recordingInterval);
+        setRecordingInterval(null);
+      }
+    }
+  }, [mediaRecorder, isRecording, recordingInterval]);
+
+  const formatRecordingTime = useCallback((seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }, []);
+
+  const handleVideoFiltersToggle = useCallback(() => {
+    setShowVideoFilters(!showVideoFilters);
+  }, [showVideoFilters]);
+
   const generateFilterString = () => {
     const adjustmentFilters = `
       brightness(${brightness}%) 
@@ -336,6 +429,11 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
       saturate(${saturation}%) 
       hue-rotate(${temperature * 1.8}deg)
     `.trim();
+    
+    if (currentMode === 'video' && activeVideoFilter && activeVideoFilter !== 'none') {
+      const videoFilter = videoFilters.find(f => f.name === activeVideoFilter);
+      return videoFilter ? `${adjustmentFilters} ${videoFilter.cssFilter}` : adjustmentFilters;
+    }
     
     return activeFilter ? `${adjustmentFilters} ${activeFilter}` : adjustmentFilters;
   };
@@ -717,6 +815,229 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
             </motion.div>
           </div>
           
+          {/* Mobile Filters Panel - Horizontal Strip */}
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.3 }}
+                className={cn(
+                  "relative z-20 bg-white/10 backdrop-blur-md border-t border-white/20",
+                  // Only show on mobile, hide on desktop
+                  "block lg:hidden",
+                  "px-4 py-3"
+                )}
+              >
+                {/* Mobile Filter Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-moonlight-800 font-title font-semibold text-base">Filters</h3>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setShowFilters(false)}
+                    className="p-1.5 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 transition-all border border-white/20"
+                  >
+                    <svg className="w-4 h-4 text-moonlight-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </motion.button>
+                </div>
+
+                {/* Active Filter Display - Mobile */}
+                {activeFilter && (
+                  <div className="mb-3 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                      <span className="text-amber-400 text-sm font-medium">
+                        {vintageFilters.find(f => f.cssFilter === activeFilter)?.name || 'Filter Active'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Horizontal Filter Grid - Mobile */}
+                <div className="overflow-x-auto">
+                  <div className="flex space-x-3 pb-2">
+                    {/* Clear Filter Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setActiveFilter('');
+                        setFilterNotification(null);
+                      }}
+                      className={cn(
+                        "flex-shrink-0 w-16 h-16 rounded-xl border-2 border-dashed border-moonlight-300 bg-white/10 backdrop-blur-sm flex items-center justify-center transition-all",
+                        !activeFilter ? "opacity-50" : "hover:bg-white/20"
+                      )}
+                    >
+                      <svg className="w-6 h-6 text-moonlight-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </motion.button>
+
+                    {/* Filter Thumbnails */}
+                    {vintageFilters.map((filter) => (
+                      <motion.div
+                        key={filter.id}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex-shrink-0"
+                      >
+                        <button
+                          onClick={() => {
+                            setActiveFilter(filter.cssFilter);
+                            setFilterNotification(`${filter.name} applied!`);
+                            setTimeout(() => setFilterNotification(null), 2000);
+                          }}
+                          className={cn(
+                            "relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all bg-moonlight-100/50 backdrop-blur-sm",
+                            activeFilter === filter.cssFilter
+                              ? "border-amber-400 shadow-lg shadow-amber-300/30"
+                              : "border-moonlight-200/50 hover:border-moonlight-300/70"
+                          )}
+                        >
+                          {/* Thumbnail Preview */}
+                          <div 
+                            className="w-full h-full bg-gradient-to-br from-moonlight-200/30 via-moonlight-100/20 to-moonlight-300/30"
+                            style={{ filter: filter.cssFilter }}
+                          >
+                            <div className="w-full h-full flex items-center justify-center">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-moonlight-400/60 to-moonlight-600/40"></div>
+                            </div>
+                          </div>
+                          
+                          {/* Active Indicator */}
+                          {activeFilter === filter.cssFilter && (
+                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full shadow-glow animate-pulse"></div>
+                          )}
+                        </button>
+                        
+                        {/* Filter Name - Mobile */}
+                        <p className="text-xs text-moonlight-700 text-center mt-1 font-medium truncate w-16">
+                          {filter.name}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Mobile Video Filters Panel - Horizontal Strip */}
+          <AnimatePresence>
+            {showVideoFilters && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.3 }}
+                className={cn(
+                  "relative z-20 bg-red-900/10 backdrop-blur-md border-t border-red-300/20",
+                  // Only show on mobile, hide on desktop
+                  "block lg:hidden",
+                  "px-4 py-3"
+                )}
+              >
+                {/* Mobile Video Filter Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-red-800 font-title font-semibold text-base">Video Filters</h3>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setShowVideoFilters(false)}
+                    className="p-1.5 bg-red-500/10 backdrop-blur-sm rounded-lg hover:bg-red-500/20 transition-all border border-red-300/20"
+                  >
+                    <svg className="w-4 h-4 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </motion.button>
+                </div>
+
+                {/* Active Video Filter Display - Mobile */}
+                {activeVideoFilter !== 'none' && (
+                  <div className="mb-3 p-2 bg-red-500/10 backdrop-blur-sm border border-red-300/20 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                      <span className="text-red-400 text-sm font-medium">
+                        {videoFilters.find(f => f.name === activeVideoFilter)?.name || 'Filter Active'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Horizontal Video Filter Grid - Mobile */}
+                <div className="overflow-x-auto">
+                  <div className="flex space-x-3 pb-2">
+                    {/* Clear Video Filter Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setActiveVideoFilter('none');
+                      }}
+                      className={cn(
+                        "flex-shrink-0 w-16 h-16 rounded-xl border-2 border-dashed border-red-300 bg-red-500/10 backdrop-blur-sm flex items-center justify-center transition-all",
+                        activeVideoFilter === 'none' ? "opacity-50" : "hover:bg-red-500/20"
+                      )}
+                    >
+                      <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </motion.button>
+
+                    {/* Video Filter Thumbnails */}
+                    {videoFilters.map((filter) => (
+                      <motion.div
+                        key={filter.name}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex-shrink-0"
+                      >
+                        <button
+                          onClick={() => {
+                            setActiveVideoFilter(filter.name);
+                          }}
+                          disabled={isRecording}
+                          className={cn(
+                            "relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all bg-red-100/50 backdrop-blur-sm",
+                            activeVideoFilter === filter.name
+                              ? "border-red-400 shadow-lg shadow-red-300/30"
+                              : "border-red-200/50 hover:border-red-300/70",
+                            isRecording && "opacity-50 cursor-not-allowed"
+                          )}
+                        >
+                          {/* Video Filter Thumbnail Preview */}
+                          <div 
+                            className="w-full h-full bg-gradient-to-br from-red-200/30 via-red-100/20 to-red-300/30"
+                            style={{ filter: filter.cssFilter }}
+                          >
+                            <div className="w-full h-full flex items-center justify-center">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-400/60 to-red-600/40"></div>
+                            </div>
+                          </div>
+                          
+                          {/* Active Indicator */}
+                          {activeVideoFilter === filter.name && (
+                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-400 rounded-full shadow-glow animate-pulse"></div>
+                          )}
+                        </button>
+                        
+                        {/* Video Filter Name - Mobile */}
+                        <p className="text-xs text-red-700 text-center mt-1 font-medium truncate w-16">
+                          {filter.name}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
           {/* REMOVED: Mobile Frames Panel */}
           {/* Modern Control Dock - Responsive */}
           <div className={cn(
@@ -733,14 +1054,59 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                 
                 {/* Gallery, Photobooth, Capture & Filters - All with better spacing */}
                 <div className="flex items-center gap-3">
-                  {/* Gallery Button */}
-                  {capturedImages.length > 0 ? (
+                  
+                  {/* Mode Toggle - Photo/Video */}
+                  <div className="flex bg-white/20 backdrop-blur-sm rounded-xl p-1 border border-serelune-200/30">
+                    {/* Photo Mode */}
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setCurrentMode('photo')}
+                      className={cn(
+                        "px-3 py-2 rounded-lg text-sm font-medium transition-all",
+                        currentMode === 'photo' 
+                          ? "bg-serelune-500 text-white shadow-glow" 
+                          : "text-moonlight-700 hover:bg-white/30"
+                      )}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </motion.button>
+                    
+                    {/* Video Mode */}
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setCurrentMode('video')}
+                      className={cn(
+                        "px-3 py-2 rounded-lg text-sm font-medium transition-all",
+                        currentMode === 'video' 
+                          ? "bg-red-500 text-white shadow-glow" 
+                          : "text-moonlight-700 hover:bg-white/30"
+                      )}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </motion.button>
+                  </div>
+                  
+                  {/* Gallery Button - Photo/Video */}
+                  {(currentMode === 'photo' && capturedImages.length > 0) || (currentMode === 'video' && recordedVideos.length > 0) ? (
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => {
-                        setSelectedImageIndex(0);
-                        setShowGallery(true);
+                        if (currentMode === 'photo') {
+                          setSelectedImageIndex(0);
+                          setShowGallery(true);
+                        } else {
+                          setShowVideoGallery(true);
+                        }
                       }}
                       className={cn(
                         "relative rounded-2xl overflow-hidden border-2 border-purple-400/60 shadow-lg shadow-purple-500/30 bg-gradient-to-br from-purple-100/40 to-purple-200/40 backdrop-blur-sm",
@@ -829,35 +1195,76 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     </motion.div>
                   </motion.button>
 
-                  {/* Capture Button */}
+                  {/* Capture/Record Button */}
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={capture}
+                    onClick={currentMode === 'video' ? (isRecording ? stopVideoRecording : startVideoRecording) : capture}
                     disabled={isCapturing || filmCount === 0 || isPhotoboothActive}
                     className="relative flex items-center justify-center disabled:opacity-50"
                   >
                     <motion.div
                       className={cn(
-                        "rounded-2xl border-2 border-serelune-400 bg-black shadow-glow p-1",
+                        "rounded-2xl border-2 shadow-glow p-1",
+                        currentMode === 'video' 
+                          ? isRecording 
+                            ? "border-red-600 bg-red-600" 
+                            : "border-red-400 bg-black"
+                          : "border-serelune-400 bg-black",
                         // Mobile: Slightly smaller
                         "w-16 h-12 lg:w-20 lg:h-16"
                       )}
-                      animate={isCapturing ? { scale: [1, 1.1, 1] } : {}}
-                      transition={{ duration: 0.3, repeat: isCapturing ? Infinity : 0 }}
+                      animate={isCapturing || isRecording ? { scale: [1, 1.1, 1] } : {}}
+                      transition={{ duration: 0.3, repeat: (isCapturing || isRecording) ? Infinity : 0 }}
                     >
-                      {/* First inner layer - dark gray */}
-                      <div className="w-full h-full rounded-xl bg-gray-900 p-1">
-                        {/* Second inner layer - darker */}
-                        <div className="w-full h-full rounded-lg bg-gray-800 p-1">
-                          {/* Third inner layer - darkest with subtle gradient */}
-                          <div className="w-full h-full rounded-lg bg-gradient-to-br from-gray-700 to-black flex items-center justify-center">
-                            {isCapturing && (
-                              <motion.div
-                                className="w-8 h-2 rounded-full bg-gray-600"
-                                animate={{ opacity: [0.5, 1, 0.5] }}
-                                transition={{ duration: 0.5, repeat: Infinity }}
-                              />
+                      {/* First inner layer */}
+                      <div className={cn(
+                        "w-full h-full rounded-xl p-1",
+                        currentMode === 'video' && isRecording ? "bg-red-700" : "bg-gray-900"
+                      )}>
+                        {/* Second inner layer */}
+                        <div className={cn(
+                          "w-full h-full rounded-lg p-1",
+                          currentMode === 'video' && isRecording ? "bg-red-800" : "bg-gray-800"
+                        )}>
+                          {/* Third inner layer */}
+                          <div className={cn(
+                            "w-full h-full rounded-lg bg-gradient-to-br flex items-center justify-center",
+                            currentMode === 'video' && isRecording 
+                              ? "from-red-700 to-red-900" 
+                              : "from-gray-700 to-black"
+                          )}>
+                            {currentMode === 'video' ? (
+                              <>
+                                {/* Recording timer */}
+                                {isRecording && (
+                                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
+                                    <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-mono">
+                                      {formatRecordingTime(recordingTime)}
+                                    </div>
+                                  </div>
+                                )}
+                                {/* Recording indicator */}
+                                {isRecording ? (
+                                  <motion.div
+                                    className="w-4 h-4 bg-white rounded-sm"
+                                    animate={{ opacity: [1, 0.5, 1] }}
+                                    transition={{ duration: 1, repeat: Infinity }}
+                                  />
+                                ) : (
+                                  <div className="w-6 h-6 bg-red-500 rounded-full"></div>
+                                )}
+                              </>
+                            ) : (
+                              <>
+                                {(isCapturing) && (
+                                  <motion.div
+                                    className="w-8 h-2 rounded-full bg-gray-600"
+                                    animate={{ opacity: [0.5, 1, 0.5] }}
+                                    transition={{ duration: 0.5, repeat: Infinity }}
+                                  />
+                                )}
+                              </>
                             )}
                           </div>
                         </div>
@@ -865,16 +1272,16 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                     </motion.div>
                   </motion.button>
 
-                  {/* Filters Button - Now next to capture with 4px gap */}
+                  {/* Filters Button - Handles both photo and video filters */}
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={handleFiltersToggle}
+                    onClick={currentMode === 'video' ? handleVideoFiltersToggle : handleFiltersToggle}
                     className={cn(
                       "rounded-2xl backdrop-blur-sm border-2 flex items-center justify-center transition-all",
                       // Mobile: Match other icons size
                       "w-14 h-14 lg:w-18 lg:h-18",
-                      showFilters 
+                      (showFilters || showVideoFilters)
                         ? "bg-purple-500/15 border-purple-400/60 text-purple-600 shadow-glow shadow-purple-300/50" 
                         : "bg-white/30 border-purple-300/40 text-purple-500 hover:border-purple-400/60 hover:bg-purple-50/20"
                     )}
@@ -888,7 +1295,7 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                       <circle cx="8" cy="15" r="4.5" strokeWidth={1.5} fill="none" />
                       <circle cx="16" cy="15" r="4.5" strokeWidth={1.5} fill="none" />
                     </svg>
-                    {activeFilter && (
+                    {(activeFilter || (currentMode === 'video' && activeVideoFilter !== 'none')) && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-purple-500 rounded-full shadow-glow animate-sparkle"></div>
                     )}
                   </motion.button>
@@ -1411,6 +1818,148 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
         )}
       </AnimatePresence>
 
+      {/* Modern Video Filter Panel */}
+      <AnimatePresence>
+        {showVideoFilters && (
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 20 }}
+            className={cn(
+              "fixed top-0 right-0 h-full bg-red-900/10 backdrop-blur-2xl border-l border-red-300/20 z-50 flex flex-col shadow-2xl",
+              // Only show on desktop, hide on mobile
+              "hidden lg:flex lg:w-80"
+            )}
+          >
+            {/* Header - Responsive */}
+            <div className={cn(
+              "border-b border-red-300/20 bg-red-500/5 backdrop-blur-sm",
+              // Mobile: Smaller padding
+              "p-4 lg:p-6"
+            )}>
+              <div className="flex justify-between items-center">
+                <h3 className={cn(
+                  "text-red-800 font-title font-bold",
+                  // Mobile: Smaller title
+                  "text-lg lg:text-xl"
+                )}>Video Filters</h3>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowVideoFilters(false)}
+                  className="p-2 hover:bg-red-500/20 rounded-lg transition-all border border-red-300/30"
+                >
+                  <svg className="w-6 h-6 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </motion.button>
+              </div>
+              
+              {/* Active Video Filter Display */}
+              {activeVideoFilter !== 'none' && (
+                <div className="mt-3 p-3 bg-red-500/15 border border-red-400/30 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-red-400 rounded-full animate-pulse"></div>
+                    <span className="text-red-700 text-sm font-medium">
+                      {videoFilters.find(f => f.name === activeVideoFilter)?.name || 'Filter Active'}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Video Filter Grid */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="grid grid-cols-2 gap-3">
+                {/* Clear Filter Option */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setActiveVideoFilter('none')}
+                  className={cn(
+                    "aspect-square rounded-xl border-2 border-dashed border-red-300 bg-red-500/10 flex flex-col items-center justify-center text-center transition-all",
+                    activeVideoFilter === 'none' ? "bg-red-500/20 border-red-400" : "hover:bg-red-500/15"
+                  )}
+                >
+                  <svg className="w-8 h-8 text-red-600 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span className="text-xs text-red-700 font-medium">None</span>
+                </motion.button>
+
+                {/* Video Filter Options */}
+                {videoFilters.map((filter) => (
+                  <motion.button
+                    key={filter.name}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setActiveVideoFilter(filter.name)}
+                    disabled={isRecording}
+                    className={cn(
+                      "relative aspect-square rounded-xl border-2 overflow-hidden transition-all bg-red-100/50",
+                      activeVideoFilter === filter.name
+                        ? "border-red-400 shadow-lg shadow-red-300/30"
+                        : "border-red-200/50 hover:border-red-300/70",
+                      isRecording && "opacity-50 cursor-not-allowed"
+                    )}
+                  >
+                    {/* Video Filter Preview */}
+                    <div 
+                      className="w-full h-full bg-gradient-to-br from-red-200/40 via-red-100/30 to-red-300/40 flex items-center justify-center"
+                      style={{ filter: filter.cssFilter }}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-400/70 to-red-600/50"></div>
+                    </div>
+                    
+                    {/* Filter Name */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-red-900/70 text-white px-2 py-1">
+                      <span className="text-xs font-medium block truncate">{filter.name}</span>
+                    </div>
+                    
+                    {/* Active Indicator */}
+                    {activeVideoFilter === filter.name && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-400 rounded-full shadow-glow animate-pulse"></div>
+                    )}
+                    
+                    {/* Recording Disabled Overlay */}
+                    {isRecording && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m0 0v2m0-2h2m-2 0H10m0 0V9a6 6 0 1112 0v6" />
+                        </svg>
+                      </div>
+                    )}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Footer Actions */}
+            <div className="p-6 border-t border-red-300/10">
+              <div className="flex space-x-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setActiveVideoFilter('none')}
+                  className="flex-1 py-3 px-4 bg-red-500/20 border border-red-400/50 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/30 transition-all"
+                >
+                  Clear All
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowVideoFilters(false)}
+                  className="flex-1 py-3 px-4 bg-green-500/20 border border-green-400/50 text-green-400 rounded-lg text-sm font-medium hover:bg-green-500/30 transition-all shadow-lg"
+                >
+                  Done
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Filter Notification */}
       <AnimatePresence>
         {filterNotification && (
@@ -1786,6 +2335,97 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                   Download Strip
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Video Gallery Modal */}
+      <AnimatePresence>
+        {showVideoGallery && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowVideoGallery(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white/10 backdrop-blur-2xl rounded-3xl border border-white/20 p-6 max-w-2xl w-full max-h-[80vh] overflow-auto shadow-2xl"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-white font-title text-xl font-bold">Video Gallery</h3>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowVideoGallery(false)}
+                  className="p-2 hover:bg-white/20 rounded-lg transition-all"
+                >
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </motion.button>
+              </div>
+              
+              {recordedVideos.length === 0 ? (
+                <div className="text-center py-12">
+                  <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} 
+                          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  <p className="text-gray-400 text-lg">No videos recorded yet</p>
+                  <p className="text-gray-500 text-sm mt-2">Switch to video mode to start recording</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {recordedVideos.map((video) => (
+                    <div key={video.id} className="bg-white/5 rounded-lg overflow-hidden border border-white/10">
+                      <video
+                        src={video.url}
+                        controls
+                        className="w-full h-48 object-cover"
+                        poster="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjMkEyQTJBIi8+CjxwYXRoIGQ9Ik0xMzAgODBMMTgwIDEwMEwxMzAgMTIwVjgwWiIgZmlsbD0iIzk5OTk5OSIvPgo8L3N2Zz4K"
+                      />
+                      <div className="p-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="text-white text-sm font-medium">
+                              {video.timestamp.toLocaleString()}
+                            </p>
+                            {video.filter && (
+                              <p className="text-red-400 text-xs mt-1">
+                                Filter: {video.filter}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex space-x-2">
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => {
+                                const a = document.createElement('a');
+                                a.href = video.url;
+                                a.download = `serelune-video-${video.timestamp.getTime()}.webm`;
+                                a.click();
+                              }}
+                              className="p-1 bg-white/20 rounded hover:bg-white/30 transition-all"
+                              title="Download"
+                            >
+                              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                              </svg>
+                            </motion.button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}

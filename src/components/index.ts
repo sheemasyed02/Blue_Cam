@@ -21,6 +21,7 @@ export interface GalleryProps {
 
 export { Navigation } from './Navigation';
 export { FiltersPanel } from './FiltersPanel';
+export { VideoFiltersPanel } from './VideoFiltersPanel';
 export { AdjustmentsPanel } from './AdjustmentsPanel';
 export { ExportPanel } from './ExportPanel';
 export type { ImageAdjustments } from './AdjustmentsPanel';
