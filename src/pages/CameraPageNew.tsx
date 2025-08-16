@@ -34,8 +34,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
   // Frames state
   const [showFrames, setShowFrames] = useState(false);
   const [activeFrame, setActiveFrame] = useState<string>('');
-  const [frameData, setFrameData] = useState<any>(null);
-  const [frameNotification, setFrameNotification] = useState<string | null>(null);
   
   // Camera editing controls
   const [brightness, setBrightness] = useState(100);
@@ -755,9 +753,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         <button
                           onClick={() => {
                             setActiveFrame('none');
-                            setFrameData(null);
-                            setFrameNotification('No Frame');
-                            setTimeout(() => setFrameNotification(null), 2000);
                           }}
                           className={cn(
                             "w-full flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
@@ -792,9 +787,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                           <button
                             onClick={() => {
                               setActiveFrame(frame.id);
-                              setFrameData(null);
-                              setFrameNotification(frame.name);
-                              setTimeout(() => setFrameNotification(null), 2000);
                             }}
                             className={cn(
                               "w-full flex flex-col items-center space-y-2 p-2 rounded-lg transition-all",
@@ -1736,9 +1728,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                         <button
                           onClick={() => {
                             setActiveFrame('none');
-                            setFrameData(null);
-                            setFrameNotification('No Frame');
-                            setTimeout(() => setFrameNotification(null), 2000);
                           }}
                           className={cn(
                             "flex items-center space-x-3 p-3 rounded-lg transition-all",
@@ -1775,9 +1764,6 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
                             key={frame.id}
                             onClick={() => {
                               setActiveFrame(frame.id);
-                              setFrameData(null);
-                              setFrameNotification(frame.name);
-                              setTimeout(() => setFrameNotification(null), 2000);
                             }}
                             className={cn(
                               "flex items-center space-x-3 p-3 rounded-lg transition-all",

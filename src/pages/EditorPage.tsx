@@ -107,13 +107,55 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
   const [isSaving, setIsSaving] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
   const [currentAdjustments, setCurrentAdjustments] = useState<ImageAdjustments>({
-    brightness: 100,
-    contrast: 100,
-    saturation: 100,
-    grain: 0,
+    // Basic Adjustments
+    brightness: 0,
+    contrast: 0,
+    exposure: 0,
+    saturation: 0,
+    vibrance: 0,
     temperature: 0,
+    tint: 0,
+    highlights: 0,
+    shadows: 0,
+    whites: 0,
+    blacks: 0,
+    
+    // Creative/Tone Adjustments
     fade: 0,
-    vignette: 0
+    haze: 0,
+    glow: 0,
+    softness: 0,
+    sharpness: 0,
+    texture: 0,
+    detail: 0,
+    mist: 0,
+    toneCurveLights: 0,
+    toneCurveDarks: 0,
+    toneCurveMidtones: 0,
+    
+    // Color Adjustments
+    hue: 0,
+    luminance: 0,
+    colorSaturation: 0,
+    splitToningHighlights: 0,
+    splitToningShadows: 0,
+    splitToningMidtones: 0,
+    
+    // Vintage/Atmosphere
+    grain: 0,
+    vignette: 0,
+    tiltShiftBlur: 0,
+    radialBlur: 0,
+    linearBlur: 0,
+    filmDust: 0,
+    filterStrength: 0,
+    
+    // Advanced
+    lensDistortion: 0,
+    perspective: 0,
+    cropRotate: 0,
+    shadowsTint: 0,
+    highlightsTint: 0
   });
 
   const tabs = [
@@ -139,13 +181,55 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
           setProcessedImage(imageUrl);
           // Reset adjustments and filters
           setCurrentAdjustments({
-            brightness: 100,
-            contrast: 100,
-            saturation: 100,
-            grain: 0,
+            // Basic Adjustments
+            brightness: 0,
+            contrast: 0,
+            exposure: 0,
+            saturation: 0,
+            vibrance: 0,
             temperature: 0,
+            tint: 0,
+            highlights: 0,
+            shadows: 0,
+            whites: 0,
+            blacks: 0,
+            
+            // Creative/Tone Adjustments
             fade: 0,
-            vignette: 0
+            haze: 0,
+            glow: 0,
+            softness: 0,
+            sharpness: 0,
+            texture: 0,
+            detail: 0,
+            mist: 0,
+            toneCurveLights: 0,
+            toneCurveDarks: 0,
+            toneCurveMidtones: 0,
+            
+            // Color Adjustments
+            hue: 0,
+            luminance: 0,
+            colorSaturation: 0,
+            splitToningHighlights: 0,
+            splitToningShadows: 0,
+            splitToningMidtones: 0,
+            
+            // Vintage/Atmosphere
+            grain: 0,
+            vignette: 0,
+            tiltShiftBlur: 0,
+            radialBlur: 0,
+            linearBlur: 0,
+            filmDust: 0,
+            filterStrength: 0,
+            
+            // Advanced
+            lensDistortion: 0,
+            perspective: 0,
+            cropRotate: 0,
+            shadowsTint: 0,
+            highlightsTint: 0
           });
           setCurrentFilter('');
         };
@@ -165,13 +249,55 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
         setProcessedImage(imageUrl); // Initially same as original
         setCurrentFilter(''); // Reset filter
         setCurrentAdjustments({
-          brightness: 100,
-          contrast: 100,
-          saturation: 100,
-          grain: 0,
+          // Basic Adjustments
+          brightness: 0,
+          contrast: 0,
+          exposure: 0,
+          saturation: 0,
+          vibrance: 0,
           temperature: 0,
+          tint: 0,
+          highlights: 0,
+          shadows: 0,
+          whites: 0,
+          blacks: 0,
+          
+          // Creative/Tone Adjustments
           fade: 0,
-          vignette: 0
+          haze: 0,
+          glow: 0,
+          softness: 0,
+          sharpness: 0,
+          texture: 0,
+          detail: 0,
+          mist: 0,
+          toneCurveLights: 0,
+          toneCurveDarks: 0,
+          toneCurveMidtones: 0,
+          
+          // Color Adjustments
+          hue: 0,
+          luminance: 0,
+          colorSaturation: 0,
+          splitToningHighlights: 0,
+          splitToningShadows: 0,
+          splitToningMidtones: 0,
+          
+          // Vintage/Atmosphere
+          grain: 0,
+          vignette: 0,
+          tiltShiftBlur: 0,
+          radialBlur: 0,
+          linearBlur: 0,
+          filmDust: 0,
+          filterStrength: 0,
+          
+          // Advanced
+          lensDistortion: 0,
+          perspective: 0,
+          cropRotate: 0,
+          shadowsTint: 0,
+          highlightsTint: 0
         });
       };
       reader.readAsDataURL(file);
@@ -256,9 +382,9 @@ export const EditorPage = ({ className, onPageChange, initialImage }: EditorPage
 
     // Convert adjustments to CSS filter string with all effects
     const filterParts = [
-      `brightness(${adjustments.brightness}%)`,
-      `contrast(${adjustments.contrast}%)`,
-      `saturate(${adjustments.saturation}%)`
+      `brightness(${100 + adjustments.brightness}%)`, // Convert from -100/+100 to CSS format
+      `contrast(${100 + adjustments.contrast}%)`,     // Convert from -100/+100 to CSS format
+      `saturate(${100 + adjustments.saturation}%)`    // Convert from -100/+100 to CSS format
     ];
 
     // Add temperature effect (hue rotation)
