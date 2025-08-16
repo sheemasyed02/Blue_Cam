@@ -296,8 +296,8 @@ export const CameraPage = ({ className, onPageChange }: CameraPageProps) => {
               transition={{ delay: 0.1 }}
               className={cn(
                 "relative w-full",
-                // Mobile: Full viewport height minus nav and controls
-                "h-[60vh] md:h-[65vh]",
+                // Mobile: Increased height to 75vh for mobile
+                "h-[75vh] md:h-[75vh]",
                 // Desktop: Original constraints
                 "lg:max-w-4xl lg:aspect-[4/3] lg:max-h-[calc(100vh-200px)] lg:h-auto"
               )}
